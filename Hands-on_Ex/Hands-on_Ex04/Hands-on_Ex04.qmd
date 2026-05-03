@@ -1,0 +1,373 @@
+---
+title: "Hands-on Exercise 4"
+author: "Lei Yuhe"
+date: "May 3, 2026"
+date-modified: "last-modified"
+execute:
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+---
+
+# Visualising Distribution
+
+## Overview
+
+Two new statistical graphic methods for visualizing distribution will be covered in this section. 
+
+1. **Ridgeline plots**: Show distributions for multiple groups stacked along a shared axis, using `ggridges`. 
+2. **Raincloud plots**: Combine a half-density, boxplot, and dot plot into one layered graphic, using `ggdist`. 
+
+Both reveal richer distributional shape such as **skewness**, **multimodality**, and **tail behaviour**.
+
+---
+
+## Setting Up
+
+```{r}
+#| label: setup
+pacman::p_load(ggdist, ggridges, ggthemes,
+               colorspace, tidyverse)
+```
+
+| Package | Role |
+|---|---|
+| `ggridges` | Ridgeline plots via `geom_density_ridges()` and variants |
+| `ggdist` | Half-eye, dot plots, uncertainty visualisation |
+| `ggthemes` | Extra themes, e.g. `theme_economist()` for publication-ready look |
+| `colorspace` | Colour manipulation via `lighten()`, `darken()`, palette tools |
+| `tidyverse` | Data wrangling (`dplyr`, `tidyr`), and base plotting (`ggplot2`) |
+
+## Importing Data
+
+```{r}
+#| label: data-import
+exam <- read_csv("data/Exam_data.csv")
+glimpse(exam)
+```
+
+The dataset has **322 students** across 9 classes (3A–3I) with scores in
+English, Maths, and Science. Variables `CLASS`, `GENDER`, and `RACE` serve
+as grouping factors throughout this chapter.
+
+---
+
+## Visualising Distribution with Ridgeline Plot
+A [**ridgeline plot**](https://www.data-to-viz.com/graph/ridgeline.html) (formerly called a Joyplot) shows the distribution of a numeric variable for several groups, stacked with a slight overlap along the y-axis.
+
+> **When to use ridgeline plots:**
+>
+> - **5 or more groups** to compare (if we have fewer groups, use violin/boxplot instead)
+> - Existence of **natural ordering** to the groups (e.g. class ranking)
+> - Reveal **shape/distribution differences** across groups, not just means
+
+In the Exam dataset used here, 9 classes (3A–3I) are a perfect candidate.
+
+### Basic Ridgeline Plot
+
+Distribution of **English scores** across all 9 classes using `geom_density_ridges()`. The classes are ordered 3A to 3I (best to weakest by class assignment).
+
+:::: panel-tabset
+
+#### The plot
+```{r}
+#| label: fig-ridgeline-basic
+#| fig-cap: "English score distributions by class - basic ridgeline plot."
+#| fig-height: 4
+#| echo: false
+ggplot(exam,
+       aes(x = ENGLISH,
+           y = CLASS)) +
+  geom_density_ridges(
+    scale          = 3,
+    rel_min_height = 0.01,
+    bandwidth      = 3.4,
+    fill           = lighten("#7097BB", .3),
+    color          = "white"
+  ) +
+  scale_x_continuous(
+    name   = "English Score",
+    expand = c(0, 0)
+  ) +
+  scale_y_discrete(
+    name   = NULL,
+    expand = expansion(add = c(0.2, 2.6))
+  ) +
+  theme_ridges()
+```
+
+#### The code
+```{r}
+#| eval: false
+ggplot(exam,
+       aes(x = ENGLISH,
+           y = CLASS)) +
+  geom_density_ridges(
+    scale          = 3,
+    rel_min_height = 0.01,
+    bandwidth      = 3.4,
+    fill           = lighten("#7097BB", .3),
+    color          = "white"
+  ) +
+  scale_x_continuous(
+    name   = "English Score",
+    expand = c(0, 0)
+  ) +
+  scale_y_discrete(
+    name   = NULL,
+    expand = expansion(add = c(0.2, 2.6))
+  ) +
+  theme_ridges()
+```
+::::
+
+**Key arguments to understand:**
+
+- `scale = 3`: It controls how much ridges overlap (higher = more overlap)
+- `rel_min_height = 0.01`: It trims tails below 1% of the peak height, avoiding long flat tails
+- `bandwidth = 3.4`: It controls the kernel density smoother width. The higher, the smoother. 
+
+> **Takeaway:**
+> Class 3A and 3B have distributions clustered at high scores (70-90), while 3H
+> and 3I are concentrated at low scores (20-50). Notably, the *shape* differs as well, 
+> 3I shows a narrow, peaked distribution (homogeneously weak), while middle
+> classes like 3E-3F show broader, flatter distributions indicating mixed ability.
+
+### Varying fill colors along the x axis
+
+Instead of a single flat fill colour, we can let the fill **vary along the score
+axis** using `geom_density_ridges_gradient()`. This adds a visual cue for score
+magnitude.
+
+:::: panel-tabset
+#### The plot
+```{r}
+#| label: fig-ridgeline-gradient
+#| fig-cap: "Maths score distributions with fill colour varying along the score axis."
+#| fig-height: 4
+#| echo: false
+
+ggplot(exam,
+       aes(x    = MATHS,
+           y    = CLASS,
+           fill = after_stat(x))) +
+  geom_density_ridges_gradient(
+    scale          = 3,
+    rel_min_height = 0.01
+  ) +
+  scale_fill_viridis_c(
+    name   = "Maths Score",
+    option = "C"
+  ) +
+  scale_x_continuous(
+    name   = "Maths Score",
+    expand = c(0, 0)
+  ) +
+  scale_y_discrete(
+    name   = NULL,
+    expand = expansion(add = c(0.2, 2.6))
+  ) +
+  theme_ridges()
+```
+
+#### The code
+```{r}
+#| eval: false
+ggplot(exam,
+       aes(x    = MATHS,
+           y    = CLASS,
+           fill = after_stat(x))) +
+  geom_density_ridges_gradient(
+    scale          = 3,
+    rel_min_height = 0.01
+  ) +
+  scale_fill_viridis_c(
+    name   = "Maths Score",
+    option = "C"
+  ) +
+  scale_x_continuous(
+    name   = "Maths Score",
+    expand = c(0, 0)
+  ) +
+  scale_y_discrete(
+    name   = NULL,
+    expand = expansion(add = c(0.2, 2.6))
+  ) +
+  theme_ridges()
+```
+::::
+
+> **Takeaway:**
+> The gradient fill immediately communicates which classes cluster at high vs low
+> scores without needing to read axis values carefully. However, `fill` and
+> `alpha` transparency **cannot be used together** with gradient fills, which is a
+> technical limitation to take note. 
+
+> **Code:** `after_stat(x)` is the modern replacement for the deprecated
+> `stat(x)` syntax used in the course notes. Both map the computed x-axis value
+> onto the fill aesthetic.
+
+
+### Mapping the probabilities directly onto colour
+Beside providing additional `geom` objects to support the need to plot ridgeline plot, `ggridges` package also provides a stat function called [`stat_density_ridges()`](https://wilkelab.org/ggridges/reference/stat_density_ridges.html) that replaces [`stat_density()`](https://ggplot2.tidyverse.org/reference/geom_density.html) of ggplot2.
+
+:::: panel-tabset
+#### The plot
+```{r}
+#| label: fig-ridgeline-ecdf
+#| fig-cap: "Science score ridgelines coloured by tail probability (ECDF)."
+#| fig-height: 4
+#| echo: false
+
+ggplot(exam,
+       aes(x    = SCIENCE,
+           y    = CLASS,
+           fill = 0.5 - abs(0.5 - after_stat(ecdf)))) +
+  stat_density_ridges(
+    geom      = "density_ridges_gradient",
+    calc_ecdf = TRUE
+  ) +
+  scale_fill_viridis_c(
+    name      = "Tail\nProbability",
+    direction = -1
+  ) +
+  scale_x_continuous(name = "Science Score", expand = c(0, 0)) +
+  scale_y_discrete(name = NULL, expand = expansion(add = c(0.2, 2.6))) +
+  theme_ridges()
+```
+#### The code
+```{r}
+#| eval: false
+
+ggplot(exam,
+       aes(x    = SCIENCE,
+           y    = CLASS,
+           fill = 0.5 - abs(0.5 - after_stat(ecdf)))) +
+  stat_density_ridges(
+    geom      = "density_ridges_gradient",
+    calc_ecdf = TRUE
+  ) +
+  scale_fill_viridis_c(
+    name      = "Tail\nProbability",
+    direction = -1
+  ) +
+  scale_x_continuous(name = "Science Score", expand = c(0, 0)) +
+  scale_y_discrete(name = NULL, expand = expansion(add = c(0.2, 2.6))) +
+  theme_ridges()
+```
+::::
+
+> **Takeaway:**
+> The expression `0.5 - abs(0.5 - ecdf)` maps values **closest to the median**
+> to the highest fill value, and tail extremes to the lowest. Dark regions are
+> the rare extreme scores. Bright central bands show where most students fall.
+> This is especially useful for spotting which classes have fat tails (more
+> outliers) vs tight central distributions.
+
+::: callout-important
+Always include `calc_ecdf = TRUE` inside `stat_density_ridges()` when using ECDF-based colour mapping, the plot will silently produce incorrect results without it.
+:::
+
+### Ridgeline plots with quantile lines
+We can colour the ridgeline by **quartile bands** to make Q1, median, and Q3
+immediately visible within each class's density shape. 
+
+:::: panel-tabset 
+#### Quartile Band 
+``` {r}
+#| label: fig-ridgeline-quantile
+#| fig-cap: "English score ridgelines coloured by quartile band."
+#| fig-height: 4
+#| echo: false
+
+ggplot(exam,
+       aes(x    = ENGLISH,
+           y    = CLASS,
+           fill = factor(after_stat(quantile)))) +
+  stat_density_ridges(
+    geom           = "density_ridges_gradient",
+    calc_ecdf      = TRUE,
+    quantiles      = 4,
+    quantile_lines = TRUE
+  ) +
+  scale_fill_viridis_d(name = "Quartiles") +
+  scale_x_continuous(name = "English Score", expand = c(0, 0)) +
+  scale_y_discrete(name = NULL, expand = expansion(add = c(0.2, 2.6))) +
+  theme_ridges()
+```
+
+#### The code
+``` {r}
+#| eval: false
+
+ggplot(exam,
+       aes(x    = ENGLISH,
+           y    = CLASS,
+           fill = factor(after_stat(quantile)))) +
+  stat_density_ridges(
+    geom           = "density_ridges_gradient",
+    calc_ecdf      = TRUE,
+    quantiles      = 4,
+    quantile_lines = TRUE
+  ) +
+  scale_fill_viridis_d(name = "Quartiles") +
+  scale_x_continuous(name = "English Score", expand = c(0, 0)) +
+  scale_y_discrete(name = NULL, expand = expansion(add = c(0.2, 2.6))) +
+  theme_ridges()
+```
+
+
+#### Probability Band
+``` {r}
+#| label: fig-ridgeline-tails
+#| fig-cap: "English scores with 2.5% and 97.5% tail regions highlighted in red/blue."
+#| fig-height: 4
+#| echo: false
+
+ggplot(exam,
+       aes(x    = ENGLISH,
+           y    = CLASS,
+           fill = factor(after_stat(quantile)))) +
+  stat_density_ridges(
+    geom      = "density_ridges_gradient",
+    calc_ecdf = TRUE,
+    quantiles = c(0.025, 0.975)
+  ) +
+  scale_fill_manual(
+    name   = "Probability",
+    values = c("#FF0000A0", "#A0A0A0A0", "#0000FFA0"),
+    labels = c("Bottom 2.5%", "Middle 95%", "Top 2.5%")
+  ) +
+  scale_x_continuous(name = "English Score", expand = c(0, 0)) +
+  scale_y_discrete(name = NULL, expand = expansion(add = c(0.2, 2.6))) +
+  theme_ridges()
+```
+
+#### The code
+``` {r}
+#| eval: false
+
+ggplot(exam,
+       aes(x    = ENGLISH,
+           y    = CLASS,
+           fill = factor(after_stat(quantile)))) +
+  stat_density_ridges(
+    geom      = "density_ridges_gradient",
+    calc_ecdf = TRUE,
+    quantiles = c(0.025, 0.975)
+  ) +
+  scale_fill_manual(
+    name   = "Probability",
+    values = c("#FF0000A0", "#A0A0A0A0", "#0000FFA0"),
+    labels = c("Bottom 2.5%", "Middle 95%", "Top 2.5%")
+  ) +
+  scale_x_continuous(name = "English Score", expand = c(0, 0)) +
+  scale_y_discrete(name = NULL, expand = expansion(add = c(0.2, 2.6))) +
+  theme_ridges()
+```
+
+::::
+
+
+

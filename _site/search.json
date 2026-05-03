@@ -7,111 +7,6 @@
     "text": "Welcome to ISSS608 Visual Analytics and Applications. In this website, you will find my coursework prepared for this course."
   },
   {
-    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html",
-    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html",
-    "title": "Hands-on Exercise 2",
-    "section": "",
-    "text": "Beside tidyverse, four R packages will be used. Here is a table for the packages, their purpose and primary functions:\n\n\n\n\n\n\n\n\nPackage\nPurpose\nPrimary Functions\n\n\n\n\nggrepel\nRepel overlapping text and label geoms\ngeom_text_repel(), geom_label_repel()\n\n\npatchwork\nCompose multiple ggplots into a single figure\n+, /, \\|, plot_layout(), plot_annotation()\n\n\nggthemes\nExtra themes inspired by news and science outlets\ntheme_economist(), theme_wsj(), theme_tufte()\n\n\nhrbrthemes\nTypography-centric, publication-ready themes\ntheme_ipsum(), theme_ipsum_rc(), theme_modern_rc()\n\n\ntidyverse\nCore data wrangling and ggplot2 visualisation\nggplot(), dplyr, tidyr, readr\n\n\n\nCheck the installation:\n\npacman::p_load(ggrepel, patchwork, \n               ggthemes, hrbrthemes,\n               tidyverse) \n\nImport the data:\n\nexam_data &lt;- read_csv(\"data/Exam_data.csv\")"
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#beyond-ggplot2-fundamentals",
-    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#beyond-ggplot2-fundamentals",
-    "title": "Hands-on Exercise 2",
-    "section": "",
-    "text": "Beside tidyverse, four R packages will be used. Here is a table for the packages, their purpose and primary functions:\n\n\n\n\n\n\n\n\nPackage\nPurpose\nPrimary Functions\n\n\n\n\nggrepel\nRepel overlapping text and label geoms\ngeom_text_repel(), geom_label_repel()\n\n\npatchwork\nCompose multiple ggplots into a single figure\n+, /, \\|, plot_layout(), plot_annotation()\n\n\nggthemes\nExtra themes inspired by news and science outlets\ntheme_economist(), theme_wsj(), theme_tufte()\n\n\nhrbrthemes\nTypography-centric, publication-ready themes\ntheme_ipsum(), theme_ipsum_rc(), theme_modern_rc()\n\n\ntidyverse\nCore data wrangling and ggplot2 visualisation\nggplot(), dplyr, tidyr, readr\n\n\n\nCheck the installation:\n\npacman::p_load(ggrepel, patchwork, \n               ggthemes, hrbrthemes,\n               tidyverse) \n\nImport the data:\n\nexam_data &lt;- read_csv(\"data/Exam_data.csv\")"
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#beyond-ggplot2-annotation-ggrepel",
-    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#beyond-ggplot2-annotation-ggrepel",
-    "title": "Hands-on Exercise 2",
-    "section": "Beyond ggplot2 Annotation: ggrepel",
-    "text": "Beyond ggplot2 Annotation: ggrepel\nOne of the challenge in plotting statistical graph is annotation, especially with large number of data points.\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\nggplot(data = exam_data,\n       aes(x = MATHS,\n           y = ENGLISH)) +\n  geom_point() +\n  geom_smooth(method = lm,\n              size = 0.5) +\n  geom_label(aes(label = ID),\n             hjust = .5,\n             vjust = -.5) +\n  coord_cartesian(xlim = c(0, 100),\n                  ylim = c(0, 100)) +\n  ggtitle(\"English scores versus Maths scores for Primary 3\")"
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#working-with-ggrepel",
-    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#working-with-ggrepel",
-    "title": "Hands-on Exercise 2",
-    "section": "Working with ggrepel",
-    "text": "Working with ggrepel\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\nggplot(data = exam_data,\n       aes(x = MATHS,\n           y = ENGLISH)) +\n  geom_point() +\n  geom_smooth(method = lm,\n              size = 0.5) +\n  geom_label_repel(aes(label = ID),\n                   fontface = \"bold\") +\n  coord_cartesian(xlim = c(0, 100),\n                  ylim = c(0, 100)) +\n  ggtitle(\"English scores versus Maths scores for Primary 3\")"
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#beyond-ggplots-themes-ggthemes-hrbrthemes",
-    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#beyond-ggplots-themes-ggthemes-hrbrthemes",
-    "title": "Hands-on Exercise 2",
-    "section": "Beyond ggplots Themes: ggthemes & hrbrthemes",
-    "text": "Beyond ggplots Themes: ggthemes & hrbrthemes\nggplot2 comes with eight built-in themes, they are: theme_gray(), theme_bw(), theme_classic(), theme_dark(), theme_light(), theme_linedraw(), theme_minimal(), and theme_void().\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\nggplot(data = exam_data,\n       aes(x = MATHS)) +\n  geom_histogram(bins = 20,\n                 boundary = 100,\n                 color = \"grey25\",\n                 fill = \"grey90\") +\n  theme_gray() +\n  ggtitle(\"Distribution of Maths scores\")\n\n\n\nRefer to this link to learn more about ggplot2 Themes"
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#working-with-ggtheme",
-    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#working-with-ggtheme",
-    "title": "Hands-on Exercise 2",
-    "section": "Working with ggtheme",
-    "text": "Working with ggtheme\nggthemes provides ‘ggplot2’ themes that replicate the look of plots by Edward Tufte, Stephen Few, Fivethirtyeight, The Economist, ‘Stata’, ‘Excel’, and The Wall Street Journal, among others.\nIn the example below, The Economist theme is used.\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\nggplot(data = exam_data,\n       aes(x = MATHS)) +\n  geom_histogram(bins = 20,\n                 boundary = 100,\n                 color = \"grey25\",\n                 fill = \"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_economist()"
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#working-with-hrbrthemes",
-    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#working-with-hrbrthemes",
-    "title": "Hands-on Exercise 2",
-    "section": "Working with hrbrthemes",
-    "text": "Working with hrbrthemes\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\nggplot(data = exam_data,\n       aes(x = MATHS)) +\n  geom_histogram(bins = 20,\n                 boundary = 100,\n                 color = \"grey25\",\n                 fill = \"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_ipsum(axis_title_size = 18,\n              base_size = 15,\n              grid = \"Y\")\n\n\n\n\n\n\n\n\n\nTipWhat can we learn from the code chunk above?\n\n\n\n\naxis_title_size argument is used to increase the font size of the axis title to 18,\nbase_size argument is used to increase the default axis label to 15, and\ngrid argument is used to remove the x-axis grid lines."
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#beyond-single-graph",
-    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#beyond-single-graph",
-    "title": "Hands-on Exercise 2",
-    "section": "Beyond Single Graph",
-    "text": "Beyond Single Graph\nPlotting below 3 single graphs for composition.\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\np1 &lt;- ggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") + \n  coord_cartesian(xlim=c(0,100)) +\n  ggtitle(\"Distribution of Maths scores\")\n\n\n\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\np2 &lt;- ggplot(data=exam_data, \n             aes(x = ENGLISH)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  coord_cartesian(xlim=c(0,100)) +\n  ggtitle(\"Distribution of English scores\")\n\n\n\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\np3 &lt;- ggplot(data=exam_data, \n             aes(x= MATHS, \n                 y=ENGLISH)) +\n  geom_point() +\n  geom_smooth(method=lm, \n              size=0.5) +  \n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100)) +\n  ggtitle(\"English scores versus Maths scores for Primary 3\")"
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#creating-composite-graphics-pathwork-methods",
-    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#creating-composite-graphics-pathwork-methods",
-    "title": "Hands-on Exercise 2",
-    "section": "Creating Composite Graphics: pathwork methods",
-    "text": "Creating Composite Graphics: pathwork methods\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\n(p1 / p2) | p3"
-  },
-  {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
-    "section": "",
-    "text": "About this site\n\n1 + 1\n\n[1] 2"
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html",
-    "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html",
-    "title": "Hands-on Exercise 1",
-    "section": "",
-    "text": "Use p_load() function to install the collection of R packages under tidyverse, which will include the ggplot2, often used to create data-driven graphics based on The Grammar of Graphics.\n\npacman::p_load(tidyverse)\n\n\nexam_data &lt;- read_csv(\"data/Exam_data.csv\")\n\nWe got 322 rows of data with 7 attributes.\n\nThe categorical attributes are: ID, CLASS, GENDER and RACE.\nThe continuous attributes are: MATHS, ENGLISH and SCIENCE."
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#getting-started-with-ggplot2",
-    "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#getting-started-with-ggplot2",
-    "title": "Hands-on Exercise 1",
-    "section": "",
-    "text": "Use p_load() function to install the collection of R packages under tidyverse, which will include the ggplot2, often used to create data-driven graphics based on The Grammar of Graphics.\n\npacman::p_load(tidyverse)\n\n\nexam_data &lt;- read_csv(\"data/Exam_data.csv\")\n\nWe got 322 rows of data with 7 attributes.\n\nThe categorical attributes are: ID, CLASS, GENDER and RACE.\nThe continuous attributes are: MATHS, ENGLISH and SCIENCE."
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#histogram-of-maths-scores",
-    "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#histogram-of-maths-scores",
-    "title": "Hands-on Exercise 1",
-    "section": "Histogram of Maths Scores",
-    "text": "Histogram of Maths Scores\nHere, you can compare the difference between R Graphics, the core graphical function of Base R, and ggplot plotting a histogram.\n\nR Graphicsggplot2\n\n\n\nhist(exam_data$MATHS)\n\n\n\n\n\n\n\n\n\n\n\nggplot(exam_data, aes(x = MATHS)) +\n  geom_histogram(bins = 10, color = \"black\", fill = \"lightgrey\") +\n  labs(title = \"Histogram of exam_data$MATHS\",\n       x = \"exam_data$MATHS\",\n       y = \"Frequency\") +\n  theme_bw()\n\n\n\n\n\n\n\n\n\n\n\nAs we can see, the difference is obvious. As quoted from Hadley Wickham:\n\nThe transferable skills from ggplot2 are not the idiosyncrasies of plotting syntax, but a powerful way of thinking about visualisation, as a way of mapping between variables and the visual properties of geometric objects that you can perceive."
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#grammar-of-graphics",
-    "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#grammar-of-graphics",
-    "title": "Hands-on Exercise 1",
-    "section": "Grammar of Graphics",
-    "text": "Grammar of Graphics\nThe ggplot2 follows a layered grammer of graphics, the 7 layers can be described as follow:\n\nData: The dataset being plotted.\nAesthetics: It take attributes of the data and use them to influence visual characteristics, such as position, colours, size, shape, or transparency.\nGeometrics: The visual elements used for our data, such as point, bar or line.\nFacets: Split the data into subsets to create multiple variations of the same graph (paneling, multiple plots).\nStatistics: Statiscal transformations that summarise data (e.g. mean, confidence intervals).\nCoordinate: It defines the plane on which data are mapped on the graphic.\nThemes: Modify all non-data components of a plot, such as main title, sub-title, y-aixs title, or legend background."
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#reference",
-    "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#reference",
-    "title": "Hands-on Exercise 1",
-    "section": "Reference",
-    "text": "Reference\n\nProf. Kam Tin Seong R for Visual Analytics."
-  },
-  {
     "objectID": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03.html",
     "href": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03.html",
     "title": "Hands-on Exercise 3",
@@ -208,5 +103,145 @@
     "title": "Hands-on Exercise 3",
     "section": "Business Insights from the Superstore Data",
     "text": "Business Insights from the Superstore Data\n\nTables and Bookcases are money-losers. Despite Table’s ranking as the 4th highest revenue sub-category, it runs at a negative average profit margin. Discounting in Furniture is likely the culprit.\nDiscounts over 40% are almost never profitable. The discount–profit scatter shows a clear inflection point around 40%. Any discount above that level correlates strongly with negative profit.\nTechnology has the best margin quality. Despite not being the top revenue category, Technology generates the highest total profit, where it was driven by Copiers and Accessories, both of which have strong positive margins.\nThe West region leads profitability across all three customer segments. The Central region is the most volatile.\nSales volume alone is a misleading KPI. Chairs are the #1 sub-category by revenue but sit in the middle of profit rankings. Any sales dashboard that shows only revenue is hiding the costs."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html",
+    "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html",
+    "title": "Hands-on Exercise 1",
+    "section": "",
+    "text": "Use p_load() function to install the collection of R packages under tidyverse, which will include the ggplot2, often used to create data-driven graphics based on The Grammar of Graphics.\n\npacman::p_load(tidyverse)\n\n\nexam_data &lt;- read_csv(\"data/Exam_data.csv\")\n\nWe got 322 rows of data with 7 attributes.\n\nThe categorical attributes are: ID, CLASS, GENDER and RACE.\nThe continuous attributes are: MATHS, ENGLISH and SCIENCE."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#getting-started-with-ggplot2",
+    "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#getting-started-with-ggplot2",
+    "title": "Hands-on Exercise 1",
+    "section": "",
+    "text": "Use p_load() function to install the collection of R packages under tidyverse, which will include the ggplot2, often used to create data-driven graphics based on The Grammar of Graphics.\n\npacman::p_load(tidyverse)\n\n\nexam_data &lt;- read_csv(\"data/Exam_data.csv\")\n\nWe got 322 rows of data with 7 attributes.\n\nThe categorical attributes are: ID, CLASS, GENDER and RACE.\nThe continuous attributes are: MATHS, ENGLISH and SCIENCE."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#histogram-of-maths-scores",
+    "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#histogram-of-maths-scores",
+    "title": "Hands-on Exercise 1",
+    "section": "Histogram of Maths Scores",
+    "text": "Histogram of Maths Scores\nHere, you can compare the difference between R Graphics, the core graphical function of Base R, and ggplot plotting a histogram.\n\nR Graphicsggplot2\n\n\n\nhist(exam_data$MATHS)\n\n\n\n\n\n\n\n\n\n\n\nggplot(exam_data, aes(x = MATHS)) +\n  geom_histogram(bins = 10, color = \"black\", fill = \"lightgrey\") +\n  labs(title = \"Histogram of exam_data$MATHS\",\n       x = \"exam_data$MATHS\",\n       y = \"Frequency\") +\n  theme_bw()\n\n\n\n\n\n\n\n\n\n\n\nAs we can see, the difference is obvious. As quoted from Hadley Wickham:\n\nThe transferable skills from ggplot2 are not the idiosyncrasies of plotting syntax, but a powerful way of thinking about visualisation, as a way of mapping between variables and the visual properties of geometric objects that you can perceive."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#grammar-of-graphics",
+    "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#grammar-of-graphics",
+    "title": "Hands-on Exercise 1",
+    "section": "Grammar of Graphics",
+    "text": "Grammar of Graphics\nThe ggplot2 follows a layered grammer of graphics, the 7 layers can be described as follow:\n\nData: The dataset being plotted.\nAesthetics: It take attributes of the data and use them to influence visual characteristics, such as position, colours, size, shape, or transparency.\nGeometrics: The visual elements used for our data, such as point, bar or line.\nFacets: Split the data into subsets to create multiple variations of the same graph (paneling, multiple plots).\nStatistics: Statiscal transformations that summarise data (e.g. mean, confidence intervals).\nCoordinate: It defines the plane on which data are mapped on the graphic.\nThemes: Modify all non-data components of a plot, such as main title, sub-title, y-aixs title, or legend background."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#reference",
+    "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#reference",
+    "title": "Hands-on Exercise 1",
+    "section": "Reference",
+    "text": "Reference\n\nProf. Kam Tin Seong R for Visual Analytics."
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this site\n\n1 + 1\n\n[1] 2"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html",
+    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html",
+    "title": "Hands-on Exercise 2",
+    "section": "",
+    "text": "Beside tidyverse, four R packages will be used. Here is a table for the packages, their purpose and primary functions:\n\n\n\n\n\n\n\n\nPackage\nPurpose\nPrimary Functions\n\n\n\n\nggrepel\nRepel overlapping text and label geoms\ngeom_text_repel(), geom_label_repel()\n\n\npatchwork\nCompose multiple ggplots into a single figure\n+, /, \\|, plot_layout(), plot_annotation()\n\n\nggthemes\nExtra themes inspired by news and science outlets\ntheme_economist(), theme_wsj(), theme_tufte()\n\n\nhrbrthemes\nTypography-centric, publication-ready themes\ntheme_ipsum(), theme_ipsum_rc(), theme_modern_rc()\n\n\ntidyverse\nCore data wrangling and ggplot2 visualisation\nggplot(), dplyr, tidyr, readr\n\n\n\nCheck the installation:\n\npacman::p_load(ggrepel, patchwork, \n               ggthemes, hrbrthemes,\n               tidyverse) \n\nImport the data:\n\nexam_data &lt;- read_csv(\"data/Exam_data.csv\")"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#beyond-ggplot2-fundamentals",
+    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#beyond-ggplot2-fundamentals",
+    "title": "Hands-on Exercise 2",
+    "section": "",
+    "text": "Beside tidyverse, four R packages will be used. Here is a table for the packages, their purpose and primary functions:\n\n\n\n\n\n\n\n\nPackage\nPurpose\nPrimary Functions\n\n\n\n\nggrepel\nRepel overlapping text and label geoms\ngeom_text_repel(), geom_label_repel()\n\n\npatchwork\nCompose multiple ggplots into a single figure\n+, /, \\|, plot_layout(), plot_annotation()\n\n\nggthemes\nExtra themes inspired by news and science outlets\ntheme_economist(), theme_wsj(), theme_tufte()\n\n\nhrbrthemes\nTypography-centric, publication-ready themes\ntheme_ipsum(), theme_ipsum_rc(), theme_modern_rc()\n\n\ntidyverse\nCore data wrangling and ggplot2 visualisation\nggplot(), dplyr, tidyr, readr\n\n\n\nCheck the installation:\n\npacman::p_load(ggrepel, patchwork, \n               ggthemes, hrbrthemes,\n               tidyverse) \n\nImport the data:\n\nexam_data &lt;- read_csv(\"data/Exam_data.csv\")"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#beyond-ggplot2-annotation-ggrepel",
+    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#beyond-ggplot2-annotation-ggrepel",
+    "title": "Hands-on Exercise 2",
+    "section": "Beyond ggplot2 Annotation: ggrepel",
+    "text": "Beyond ggplot2 Annotation: ggrepel\nOne of the challenge in plotting statistical graph is annotation, especially with large number of data points.\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\nggplot(data = exam_data,\n       aes(x = MATHS,\n           y = ENGLISH)) +\n  geom_point() +\n  geom_smooth(method = lm,\n              size = 0.5) +\n  geom_label(aes(label = ID),\n             hjust = .5,\n             vjust = -.5) +\n  coord_cartesian(xlim = c(0, 100),\n                  ylim = c(0, 100)) +\n  ggtitle(\"English scores versus Maths scores for Primary 3\")"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#working-with-ggrepel",
+    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#working-with-ggrepel",
+    "title": "Hands-on Exercise 2",
+    "section": "Working with ggrepel",
+    "text": "Working with ggrepel\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\nggplot(data = exam_data,\n       aes(x = MATHS,\n           y = ENGLISH)) +\n  geom_point() +\n  geom_smooth(method = lm,\n              size = 0.5) +\n  geom_label_repel(aes(label = ID),\n                   fontface = \"bold\") +\n  coord_cartesian(xlim = c(0, 100),\n                  ylim = c(0, 100)) +\n  ggtitle(\"English scores versus Maths scores for Primary 3\")"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#beyond-ggplots-themes-ggthemes-hrbrthemes",
+    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#beyond-ggplots-themes-ggthemes-hrbrthemes",
+    "title": "Hands-on Exercise 2",
+    "section": "Beyond ggplots Themes: ggthemes & hrbrthemes",
+    "text": "Beyond ggplots Themes: ggthemes & hrbrthemes\nggplot2 comes with eight built-in themes, they are: theme_gray(), theme_bw(), theme_classic(), theme_dark(), theme_light(), theme_linedraw(), theme_minimal(), and theme_void().\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\nggplot(data = exam_data,\n       aes(x = MATHS)) +\n  geom_histogram(bins = 20,\n                 boundary = 100,\n                 color = \"grey25\",\n                 fill = \"grey90\") +\n  theme_gray() +\n  ggtitle(\"Distribution of Maths scores\")\n\n\n\nRefer to this link to learn more about ggplot2 Themes"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#working-with-ggtheme",
+    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#working-with-ggtheme",
+    "title": "Hands-on Exercise 2",
+    "section": "Working with ggtheme",
+    "text": "Working with ggtheme\nggthemes provides ‘ggplot2’ themes that replicate the look of plots by Edward Tufte, Stephen Few, Fivethirtyeight, The Economist, ‘Stata’, ‘Excel’, and The Wall Street Journal, among others.\nIn the example below, The Economist theme is used.\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\nggplot(data = exam_data,\n       aes(x = MATHS)) +\n  geom_histogram(bins = 20,\n                 boundary = 100,\n                 color = \"grey25\",\n                 fill = \"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_economist()"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#working-with-hrbrthemes",
+    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#working-with-hrbrthemes",
+    "title": "Hands-on Exercise 2",
+    "section": "Working with hrbrthemes",
+    "text": "Working with hrbrthemes\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\nggplot(data = exam_data,\n       aes(x = MATHS)) +\n  geom_histogram(bins = 20,\n                 boundary = 100,\n                 color = \"grey25\",\n                 fill = \"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_ipsum(axis_title_size = 18,\n              base_size = 15,\n              grid = \"Y\")\n\n\n\n\n\n\n\n\n\nTipWhat can we learn from the code chunk above?\n\n\n\n\naxis_title_size argument is used to increase the font size of the axis title to 18,\nbase_size argument is used to increase the default axis label to 15, and\ngrid argument is used to remove the x-axis grid lines."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#beyond-single-graph",
+    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#beyond-single-graph",
+    "title": "Hands-on Exercise 2",
+    "section": "Beyond Single Graph",
+    "text": "Beyond Single Graph\nPlotting below 3 single graphs for composition.\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\np1 &lt;- ggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") + \n  coord_cartesian(xlim=c(0,100)) +\n  ggtitle(\"Distribution of Maths scores\")\n\n\n\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\np2 &lt;- ggplot(data=exam_data, \n             aes(x = ENGLISH)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  coord_cartesian(xlim=c(0,100)) +\n  ggtitle(\"Distribution of English scores\")\n\n\n\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\np3 &lt;- ggplot(data=exam_data, \n             aes(x= MATHS, \n                 y=ENGLISH)) +\n  geom_point() +\n  geom_smooth(method=lm, \n              size=0.5) +  \n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100)) +\n  ggtitle(\"English scores versus Maths scores for Primary 3\")"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#creating-composite-graphics-pathwork-methods",
+    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#creating-composite-graphics-pathwork-methods",
+    "title": "Hands-on Exercise 2",
+    "section": "Creating Composite Graphics: pathwork methods",
+    "text": "Creating Composite Graphics: pathwork methods\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\n(p1 / p2) | p3"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04.html",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04.html",
+    "title": "Hands-on Exercise 4",
+    "section": "",
+    "text": "Two new statistical graphic methods for visualizing distribution will be covered in this section.\n\nRidgeline plots: Show distributions for multiple groups stacked along a shared axis, using ggridges.\nRaincloud plots: Combine a half-density, boxplot, and dot plot into one layered graphic, using ggdist.\n\nBoth reveal richer distributional shape such as skewness, multimodality, and tail behaviour.\n\n\n\n\n\npacman::p_load(ggdist, ggridges, ggthemes,\n               colorspace, tidyverse)\n\n\n\n\n\n\n\n\nPackage\nRole\n\n\n\n\nggridges\nRidgeline plots via geom_density_ridges() and variants\n\n\nggdist\nHalf-eye, dot plots, uncertainty visualisation\n\n\nggthemes\nExtra themes, e.g. theme_economist() for publication-ready look\n\n\ncolorspace\nColour manipulation via lighten(), darken(), palette tools\n\n\ntidyverse\nData wrangling (dplyr, tidyr), and base plotting (ggplot2)\n\n\n\n\n\n\n\nexam &lt;- read_csv(\"data/Exam_data.csv\")\nglimpse(exam)\n\nRows: 322\nColumns: 7\n$ ID      &lt;chr&gt; \"Student321\", \"Student305\", \"Student289\", \"Student227\", \"Stude…\n$ CLASS   &lt;chr&gt; \"3I\", \"3I\", \"3H\", \"3F\", \"3I\", \"3I\", \"3I\", \"3I\", \"3I\", \"3H\", \"3…\n$ GENDER  &lt;chr&gt; \"Male\", \"Female\", \"Male\", \"Male\", \"Male\", \"Female\", \"Male\", \"M…\n$ RACE    &lt;chr&gt; \"Malay\", \"Malay\", \"Chinese\", \"Chinese\", \"Malay\", \"Malay\", \"Chi…\n$ ENGLISH &lt;dbl&gt; 21, 24, 26, 27, 27, 31, 31, 31, 33, 34, 34, 36, 36, 36, 37, 38…\n$ MATHS   &lt;dbl&gt; 9, 22, 16, 77, 11, 16, 21, 18, 19, 49, 39, 35, 23, 36, 49, 30,…\n$ SCIENCE &lt;dbl&gt; 15, 16, 16, 31, 25, 16, 25, 27, 15, 37, 42, 22, 32, 36, 35, 45…\n\n\nThe dataset has 322 students across 9 classes (3A–3I) with scores in English, Maths, and Science. Variables CLASS, GENDER, and RACE serve as grouping factors throughout this chapter.\n\n\n\n\nA ridgeline plot (formerly called a Joyplot) shows the distribution of a numeric variable for several groups, stacked with a slight overlap along the y-axis.\n\nWhen to use ridgeline plots:\n\n5 or more groups to compare (if we have fewer groups, use violin/boxplot instead)\nExistence of natural ordering to the groups (e.g. class ranking)\nReveal shape/distribution differences across groups, not just means\n\n\nIn the Exam dataset used here, 9 classes (3A–3I) are a perfect candidate.\n\n\nDistribution of English scores across all 9 classes using geom_density_ridges(). The classes are ordered 3A to 3I (best to weakest by class assignment).\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\nFigure 1: English score distributions by class - basic ridgeline plot.\n\n\n\n\n\n\n\n\nggplot(exam,\n       aes(x = ENGLISH,\n           y = CLASS)) +\n  geom_density_ridges(\n    scale          = 3,\n    rel_min_height = 0.01,\n    bandwidth      = 3.4,\n    fill           = lighten(\"#7097BB\", .3),\n    color          = \"white\"\n  ) +\n  scale_x_continuous(\n    name   = \"English Score\",\n    expand = c(0, 0)\n  ) +\n  scale_y_discrete(\n    name   = NULL,\n    expand = expansion(add = c(0.2, 2.6))\n  ) +\n  theme_ridges()\n\n\n\n\nKey arguments to understand:\n\nscale = 3: It controls how much ridges overlap (higher = more overlap)\nrel_min_height = 0.01: It trims tails below 1% of the peak height, avoiding long flat tails\nbandwidth = 3.4: It controls the kernel density smoother width. The higher, the smoother.\n\n\nTakeaway: Class 3A and 3B have distributions clustered at high scores (70-90), while 3H and 3I are concentrated at low scores (20-50). Notably, the shape differs as well, 3I shows a narrow, peaked distribution (homogeneously weak), while middle classes like 3E-3F show broader, flatter distributions indicating mixed ability.\n\n\n\n\nInstead of a single flat fill colour, we can let the fill vary along the score axis using geom_density_ridges_gradient(). This adds a visual cue for score magnitude.\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\nFigure 2: Maths score distributions with fill colour varying along the score axis.\n\n\n\n\n\n\n\n\nggplot(exam,\n       aes(x    = MATHS,\n           y    = CLASS,\n           fill = after_stat(x))) +\n  geom_density_ridges_gradient(\n    scale          = 3,\n    rel_min_height = 0.01\n  ) +\n  scale_fill_viridis_c(\n    name   = \"Maths Score\",\n    option = \"C\"\n  ) +\n  scale_x_continuous(\n    name   = \"Maths Score\",\n    expand = c(0, 0)\n  ) +\n  scale_y_discrete(\n    name   = NULL,\n    expand = expansion(add = c(0.2, 2.6))\n  ) +\n  theme_ridges()\n\n\n\n\n\nTakeaway: The gradient fill immediately communicates which classes cluster at high vs low scores without needing to read axis values carefully. However, fill and alpha transparency cannot be used together with gradient fills, which is a technical limitation to take note.\n\n\nCode: after_stat(x) is the modern replacement for the deprecated stat(x) syntax used in the course notes. Both map the computed x-axis value onto the fill aesthetic.\n\n\n\n\nBeside providing additional geom objects to support the need to plot ridgeline plot, ggridges package also provides a stat function called stat_density_ridges() that replaces stat_density() of ggplot2.\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\nFigure 3: Science score ridgelines coloured by tail probability (ECDF).\n\n\n\n\n\n\n\n\nggplot(exam,\n       aes(x    = SCIENCE,\n           y    = CLASS,\n           fill = 0.5 - abs(0.5 - after_stat(ecdf)))) +\n  stat_density_ridges(\n    geom      = \"density_ridges_gradient\",\n    calc_ecdf = TRUE\n  ) +\n  scale_fill_viridis_c(\n    name      = \"Tail\\nProbability\",\n    direction = -1\n  ) +\n  scale_x_continuous(name = \"Science Score\", expand = c(0, 0)) +\n  scale_y_discrete(name = NULL, expand = expansion(add = c(0.2, 2.6))) +\n  theme_ridges()\n\n\n\n\n\nTakeaway: The expression 0.5 - abs(0.5 - ecdf) maps values closest to the median to the highest fill value, and tail extremes to the lowest. Dark regions are the rare extreme scores. Bright central bands show where most students fall. This is especially useful for spotting which classes have fat tails (more outliers) vs tight central distributions.\n\n\n\n\n\n\n\nImportant\n\n\n\nAlways include calc_ecdf = TRUE inside stat_density_ridges() when using ECDF-based colour mapping, the plot will silently produce incorrect results without it.\n\n\n\n\n\nWe can colour the ridgeline by quartile bands to make Q1, median, and Q3 immediately visible within each class’s density shape.\n\nQuartile BandThe codeProbability BandThe code\n\n\n\n\n\n\n\n\n\n\nFigure 4: English score ridgelines coloured by quartile band.\n\n\n\n\n\n\n\n\nggplot(exam,\n       aes(x    = ENGLISH,\n           y    = CLASS,\n           fill = factor(after_stat(quantile)))) +\n  stat_density_ridges(\n    geom           = \"density_ridges_gradient\",\n    calc_ecdf      = TRUE,\n    quantiles      = 4,\n    quantile_lines = TRUE\n  ) +\n  scale_fill_viridis_d(name = \"Quartiles\") +\n  scale_x_continuous(name = \"English Score\", expand = c(0, 0)) +\n  scale_y_discrete(name = NULL, expand = expansion(add = c(0.2, 2.6))) +\n  theme_ridges()\n\n\n\n\n\n\n\n\n\n\n\nFigure 5: English scores with 2.5% and 97.5% tail regions highlighted in red/blue.\n\n\n\n\n\n\n\n\nggplot(exam,\n       aes(x    = ENGLISH,\n           y    = CLASS,\n           fill = factor(after_stat(quantile)))) +\n  stat_density_ridges(\n    geom      = \"density_ridges_gradient\",\n    calc_ecdf = TRUE,\n    quantiles = c(0.025, 0.975)\n  ) +\n  scale_fill_manual(\n    name   = \"Probability\",\n    values = c(\"#FF0000A0\", \"#A0A0A0A0\", \"#0000FFA0\"),\n    labels = c(\"Bottom 2.5%\", \"Middle 95%\", \"Top 2.5%\")\n  ) +\n  scale_x_continuous(name = \"English Score\", expand = c(0, 0)) +\n  scale_y_discrete(name = NULL, expand = expansion(add = c(0.2, 2.6))) +\n  theme_ridges()"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04.html#overview",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04.html#overview",
+    "title": "Hands-on Exercise 4",
+    "section": "",
+    "text": "Two new statistical graphic methods for visualizing distribution will be covered in this section.\n\nRidgeline plots: Show distributions for multiple groups stacked along a shared axis, using ggridges.\nRaincloud plots: Combine a half-density, boxplot, and dot plot into one layered graphic, using ggdist.\n\nBoth reveal richer distributional shape such as skewness, multimodality, and tail behaviour."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04.html#setting-up",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04.html#setting-up",
+    "title": "Hands-on Exercise 4",
+    "section": "",
+    "text": "pacman::p_load(ggdist, ggridges, ggthemes,\n               colorspace, tidyverse)\n\n\n\n\n\n\n\n\nPackage\nRole\n\n\n\n\nggridges\nRidgeline plots via geom_density_ridges() and variants\n\n\nggdist\nHalf-eye, dot plots, uncertainty visualisation\n\n\nggthemes\nExtra themes, e.g. theme_economist() for publication-ready look\n\n\ncolorspace\nColour manipulation via lighten(), darken(), palette tools\n\n\ntidyverse\nData wrangling (dplyr, tidyr), and base plotting (ggplot2)"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04.html#importing-data",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04.html#importing-data",
+    "title": "Hands-on Exercise 4",
+    "section": "",
+    "text": "exam &lt;- read_csv(\"data/Exam_data.csv\")\nglimpse(exam)\n\nRows: 322\nColumns: 7\n$ ID      &lt;chr&gt; \"Student321\", \"Student305\", \"Student289\", \"Student227\", \"Stude…\n$ CLASS   &lt;chr&gt; \"3I\", \"3I\", \"3H\", \"3F\", \"3I\", \"3I\", \"3I\", \"3I\", \"3I\", \"3H\", \"3…\n$ GENDER  &lt;chr&gt; \"Male\", \"Female\", \"Male\", \"Male\", \"Male\", \"Female\", \"Male\", \"M…\n$ RACE    &lt;chr&gt; \"Malay\", \"Malay\", \"Chinese\", \"Chinese\", \"Malay\", \"Malay\", \"Chi…\n$ ENGLISH &lt;dbl&gt; 21, 24, 26, 27, 27, 31, 31, 31, 33, 34, 34, 36, 36, 36, 37, 38…\n$ MATHS   &lt;dbl&gt; 9, 22, 16, 77, 11, 16, 21, 18, 19, 49, 39, 35, 23, 36, 49, 30,…\n$ SCIENCE &lt;dbl&gt; 15, 16, 16, 31, 25, 16, 25, 27, 15, 37, 42, 22, 32, 36, 35, 45…\n\n\nThe dataset has 322 students across 9 classes (3A–3I) with scores in English, Maths, and Science. Variables CLASS, GENDER, and RACE serve as grouping factors throughout this chapter."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04.html#visualising-distribution-with-ridgeline-plot",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04.html#visualising-distribution-with-ridgeline-plot",
+    "title": "Hands-on Exercise 4",
+    "section": "",
+    "text": "A ridgeline plot (formerly called a Joyplot) shows the distribution of a numeric variable for several groups, stacked with a slight overlap along the y-axis.\n\nWhen to use ridgeline plots:\n\n5 or more groups to compare (if we have fewer groups, use violin/boxplot instead)\nExistence of natural ordering to the groups (e.g. class ranking)\nReveal shape/distribution differences across groups, not just means\n\n\nIn the Exam dataset used here, 9 classes (3A–3I) are a perfect candidate.\n\n\nDistribution of English scores across all 9 classes using geom_density_ridges(). The classes are ordered 3A to 3I (best to weakest by class assignment).\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\nFigure 1: English score distributions by class - basic ridgeline plot.\n\n\n\n\n\n\n\n\nggplot(exam,\n       aes(x = ENGLISH,\n           y = CLASS)) +\n  geom_density_ridges(\n    scale          = 3,\n    rel_min_height = 0.01,\n    bandwidth      = 3.4,\n    fill           = lighten(\"#7097BB\", .3),\n    color          = \"white\"\n  ) +\n  scale_x_continuous(\n    name   = \"English Score\",\n    expand = c(0, 0)\n  ) +\n  scale_y_discrete(\n    name   = NULL,\n    expand = expansion(add = c(0.2, 2.6))\n  ) +\n  theme_ridges()\n\n\n\n\nKey arguments to understand:\n\nscale = 3: It controls how much ridges overlap (higher = more overlap)\nrel_min_height = 0.01: It trims tails below 1% of the peak height, avoiding long flat tails\nbandwidth = 3.4: It controls the kernel density smoother width. The higher, the smoother.\n\n\nTakeaway: Class 3A and 3B have distributions clustered at high scores (70-90), while 3H and 3I are concentrated at low scores (20-50). Notably, the shape differs as well, 3I shows a narrow, peaked distribution (homogeneously weak), while middle classes like 3E-3F show broader, flatter distributions indicating mixed ability.\n\n\n\n\nInstead of a single flat fill colour, we can let the fill vary along the score axis using geom_density_ridges_gradient(). This adds a visual cue for score magnitude.\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\nFigure 2: Maths score distributions with fill colour varying along the score axis.\n\n\n\n\n\n\n\n\nggplot(exam,\n       aes(x    = MATHS,\n           y    = CLASS,\n           fill = after_stat(x))) +\n  geom_density_ridges_gradient(\n    scale          = 3,\n    rel_min_height = 0.01\n  ) +\n  scale_fill_viridis_c(\n    name   = \"Maths Score\",\n    option = \"C\"\n  ) +\n  scale_x_continuous(\n    name   = \"Maths Score\",\n    expand = c(0, 0)\n  ) +\n  scale_y_discrete(\n    name   = NULL,\n    expand = expansion(add = c(0.2, 2.6))\n  ) +\n  theme_ridges()\n\n\n\n\n\nTakeaway: The gradient fill immediately communicates which classes cluster at high vs low scores without needing to read axis values carefully. However, fill and alpha transparency cannot be used together with gradient fills, which is a technical limitation to take note.\n\n\nCode: after_stat(x) is the modern replacement for the deprecated stat(x) syntax used in the course notes. Both map the computed x-axis value onto the fill aesthetic.\n\n\n\n\nBeside providing additional geom objects to support the need to plot ridgeline plot, ggridges package also provides a stat function called stat_density_ridges() that replaces stat_density() of ggplot2.\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\nFigure 3: Science score ridgelines coloured by tail probability (ECDF).\n\n\n\n\n\n\n\n\nggplot(exam,\n       aes(x    = SCIENCE,\n           y    = CLASS,\n           fill = 0.5 - abs(0.5 - after_stat(ecdf)))) +\n  stat_density_ridges(\n    geom      = \"density_ridges_gradient\",\n    calc_ecdf = TRUE\n  ) +\n  scale_fill_viridis_c(\n    name      = \"Tail\\nProbability\",\n    direction = -1\n  ) +\n  scale_x_continuous(name = \"Science Score\", expand = c(0, 0)) +\n  scale_y_discrete(name = NULL, expand = expansion(add = c(0.2, 2.6))) +\n  theme_ridges()\n\n\n\n\n\nTakeaway: The expression 0.5 - abs(0.5 - ecdf) maps values closest to the median to the highest fill value, and tail extremes to the lowest. Dark regions are the rare extreme scores. Bright central bands show where most students fall. This is especially useful for spotting which classes have fat tails (more outliers) vs tight central distributions.\n\n\n\n\n\n\n\nImportant\n\n\n\nAlways include calc_ecdf = TRUE inside stat_density_ridges() when using ECDF-based colour mapping, the plot will silently produce incorrect results without it.\n\n\n\n\n\nWe can colour the ridgeline by quartile bands to make Q1, median, and Q3 immediately visible within each class’s density shape.\n\nQuartile BandThe codeProbability BandThe code\n\n\n\n\n\n\n\n\n\n\nFigure 4: English score ridgelines coloured by quartile band.\n\n\n\n\n\n\n\n\nggplot(exam,\n       aes(x    = ENGLISH,\n           y    = CLASS,\n           fill = factor(after_stat(quantile)))) +\n  stat_density_ridges(\n    geom           = \"density_ridges_gradient\",\n    calc_ecdf      = TRUE,\n    quantiles      = 4,\n    quantile_lines = TRUE\n  ) +\n  scale_fill_viridis_d(name = \"Quartiles\") +\n  scale_x_continuous(name = \"English Score\", expand = c(0, 0)) +\n  scale_y_discrete(name = NULL, expand = expansion(add = c(0.2, 2.6))) +\n  theme_ridges()\n\n\n\n\n\n\n\n\n\n\n\nFigure 5: English scores with 2.5% and 97.5% tail regions highlighted in red/blue.\n\n\n\n\n\n\n\n\nggplot(exam,\n       aes(x    = ENGLISH,\n           y    = CLASS,\n           fill = factor(after_stat(quantile)))) +\n  stat_density_ridges(\n    geom      = \"density_ridges_gradient\",\n    calc_ecdf = TRUE,\n    quantiles = c(0.025, 0.975)\n  ) +\n  scale_fill_manual(\n    name   = \"Probability\",\n    values = c(\"#FF0000A0\", \"#A0A0A0A0\", \"#0000FFA0\"),\n    labels = c(\"Bottom 2.5%\", \"Middle 95%\", \"Top 2.5%\")\n  ) +\n  scale_x_continuous(name = \"English Score\", expand = c(0, 0)) +\n  scale_y_discrete(name = NULL, expand = expansion(add = c(0.2, 2.6))) +\n  theme_ridges()"
   }
 ]
