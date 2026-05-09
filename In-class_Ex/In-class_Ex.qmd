@@ -1,0 +1,12 @@
+---
+title: "In-class Exercises using Tableau for Data Visualisation"
+author: "Lei Yuhe"
+date: "May 10, 2026"
+date-modified: "last-modified"
+execute:
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+---
+

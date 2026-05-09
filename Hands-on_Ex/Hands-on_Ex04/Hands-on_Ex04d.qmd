@@ -1,0 +1,144 @@
+---
+title: "Hands-on Exercise 4d: Building Funnel Plot with R"
+author: "Lei Yuhe"
+date: "May 3, 2026"
+date-modified: "last-modified"
+execute:
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+---
+
+# Funnel Plots for Fair Comparison
+
+## Overview
+
+Three methods for creating **funnel plots** for fair visual comparison:
+
+1.  The `FunnelPlotR` package (quick method)
+2.  `ggplot2` from scratch (manual method)
+3.  `plotly` + `ggplot2` for interactivity
+
+The dataset used is **COVID-19_DKI_Jakarta.csv**, which contains cumulative COVID-19 cases and deaths by sub-district (*kelurahan*) as at 31 July 2021.
+
+------------------------------------------------------------------------
+
+## Load Packages
+
+```{r}
+#| label: load-packages
+
+pacman::p_load(tidyverse, FunnelPlotR, plotly, knitr)
+```
+
+**Packages used:**
+
+| Package       | Purpose                                  |
+|---------------|------------------------------------------|
+| `tidyverse`   | Data wrangling & `ggplot2` visualisation |
+| `FunnelPlotR` | High-level funnel plot creation          |
+| `plotly`      | Interactive visualisation                |
+| `knitr`       | Rendering static HTML tables             |
+
+------------------------------------------------------------------------
+
+## Import Data
+
+```{r}
+#| label: import-data
+
+covid19 <- read_csv("data/COVID-19_DKI_Jakarta.csv") %>%
+  mutate_if(is.character, as.factor)
+```
+
+::: callout-note
+The dataset covers 267 sub-districts across five cities in DKI Jakarta. Key columns are `Positive` (cumulative confirmed cases) and `Death` (cumulative deaths).
+:::
+
+Preview the first few rows:
+
+```{r}
+#| label: preview-data
+
+covid19 %>%
+  head(6) %>%
+  kable()
+```
+
+## FunnelPlotR Methods
+
+### Basic Funnel Plot
+
+The simplest call to `funnel_plot()` requires only a numerator, denominator, and group variable.
+
+```{r}
+#| label: funnelplotr-basic
+#| fig-width: 10
+
+funnel_plot(
+  .data       = covid19,
+  numerator   = Positive,
+  denominator = Death,
+  group       = `Sub-district`
+)
+```
+
+::: callout-tip
+**What to note:**
+
+-   `group` defines the granularity of points (sub-district vs. district or city).
+-   Default `data_type` is `"SR"` (standardised ratio).
+-   The plot is automatically adjusted for overdispersion.
+-   Confidence limits shown are 95% and 99.8% by default.
+:::
+
+------------------------------------------------------------------------
+
+### Makeover 1. Switch to Proportions with Zoomed Axes
+
+Swap numerator/denominator so we plot the **fatality rate** (deaths ÷ positives), change `data_type` to `"PR"` (proportions), and zoom the axes for readability.
+
+```{r}
+#| label: funnelplotr-makeover1
+#| fig-width: 10
+
+funnel_plot(
+  .data       = covid19,
+  numerator   = Death,
+  denominator = Positive,
+  group       = `Sub-district`,
+  data_type   = "PR",        # proportions instead of standardised ratio
+  xrange      = c(0, 6500),  # zoom x-axis
+  yrange      = c(0, 0.05)   # zoom y-axis
+)
+```
+
+::: callout-tip
+`data_type = "PR"` switches the underlying statistical model to a proportion-based funnel, which is more appropriate when comparing rates (deaths per case) across units of different sizes.
+:::
+
+------------------------------------------------------------------------
+
+### Makeover 2. Clean Labels and Title
+
+Remove automatic outlier labels and add descriptive axis titles and a plot title.
+
+```{r}
+#| label: funnelplotr-makeover2
+#| fig-width: 10
+
+funnel_plot(
+  .data       = covid19,
+  numerator   = Death,
+  denominator = Positive,
+  group       = `Sub-district`,
+  data_type   = "PR",
+  xrange      = c(0, 6500),
+  yrange      = c(0, 0.05),
+  label       = NA,           # remove outlier labels
+  title       = "Cumulative COVID-19 Fatality Rate by Cumulative Total Number of COVID-19 Positive Cases",
+  x_label     = "Cumulative COVID-19 Positive Cases",
+  y_label     = "Cumulative Fatality Rate"
+)
+```

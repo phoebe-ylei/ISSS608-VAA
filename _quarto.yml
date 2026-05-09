@@ -8,14 +8,21 @@ website:
     left:
     - text: "Hands-on Exercises"
       menu: 
-        - text: "Hands-on Exercise 1"
+        - text: "1. Layered Grammar of Graphics: ggplot2"
           href: "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html"
-        - text: "Hands-on Exercise 2"
+        - text: "2. Beyond ggplot2 Fundamentals"
           href: "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html"
-        - text: "Hands-on Exercise 3"
-          href: "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03.html"
-        - text: "Hands-on Exercise 4"
-          href: "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04.html"
+        - text: "3a. Interactive Data Visualization"
+          href: "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03a.html"
+        - text: "4a. Visualizing Distribution"
+          href: "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04a.html"
+        - text: "4d. Building Funnel Plot"
+          href: "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04d.html"
+    - text: "In-class Exercises"
+      href: "In-class_Ex/In-class_Ex.html"
+    - text: "Take-home Exercises"
+      menu:
+        - text: "Take-home Exercise 1"
     right: 
       - href: index.qmd
         text: Home

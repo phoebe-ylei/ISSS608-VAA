@@ -1,5 +1,5 @@
 ---
-title: "Hands-on Exercise 2"
+title: "Hands-on Exercise 2: Beyond ggplot2 Fundamentals"
 author: "Lei Yuhe"
 date: "April 19, 2026"
 date-modified: "last-modified"
@@ -12,35 +12,36 @@ format: html
 ---
 
 ## Beyond ggplot2 Fundamentals
-Beside tidyverse, four R packages will be used. Here is a table for the packages, their purpose and primary functions: 
+
+Beside tidyverse, four R packages will be used. Here is a table for the packages, their purpose and primary functions:
 
 | Package | Purpose | Primary Functions |
-|---|---|---|
+|------------------------|------------------------|------------------------|
 | `ggrepel` | Repel overlapping text and label geoms | `geom_text_repel()`, `geom_label_repel()` |
 | `patchwork` | Compose multiple ggplots into a single figure | `+`, `/`, `\|`, `plot_layout()`, `plot_annotation()` |
 | `ggthemes` | Extra themes inspired by news and science outlets | `theme_economist()`, `theme_wsj()`, `theme_tufte()` |
 | `hrbrthemes` | Typography-centric, publication-ready themes | `theme_ipsum()`, `theme_ipsum_rc()`, `theme_modern_rc()` |
 | `tidyverse` | Core data wrangling and ggplot2 visualisation | `ggplot()`, `dplyr`, `tidyr`, `readr` |
 
-Check the installation: 
+Check the installation:
+
 ```{r}
 pacman::p_load(ggrepel, patchwork, 
                ggthemes, hrbrthemes,
                tidyverse) 
 ```
 
-Import the data: 
+Import the data:
+
 ```{r}
 exam_data <- read_csv("data/Exam_data.csv")
 ```
-
 
 ## Beyond ggplot2 Annotation: ggrepel
 
 One of the challenge in plotting statistical graph is annotation, especially with large number of data points.
 
-::: {.panel-tabset}
-
+::: panel-tabset
 ## The plot
 
 ```{r, echo=FALSE}
@@ -60,7 +61,7 @@ ggplot(data = exam_data,
 
 ## The code
 
-```r
+``` r
 ggplot(data = exam_data,
        aes(x = MATHS,
            y = ENGLISH)) +
@@ -74,13 +75,11 @@ ggplot(data = exam_data,
                   ylim = c(0, 100)) +
   ggtitle("English scores versus Maths scores for Primary 3")
 ```
-
 :::
 
 ## Working with ggrepel
 
-::: {.panel-tabset}
-
+::: panel-tabset
 ## The plot
 
 ```{r, echo=FALSE}
@@ -99,7 +98,7 @@ ggplot(data = exam_data,
 
 ## The code
 
-```r
+``` r
 ggplot(data = exam_data,
        aes(x = MATHS,
            y = ENGLISH)) +
@@ -112,16 +111,13 @@ ggplot(data = exam_data,
                   ylim = c(0, 100)) +
   ggtitle("English scores versus Maths scores for Primary 3")
 ```
-
 :::
-
 
 ## Beyond ggplots Themes: ggthemes & hrbrthemes
 
 ggplot2 comes with eight [built-in themes](https://ggplot2.tidyverse.org/reference/ggtheme.html), they are: `theme_gray()`, `theme_bw()`, `theme_classic()`, `theme_dark()`, `theme_light()`, `theme_linedraw()`, `theme_minimal()`, and `theme_void()`.
 
-::: {.panel-tabset}
-
+::: panel-tabset
 ## The plot
 
 ```{r, echo=FALSE}
@@ -137,7 +133,7 @@ ggplot(data = exam_data,
 
 ## The code
 
-```r
+``` r
 ggplot(data = exam_data,
        aes(x = MATHS)) +
   geom_histogram(bins = 20,
@@ -147,7 +143,6 @@ ggplot(data = exam_data,
   theme_gray() +
   ggtitle("Distribution of Maths scores")
 ```
-
 :::
 
 Refer to this [link](https://ggplot2.tidyverse.org/reference/ggtheme.html) to learn more about ggplot2 `Themes`
@@ -158,8 +153,7 @@ Refer to this [link](https://ggplot2.tidyverse.org/reference/ggtheme.html) to le
 
 In the example below, *The Economist* theme is used.
 
-::: {.panel-tabset}
-
+::: panel-tabset
 ## The plot
 
 ```{r, echo=FALSE}
@@ -175,7 +169,7 @@ ggplot(data = exam_data,
 
 ## The code
 
-```r
+``` r
 ggplot(data = exam_data,
        aes(x = MATHS)) +
   geom_histogram(bins = 20,
@@ -185,14 +179,11 @@ ggplot(data = exam_data,
   ggtitle("Distribution of Maths scores") +
   theme_economist()
 ```
-
 :::
-
 
 ## Working with hrbrthemes
 
-::: {.panel-tabset}
-
+::: panel-tabset
 ## The plot
 
 ```{r, echo=FALSE}
@@ -210,7 +201,7 @@ ggplot(data = exam_data,
 
 ## The code
 
-```r
+``` r
 ggplot(data = exam_data,
        aes(x = MATHS)) +
   geom_histogram(bins = 20,
@@ -222,24 +213,21 @@ ggplot(data = exam_data,
               base_size = 15,
               grid = "Y")
 ```
-
 :::
 
-::: {.callout-tip}
+::: callout-tip
 ## What can we learn from the code chunk above?
 
-- `axis_title_size` argument is used to increase the font size of the axis title to 18,
-- `base_size` argument is used to increase the default axis label to 15, and
-- `grid` argument is used to remove the x-axis grid lines.
+-   `axis_title_size` argument is used to increase the font size of the axis title to 18,
+-   `base_size` argument is used to increase the default axis label to 15, and
+-   `grid` argument is used to remove the x-axis grid lines.
 :::
-
 
 ## Beyond Single Graph
 
-Plotting below 3 single graphs for composition. 
+Plotting below 3 single graphs for composition.
 
-::: {.panel-tabset}
-
+::: panel-tabset
 ## The plot
 
 ```{r, echo=FALSE}
@@ -257,7 +245,7 @@ p1
 
 ## The code
 
-```r
+``` r
 p1 <- ggplot(data=exam_data, 
              aes(x = MATHS)) +
   geom_histogram(bins=20, 
@@ -269,7 +257,7 @@ p1 <- ggplot(data=exam_data,
 ```
 :::
 
-::: {.panel-tabset}
+::: panel-tabset
 ## The plot
 
 ```{r, echo=FALSE}
@@ -287,7 +275,7 @@ p2
 
 ## The code
 
-```r
+``` r
 p2 <- ggplot(data=exam_data, 
              aes(x = ENGLISH)) +
   geom_histogram(bins=20, 
@@ -299,7 +287,7 @@ p2 <- ggplot(data=exam_data,
 ```
 :::
 
-::: {.panel-tabset}
+::: panel-tabset
 ## The plot
 
 ```{r, echo=FALSE}
@@ -318,7 +306,7 @@ p3
 
 ## The code
 
-```r
+``` r
 p3 <- ggplot(data=exam_data, 
              aes(x= MATHS, 
                  y=ENGLISH)) +
@@ -333,7 +321,7 @@ p3 <- ggplot(data=exam_data,
 
 ## Creating Composite Graphics: pathwork methods
 
-::: {.panel-tabset}
+::: panel-tabset
 ## The plot
 
 ```{r, echo=FALSE}
@@ -342,11 +330,7 @@ p3 <- ggplot(data=exam_data,
 
 ## The code
 
-```r
+``` r
 (p1 / p2) | p3
 ```
 :::
-
-
-
-
