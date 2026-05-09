@@ -192,6 +192,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#visualising-distribution-with-raincloud-plot" id="toc-visualising-distribution-with-raincloud-plot" class="nav-link" data-scroll-target="#visualising-distribution-with-raincloud-plot">Visualising Distribution with Raincloud Plot</a></li>
   </ul></li>
+  <li><a href="#funnel-plots-for-fair-comparison" id="toc-funnel-plots-for-fair-comparison" class="nav-link" data-scroll-target="#funnel-plots-for-fair-comparison">Funnel Plots for Fair Comparison</a>
+  <ul class="collapse">
+  <li><a href="#overview-1" id="toc-overview-1" class="nav-link" data-scroll-target="#overview-1">Overview</a></li>
+  <li><a href="#load-packages" id="toc-load-packages" class="nav-link" data-scroll-target="#load-packages">Load Packages</a></li>
+  <li><a href="#import-data" id="toc-import-data" class="nav-link" data-scroll-target="#import-data">Import Data</a></li>
+  <li><a href="#funnelplotr-methods" id="toc-funnelplotr-methods" class="nav-link" data-scroll-target="#funnelplotr-methods">FunnelPlotR Methods</a>
+  <ul class="collapse">
+  <li><a href="#basic-funnel-plot" id="toc-basic-funnel-plot" class="nav-link" data-scroll-target="#basic-funnel-plot">Basic Funnel Plot</a></li>
+  <li><a href="#makeover-1.-switch-to-proportions-with-zoomed-axes" id="toc-makeover-1.-switch-to-proportions-with-zoomed-axes" class="nav-link" data-scroll-target="#makeover-1.-switch-to-proportions-with-zoomed-axes">Makeover 1. Switch to Proportions with Zoomed Axes</a></li>
+  <li><a href="#makeover-2.-clean-labels-and-title" id="toc-makeover-2.-clean-labels-and-title" class="nav-link" data-scroll-target="#makeover-2.-clean-labels-and-title">Makeover 2. Clean Labels and Title</a></li>
+  </ul></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -654,8 +666,278 @@ Figure&nbsp;6: Raincloud plot: Maths scores by Gender.
 </div>
 </div>
 </div>
+</section>
+</section>
+<section id="funnel-plots-for-fair-comparison" class="level1">
+<h1>Funnel Plots for Fair Comparison</h1>
+<section id="overview-1" class="level2">
+<h2 class="anchored" data-anchor-id="overview-1">Overview</h2>
+<p>Three methods for creating <strong>funnel plots</strong> for fair visual comparison:</p>
+<ol type="1">
+<li>The <code>FunnelPlotR</code> package (quick method)</li>
+<li><code>ggplot2</code> from scratch (manual method)</li>
+<li><code>plotly</code> + <code>ggplot2</code> for interactivity</li>
+</ol>
+<p>The dataset used is <strong>COVID-19_DKI_Jakarta.csv</strong>, which contains cumulative COVID-19 cases and deaths by sub-district (<em>kelurahan</em>) as at 31 July 2021.</p>
+<hr>
+</section>
+<section id="load-packages" class="level2">
+<h2 class="anchored" data-anchor-id="load-packages">Load Packages</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(tidyverse, FunnelPlotR, plotly, knitr)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Packages used:</strong></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Package</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>tidyverse</code></td>
+<td>Data wrangling &amp; <code>ggplot2</code> visualisation</td>
+</tr>
+<tr class="even">
+<td><code>FunnelPlotR</code></td>
+<td>High-level funnel plot creation</td>
+</tr>
+<tr class="odd">
+<td><code>plotly</code></td>
+<td>Interactive visualisation</td>
+</tr>
+<tr class="even">
+<td><code>knitr</code></td>
+<td>Rendering static HTML tables</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="import-data" class="level2">
+<h2 class="anchored" data-anchor-id="import-data">Import Data</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>covid19 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/COVID-19_DKI_Jakarta.csv"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_if</span>(is.character, as.factor)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The dataset covers 267 sub-districts across five cities in DKI Jakarta. Key columns are <code>Positive</code> (cumulative confirmed cases) and <code>Death</code> (cumulative deaths).</p>
+</div>
+</div>
+<p>Preview the first few rows:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>covid19 <span class="sc">%&gt;%</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">6</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 18%">
+<col style="width: 18%">
+<col style="width: 19%">
+<col style="width: 14%">
+<col style="width: 10%">
+<col style="width: 11%">
+<col style="width: 6%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">Sub-district ID</th>
+<th style="text-align: left;">City</th>
+<th style="text-align: left;">District</th>
+<th style="text-align: left;">Sub-district</th>
+<th style="text-align: right;">Positive</th>
+<th style="text-align: right;">Recovered</th>
+<th style="text-align: right;">Death</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">3172051003</td>
+<td style="text-align: left;">JAKARTA UTARA</td>
+<td style="text-align: left;">PADEMANGAN</td>
+<td style="text-align: left;">ANCOL</td>
+<td style="text-align: right;">1776</td>
+<td style="text-align: right;">1691</td>
+<td style="text-align: right;">26</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3173041007</td>
+<td style="text-align: left;">JAKARTA BARAT</td>
+<td style="text-align: left;">TAMBORA</td>
+<td style="text-align: left;">ANGKE</td>
+<td style="text-align: right;">1783</td>
+<td style="text-align: right;">1720</td>
+<td style="text-align: right;">29</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3175041005</td>
+<td style="text-align: left;">JAKARTA TIMUR</td>
+<td style="text-align: left;">KRAMAT JATI</td>
+<td style="text-align: left;">BALE KAMBANG</td>
+<td style="text-align: right;">2049</td>
+<td style="text-align: right;">1964</td>
+<td style="text-align: right;">31</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3175031003</td>
+<td style="text-align: left;">JAKARTA TIMUR</td>
+<td style="text-align: left;">JATINEGARA</td>
+<td style="text-align: left;">BALI MESTER</td>
+<td style="text-align: right;">827</td>
+<td style="text-align: right;">797</td>
+<td style="text-align: right;">13</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3175101006</td>
+<td style="text-align: left;">JAKARTA TIMUR</td>
+<td style="text-align: left;">CIPAYUNG</td>
+<td style="text-align: left;">BAMBU APUS</td>
+<td style="text-align: right;">2866</td>
+<td style="text-align: right;">2792</td>
+<td style="text-align: right;">27</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3174031002</td>
+<td style="text-align: left;">JAKARTA SELATAN</td>
+<td style="text-align: left;">MAMPANG PRAPATAN</td>
+<td style="text-align: left;">BANGKA</td>
+<td style="text-align: right;">1828</td>
+<td style="text-align: right;">1757</td>
+<td style="text-align: right;">26</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="funnelplotr-methods" class="level2">
+<h2 class="anchored" data-anchor-id="funnelplotr-methods">FunnelPlotR Methods</h2>
+<section id="basic-funnel-plot" class="level3">
+<h3 class="anchored" data-anchor-id="basic-funnel-plot">Basic Funnel Plot</h3>
+<p>The simplest call to <code>funnel_plot()</code> requires only a numerator, denominator, and group variable.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">funnel_plot</span>(</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">.data       =</span> covid19,</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">numerator   =</span> Positive,</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">denominator =</span> Death,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">group       =</span> <span class="st">`</span><span class="at">Sub-district</span><span class="st">`</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-on_Ex04_files/figure-html/funnelplotr-basic-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>A funnel plot object with 267 points of which 0 are outliers. 
+Plot is adjusted for overdispersion. </code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>What to note:</strong></p>
+<ul>
+<li><code>group</code> defines the granularity of points (sub-district vs.&nbsp;district or city).</li>
+<li>Default <code>data_type</code> is <code>"SR"</code> (standardised ratio).</li>
+<li>The plot is automatically adjusted for overdispersion.</li>
+<li>Confidence limits shown are 95% and 99.8% by default.</li>
+</ul>
+</div>
+</div>
+<hr>
+</section>
+<section id="makeover-1.-switch-to-proportions-with-zoomed-axes" class="level3">
+<h3 class="anchored" data-anchor-id="makeover-1.-switch-to-proportions-with-zoomed-axes">Makeover 1. Switch to Proportions with Zoomed Axes</h3>
+<p>Swap numerator/denominator so we plot the <strong>fatality rate</strong> (deaths ÷ positives), change <code>data_type</code> to <code>"PR"</code> (proportions), and zoom the axes for readability.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">funnel_plot</span>(</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">.data       =</span> covid19,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">numerator   =</span> Death,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">denominator =</span> Positive,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">group       =</span> <span class="st">`</span><span class="at">Sub-district</span><span class="st">`</span>,</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">data_type   =</span> <span class="st">"PR"</span>,        <span class="co"># proportions instead of standardised ratio</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">xrange      =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">6500</span>),  <span class="co"># zoom x-axis</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">yrange      =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.05</span>)   <span class="co"># zoom y-axis</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-on_Ex04_files/figure-html/funnelplotr-makeover1-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>A funnel plot object with 267 points of which 7 are outliers. 
+Plot is adjusted for overdispersion. </code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>data_type = "PR"</code> switches the underlying statistical model to a proportion-based funnel, which is more appropriate when comparing rates (deaths per case) across units of different sizes.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="makeover-2.-clean-labels-and-title" class="level3">
+<h3 class="anchored" data-anchor-id="makeover-2.-clean-labels-and-title">Makeover 2. Clean Labels and Title</h3>
+<p>Remove automatic outlier labels and add descriptive axis titles and a plot title.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">funnel_plot</span>(</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">.data       =</span> covid19,</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">numerator   =</span> Death,</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">denominator =</span> Positive,</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">group       =</span> <span class="st">`</span><span class="at">Sub-district</span><span class="st">`</span>,</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">data_type   =</span> <span class="st">"PR"</span>,</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">xrange      =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">6500</span>),</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">yrange      =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.05</span>),</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">label       =</span> <span class="cn">NA</span>,           <span class="co"># remove outlier labels</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">title       =</span> <span class="st">"Cumulative COVID-19 Fatality Rate by Cumulative Total Number of COVID-19 Positive Cases"</span>,</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">x_label     =</span> <span class="st">"Cumulative COVID-19 Positive Cases"</span>,</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">y_label     =</span> <span class="st">"Cumulative Fatality Rate"</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-on_Ex04_files/figure-html/funnelplotr-makeover2-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>A funnel plot object with 267 points of which 7 are outliers. 
+Plot is adjusted for overdispersion. </code></pre>
+</div>
+</div>
 
 
+</section>
 </section>
 </section>
 
