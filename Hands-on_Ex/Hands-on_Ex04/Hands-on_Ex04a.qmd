@@ -429,3 +429,8 @@ ggplot(exam,
   theme_economist()
 ```
 :::
+
+## Reference
+
+Kam, T.S. (2023). [Visualising Distribution](https://r4va.netlify.app/chap09).
+

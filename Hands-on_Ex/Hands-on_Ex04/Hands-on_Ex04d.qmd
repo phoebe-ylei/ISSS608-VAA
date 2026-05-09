@@ -142,3 +142,185 @@ funnel_plot(
   y_label     = "Cumulative Fatality Rate"
 )
 ```
+
+
+
+
+## Building a Funnel Plot from Scratch with ggplot2
+
+Using `FunnelPlotR` is convenient, but building the plot manually with `ggplot2` gives full control over every visual element. 
+
+### Derive Basic Fields
+
+Compute the **death rate** and its **standard error** for each sub-district, then filter out zero-rate sub-districts.
+
+```{r}
+#| label: derive-fields
+
+df <- covid19 %>%
+  mutate(rate    = Death / Positive,
+         rate.se = sqrt((rate * (1 - rate)) / Positive)) %>%
+  filter(rate > 0)
+
+glimpse(df)
+```
+
+Compute the **weighted grand mean** rate (inverse-variance weighting):
+
+```{r}
+#| label: fit-mean
+
+fit.mean <- weighted.mean(df$rate, 1 / df$rate.se^2)
+fit.mean
+```
+
+---
+
+### Compute 95% and 99.9% Confidence Limits
+
+Generate a sequence of denominator values from 1 to the maximum, then compute lower/upper funnel limits at both confidence levels.
+
+```{r}
+#| label: compute-ci
+
+number.seq   <- seq(1, max(df$Positive), 1)
+
+number.ll95  <- fit.mean - 1.96 * sqrt((fit.mean * (1 - fit.mean)) / number.seq)
+number.ul95  <- fit.mean + 1.96 * sqrt((fit.mean * (1 - fit.mean)) / number.seq)
+number.ll999 <- fit.mean - 3.29 * sqrt((fit.mean * (1 - fit.mean)) / number.seq)
+number.ul999 <- fit.mean + 3.29 * sqrt((fit.mean * (1 - fit.mean)) / number.seq)
+
+dfCI <- data.frame(
+  number.seq, fit.mean,
+  number.ll95, number.ul95,
+  number.ll999, number.ul999
+)
+
+head(dfCI)
+```
+
+::: callout-note
+**Why these multipliers?**
+
+| Limit | Multiplier | Interpretation |
+|---|---|---|
+| 95% CI | 1.96 | ~2 SD from mean; "common cause" variation |
+| 99.9% CI | 3.29 | ~3.3 SD from mean; strong evidence of outlier |
+:::
+
+---
+
+### Static Funnel Plot with ggplot2
+
+Layer the data points, funnel bands, and a mean reference line.
+
+```{r}
+#| label: static-funnel-plot
+#| fig-width: 10
+#| fig-height: 6
+
+p <- ggplot(df, aes(x = Positive, y = rate)) +
+  
+  # Data points
+  geom_point(aes(label = `Sub-district`),
+             alpha = 0.4) +
+  
+  # 95% lower limit (dashed)
+  geom_line(data = dfCI,
+            aes(x = number.seq, y = number.ll95),
+            size = 0.4, colour = "grey40", linetype = "dashed") +
+  
+  # 95% upper limit (dashed)
+  geom_line(data = dfCI,
+            aes(x = number.seq, y = number.ul95),
+            size = 0.4, colour = "grey40", linetype = "dashed") +
+  
+  # 99.9% lower limit (solid)
+  geom_line(data = dfCI,
+            aes(x = number.seq, y = number.ll999),
+            size = 0.4, colour = "grey40") +
+  
+  # 99.9% upper limit (solid)
+  geom_line(data = dfCI,
+            aes(x = number.seq, y = number.ul999),
+            size = 0.4, colour = "grey40") +
+  
+  # Grand mean reference line
+  geom_hline(data = dfCI,
+             aes(yintercept = fit.mean),
+             size = 0.4, colour = "grey40") +
+  
+  # Zoom y-axis without clipping CI lines
+  coord_cartesian(ylim = c(0, 0.05)) +
+  
+  # CI band labels
+  annotate("text", x = 1,   y = -0.13, label = "95%",
+           size = 3, colour = "grey40") +
+  annotate("text", x = 4.5, y = -0.18, label = "99%",
+           size = 3, colour = "grey40") +
+  
+  # Titles
+  ggtitle("Cumulative Fatality Rate by Cumulative Number of COVID-19 Cases") +
+  xlab("Cumulative Number of COVID-19 Cases") +
+  ylab("Cumulative Fatality Rate") +
+  
+  theme_light() +
+  theme(
+    plot.title        = element_text(size = 12),
+    legend.position   = c(0.91, 0.85),
+    legend.title      = element_text(size = 7),
+    legend.text       = element_text(size = 7),
+    legend.background = element_rect(colour = "grey60", linetype = "dotted"),
+    legend.key.height = unit(0.3, "cm")
+  )
+
+p
+```
+
+::: callout-tip
+**Reading the funnel plot:**
+
+- Points **within** the 95% band: variation is within expected statistical noise.
+- Points **between** the 95% and 99.9% bands: moderate evidence of unusual performance.
+- Points **outside** the 99.9% band: strong evidence the sub-district's rate differs from the overall average.
+:::
+
+---
+
+### Interactive Funnel Plot with plotly
+
+Wrap the `ggplot2` object with `ggplotly()` to enable hover tooltips showing the sub-district name, case count, and fatality rate.
+
+```{r}
+#| label: interactive-funnel-plot
+
+fp_ggplotly <- ggplotly(p,
+  tooltip = c("label", "x", "y"))
+
+fp_ggplotly
+```
+
+::: callout-tip
+Hover over any point to see the **sub-district name**, **cumulative positive cases**, and **fatality rate**. This makes it easy to identify and investigate outlying sub-districts without cluttering the static chart with labels.
+:::
+
+---
+
+## Summary
+
+| Method | Pros | Cons |
+|---|---|---|
+| `FunnelPlotR` | Fast, handles overdispersion automatically | Limited customisation |
+| `ggplot2` (manual) | Full control over every visual element | More code required |
+| `plotly` + `ggplot2` | Adds interactivity with minimal extra code | Requires `label` aesthetic on `geom_point` |
+
+A funnel plot is most valuable when we need to compare many units (e.g., hospitals, districts) while accounting for the fact that **smaller units have more variability** — the narrowing funnel shape naturally encodes this statistical reality.
+
+---
+
+## Reference
+
+Kam, T.S. (2023). [Funnel Plots for Fair Comparisons](https://r4va.netlify.app/chap08).
+
+
+
