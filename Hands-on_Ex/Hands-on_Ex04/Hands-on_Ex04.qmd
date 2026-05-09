@@ -371,3 +371,85 @@ ggplot(exam,
 
 
 
+## Visualising Distribution with Raincloud Plot
+
+A **Raincloud plot** overlays three visual layers to give a complete picture of
+the distribution:
+
+| Layer | Geom | What it shows |
+|---|---|---|
+| Half-density ("cloud") | `stat_halfeye()` | Overall shape, skewness, modes |
+| Boxplot | `geom_boxplot()` | Median, IQR, outliers |
+| Dot plot ("rain") | `stat_dots()` | Individual data points, sample size |
+
+:::: panel-tabset
+#### The plot
+```{r}
+#| label: fig-raincloud-gender
+#| fig-cap: "Raincloud plot: Maths scores by Gender."
+#| fig-height: 3.5
+#| echo: false
+
+ggplot(exam,
+       aes(x = GENDER,
+           y = MATHS)) +
+  stat_halfeye(
+    adjust        = 0.5,
+    justification = -0.2,
+    .width        = 0,
+    point_colour  = NA
+  ) +
+  geom_boxplot(
+    width         = 0.20,
+    outlier.shape = NA
+  ) +
+  stat_dots(
+    side          = "left",
+    justification = 1.2,
+    binwidth      = 0.5,
+    dotsize       = 1.5
+  ) +
+  coord_flip() +
+  theme_economist()
+```
+
+#### The code
+```{r}
+#| eval: false
+
+ggplot(exam,
+       aes(x = GENDER,
+           y = MATHS)) +
+  stat_halfeye(
+    adjust        = 0.5,
+    justification = -0.2,
+    .width        = 0,
+    point_colour  = NA
+  ) +
+  geom_boxplot(
+    width         = 0.20,
+    outlier.shape = NA
+  ) +
+  stat_dots(
+    side          = "left",
+    justification = 1.2,
+    binwidth      = 0.5,
+    dotsize       = 1.5
+  ) +
+  coord_flip() +
+  theme_economist()
+```
+
+::::
+
+
+
+
+
+
+
+
+
+
+
+
