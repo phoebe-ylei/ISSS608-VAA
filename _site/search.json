@@ -313,5 +313,47 @@
     "title": "4a. Visualizing Distribution",
     "section": "",
     "text": "Kam, T.S. (2023). Visualising Distribution."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html",
+    "href": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html",
+    "title": "Hands-on Exercise 3b: Programming Animated Statistical Graphics with R",
+    "section": "",
+    "text": "When creating animations, the plot does not actually move. Instead, many individual plots are built and then stitched together as movie frames, like an old-school flip book or cartoon. Each frame is a different plot when conveying motion, built using a relevant subset of the aggregate data. The subset drives the flow of the animation when stitched back together.\nBefore diving in, it is important to understand some key concepts:\n\nFrame: Each frame represents a different point in time or category. When the frame changes, the data points on the graph update to reflect the new data.\nAnimation Attributes: Settings that control how the animation behaves — for example, the duration of each frame, the easing function used to transition between frames, and whether to start from the current frame or the beginning."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html#basic-concepts-of-animation",
+    "href": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html#basic-concepts-of-animation",
+    "title": "Hands-on Exercise 3b: Programming Animated Statistical Graphics with R",
+    "section": "",
+    "text": "When creating animations, the plot does not actually move. Instead, many individual plots are built and then stitched together as movie frames, like an old-school flip book or cartoon. Each frame is a different plot when conveying motion, built using a relevant subset of the aggregate data. The subset drives the flow of the animation when stitched back together.\nBefore diving in, it is important to understand some key concepts:\n\nFrame: Each frame represents a different point in time or category. When the frame changes, the data points on the graph update to reflect the new data.\nAnimation Attributes: Settings that control how the animation behaves — for example, the duration of each frame, the easing function used to transition between frames, and whether to start from the current frame or the beginning."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html#getting-started",
+    "href": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html#getting-started",
+    "title": "Hands-on Exercise 3b: Programming Animated Statistical Graphics with R",
+    "section": "Getting Started",
+    "text": "Getting Started\n\nLoading the R Packages\nThe following packages are used in this chapter:\n\nplotly for plotting interactive statistical graphs\ngganimate: a ggplot2 extension for animated statistical graphs\ngifski converts video frames to GIF animations using efficient cross-frame palettes and temporal dithering\ngapminder provides the country_colors colour scheme used in the plots\ntidyverse for data wrangling, transformation, and static graphics\n\n\npacman::p_load(readxl, gifski, gapminder,\n               plotly, gganimate, tidyverse)\n\n\n\nImporting the Data\nThe Data worksheet from the GlobalPopulation Excel workbook is used throughout this chapter.\n\ncol &lt;- c(\"Country\", \"Continent\")\nglobalPop &lt;- read_xls(\"data/GlobalPopulation.xls\",\n                      sheet = \"Data\") %&gt;%\n  mutate(across(col, as.factor)) %&gt;%\n  mutate(Year = as.integer(Year))\n\n\n\n\n\n\n\nNote\n\n\n\nThings to learn from the code chunk above:\n\nread_xls() from readxl imports the Excel worksheet.\nmutate(across()) converts the Country and Continent character columns to factors. This replaces the deprecated mutate_each_() and mutate_at() approaches from older dplyr versions.\nmutate(Year = as.integer(Year)) converts the Year field to integer type."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html#animated-data-visualisation-gganimate-methods",
+    "href": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html#animated-data-visualisation-gganimate-methods",
+    "title": "Hands-on Exercise 3b: Programming Animated Statistical Graphics with R",
+    "section": "Animated Data Visualisation: gganimate Methods",
+    "text": "Animated Data Visualisation: gganimate Methods\ngganimate extends the grammar of graphics implemented by ggplot2 to include animation. It provides a range of new grammar classes that can be added to the plot object:\n\n\n\n\n\n\n\nFunction\nPurpose\n\n\n\n\ntransition_*()\nDefines how data spreads across time\n\n\nview_*()\nDefines how positional scales change during animation\n\n\nshadow_*()\nDefines how data from other time points is displayed\n\n\nenter_*()/exit_*()\nDefines how new/old data appears and disappears\n\n\nease_aes()\nDefines how aesthetics are eased during transitions\n\n\n\n\nBuilding a Static Population Bubble Plot\nThe basic ggplot2 functions are used to create a static bubble plot first. This is the foundation before animating.\n\nggplot(globalPop, aes(x = Old, y = Young,\n                      size = Population,\n                      colour = Country)) +\n  geom_point(alpha = 0.7,\n             show.legend = FALSE) +\n  scale_colour_manual(values = country_colors) +\n  scale_size(range = c(2, 12)) +\n  labs(title = 'Year: {frame_time}',\n       x = '% Aged',\n       y = '% Young')\n\n\n\n\n\n\n\n\n\n\nBuilding the Animated Bubble Plot\nTwo gganimate functions are added to bring the plot to life:\n\ntransition_time(): creates transitions through distinct states in time (i.e. Year)\nease_aes(): controls easing of aesthetics during transitions. The default is linear, other options include quadratic, cubic, sine, elastic, bounce, and more.\n\n\nggplot(globalPop, aes(x = Old, y = Young,\n                      size = Population,\n                      colour = Country)) +\n  geom_point(alpha = 0.7,\n             show.legend = FALSE) +\n  scale_colour_manual(values = country_colors) +\n  scale_size(range = c(2, 12)) +\n  labs(title = 'Year: {frame_time}',\n       x = '% Aged',\n       y = '% Young') +\n  transition_time(Year) +\n  ease_aes('linear')"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html#animated-data-visualisation-plotly",
+    "href": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html#animated-data-visualisation-plotly",
+    "title": "Hands-on Exercise 3b: Programming Animated Statistical Graphics with R",
+    "section": "Animated Data Visualisation: plotly",
+    "text": "Animated Data Visualisation: plotly\nIn Plotly R, both ggplotly() and plot_ly() support key frame animations through the frame argument/aesthetic. They also support an ids argument/aesthetic to ensure smooth transitions between objects with the same id (facilitating object constancy).\n\nBuilding an Animated Bubble Plot: ggplotly() Method\nThe animated bubble plot produced with ggplotly() includes a play/pause button and a slider component for controlling the animation.\n\ngg &lt;- ggplot(globalPop,\n       aes(x = Old,\n           y = Young,\n           size = Population,\n           colour = Country)) +\n  geom_point(aes(size = Population,\n                 frame = Year),\n             alpha = 0.7) +\n  scale_colour_manual(values = country_colors) +\n  scale_size(range = c(2, 12)) +\n  labs(x = '% Aged',\n       y = '% Young') +\n  theme(legend.position = 'none')\n\nggplotly(gg)\n\n\n\n\n\n\n\n\n\n\n\nNote\n\n\n\nThings to learn from the code chunk above:\n\nA static bubble plot is built with ggplot2 and saved as the R object gg.\nggplotly() converts the R graphic object into an animated SVG object.\ntheme(legend.position = 'none') is required to suppress the legend.\nUsing show.legend = FALSE inside geom_point() does not remove it in plotly.\n\n\n\n\n\nBuilding an Animated Bubble Plot: plot_ly() Method\nThe plot_ly() method provides a more direct plotly interface, colouring bubbles by Continent and using hoverinfo to show country names on hover.\n\nbp &lt;- globalPop %&gt;%\n  plot_ly(x = ~Old,\n          y = ~Young,\n          size = ~Population,\n          color = ~Continent,\n          sizes = c(2, 100),\n          frame = ~Year,\n          text = ~Country,\n          hoverinfo = \"text\",\n          type = 'scatter',\n          mode = 'markers'\n          ) %&gt;%\n  layout(showlegend = FALSE)\n\nbp"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html#reference",
+    "href": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html#reference",
+    "title": "Hands-on Exercise 3b: Programming Animated Statistical Graphics with R",
+    "section": "Reference",
+    "text": "Reference\nKam, T. S. (2023) R for Visual Analytics"
   }
 ]

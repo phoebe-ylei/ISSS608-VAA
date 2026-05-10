@@ -14,6 +14,8 @@ website:
           href: "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html"
         - text: "3a. Interactive Data Visualization"
           href: "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03a.html"
+        - text: "3b. Animated Statistical Graphics"
+          href: "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html"
         - text: "4a. Visualizing Distribution"
           href: "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04a.html"
         - text: "4d. Building Funnel Plot"
@@ -23,6 +25,7 @@ website:
     - text: "Take-home Exercises"
       menu:
         - text: "Take-home Exercise 1"
+        - href: ""
     right: 
       - href: index.qmd
         text: Home
