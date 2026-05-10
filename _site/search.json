@@ -42,6 +42,174 @@
     "text": "The simplest call to funnel_plot() requires only a numerator, denominator, and group variable.\n\nfunnel_plot(\n  .data       = covid19,\n  numerator   = Positive,\n  denominator = Death,\n  group       = `Sub-district`\n)\n\n\n\n\n\n\n\n\nA funnel plot object with 267 points of which 0 are outliers. \nPlot is adjusted for overdispersion. \n\n\n\n\n\n\n\n\nTip\n\n\n\nWhat to note:\n\ngroup defines the granularity of points (sub-district vs. district or city).\nDefault data_type is \"SR\" (standardised ratio).\nThe plot is automatically adjusted for overdispersion.\nConfidence limits shown are 95% and 99.8% by default.\n\n\n\n\n\n\n\nSwap numerator/denominator so we plot the fatality rate (deaths ÷ positives), change data_type to \"PR\" (proportions), and zoom the axes for readability.\n\nfunnel_plot(\n  .data       = covid19,\n  numerator   = Death,\n  denominator = Positive,\n  group       = `Sub-district`,\n  data_type   = \"PR\",        # proportions instead of standardised ratio\n  xrange      = c(0, 6500),  # zoom x-axis\n  yrange      = c(0, 0.05)   # zoom y-axis\n)\n\n\n\n\n\n\n\n\nA funnel plot object with 267 points of which 7 are outliers. \nPlot is adjusted for overdispersion. \n\n\n\n\n\n\n\n\nTip\n\n\n\ndata_type = \"PR\" switches the underlying statistical model to a proportion-based funnel, which is more appropriate when comparing rates (deaths per case) across units of different sizes.\n\n\n\n\n\n\nRemove automatic outlier labels and add descriptive axis titles and a plot title.\n\nfunnel_plot(\n  .data       = covid19,\n  numerator   = Death,\n  denominator = Positive,\n  group       = `Sub-district`,\n  data_type   = \"PR\",\n  xrange      = c(0, 6500),\n  yrange      = c(0, 0.05),\n  label       = NA,           # remove outlier labels\n  title       = \"Cumulative COVID-19 Fatality Rate by Cumulative Total Number of COVID-19 Positive Cases\",\n  x_label     = \"Cumulative COVID-19 Positive Cases\",\n  y_label     = \"Cumulative Fatality Rate\"\n)\n\n\n\n\n\n\n\n\nA funnel plot object with 267 points of which 7 are outliers. \nPlot is adjusted for overdispersion."
   },
   {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04d.html#building-a-funnel-plot-from-scratch-with-ggplot2",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04d.html#building-a-funnel-plot-from-scratch-with-ggplot2",
+    "title": "Hands-on Exercise 4d: Building Funnel Plot with R",
+    "section": "",
+    "text": "Using FunnelPlotR is convenient, but building the plot manually with ggplot2 gives full control over every visual element.\n\n\nCompute the death rate and its standard error for each sub-district, then filter out zero-rate sub-districts.\n\ndf &lt;- covid19 %&gt;%\n  mutate(rate    = Death / Positive,\n         rate.se = sqrt((rate * (1 - rate)) / Positive)) %&gt;%\n  filter(rate &gt; 0)\n\nglimpse(df)\n\nRows: 266\nColumns: 9\n$ `Sub-district ID` &lt;dbl&gt; 3172051003, 3173041007, 3175041005, 3175031003, 3175…\n$ City              &lt;fct&gt; JAKARTA UTARA, JAKARTA BARAT, JAKARTA TIMUR, JAKARTA…\n$ District          &lt;fct&gt; PADEMANGAN, TAMBORA, KRAMAT JATI, JATINEGARA, CIPAYU…\n$ `Sub-district`    &lt;fct&gt; ANCOL, ANGKE, BALE KAMBANG, BALI MESTER, BAMBU APUS,…\n$ Positive          &lt;dbl&gt; 1776, 1783, 2049, 827, 2866, 1828, 2541, 3608, 2012,…\n$ Recovered         &lt;dbl&gt; 1691, 1720, 1964, 797, 2792, 1757, 2433, 3445, 1937,…\n$ Death             &lt;dbl&gt; 26, 29, 31, 13, 27, 26, 37, 68, 38, 52, 72, 28, 25, …\n$ rate              &lt;dbl&gt; 0.014639640, 0.016264722, 0.015129331, 0.015719468, …\n$ rate.se           &lt;dbl&gt; 0.002849976, 0.002995620, 0.002696674, 0.004325393, …\n\n\nCompute the weighted grand mean rate (inverse-variance weighting):\n\nfit.mean &lt;- weighted.mean(df$rate, 1 / df$rate.se^2)\nfit.mean\n\n[1] 0.01496959\n\n\n\n\n\n\nGenerate a sequence of denominator values from 1 to the maximum, then compute lower/upper funnel limits at both confidence levels.\n\nnumber.seq   &lt;- seq(1, max(df$Positive), 1)\n\nnumber.ll95  &lt;- fit.mean - 1.96 * sqrt((fit.mean * (1 - fit.mean)) / number.seq)\nnumber.ul95  &lt;- fit.mean + 1.96 * sqrt((fit.mean * (1 - fit.mean)) / number.seq)\nnumber.ll999 &lt;- fit.mean - 3.29 * sqrt((fit.mean * (1 - fit.mean)) / number.seq)\nnumber.ul999 &lt;- fit.mean + 3.29 * sqrt((fit.mean * (1 - fit.mean)) / number.seq)\n\ndfCI &lt;- data.frame(\n  number.seq, fit.mean,\n  number.ll95, number.ul95,\n  number.ll999, number.ul999\n)\n\nhead(dfCI)\n\n  number.seq   fit.mean number.ll95 number.ul95 number.ll999 number.ul999\n1          1 0.01496959 -0.22303528   0.2529745   -0.3845386    0.4144778\n2          2 0.01496959 -0.15332527   0.1832645   -0.2675254    0.2974645\n3          3 0.01496959 -0.12244259   0.1523818   -0.2156866    0.2456257\n4          4 0.01496959 -0.10403285   0.1339720   -0.1847845    0.2147237\n5          5 0.01496959 -0.09146942   0.1214086   -0.1636959    0.1936351\n6          6 0.01496959 -0.08219549   0.1121347   -0.1481289    0.1780681\n\n\n\n\n\n\n\n\nNote\n\n\n\nWhy these multipliers?\n\n\n\nLimit\nMultiplier\nInterpretation\n\n\n\n\n95% CI\n1.96\n~2 SD from mean; “common cause” variation\n\n\n99.9% CI\n3.29\n~3.3 SD from mean; strong evidence of outlier\n\n\n\n\n\n\n\n\n\nLayer the data points, funnel bands, and a mean reference line.\n\np &lt;- ggplot(df, aes(x = Positive, y = rate)) +\n  \n  # Data points\n  geom_point(aes(label = `Sub-district`),\n             alpha = 0.4) +\n  \n  # 95% lower limit (dashed)\n  geom_line(data = dfCI,\n            aes(x = number.seq, y = number.ll95),\n            size = 0.4, colour = \"grey40\", linetype = \"dashed\") +\n  \n  # 95% upper limit (dashed)\n  geom_line(data = dfCI,\n            aes(x = number.seq, y = number.ul95),\n            size = 0.4, colour = \"grey40\", linetype = \"dashed\") +\n  \n  # 99.9% lower limit (solid)\n  geom_line(data = dfCI,\n            aes(x = number.seq, y = number.ll999),\n            size = 0.4, colour = \"grey40\") +\n  \n  # 99.9% upper limit (solid)\n  geom_line(data = dfCI,\n            aes(x = number.seq, y = number.ul999),\n            size = 0.4, colour = \"grey40\") +\n  \n  # Grand mean reference line\n  geom_hline(data = dfCI,\n             aes(yintercept = fit.mean),\n             size = 0.4, colour = \"grey40\") +\n  \n  # Zoom y-axis without clipping CI lines\n  coord_cartesian(ylim = c(0, 0.05)) +\n  \n  # CI band labels\n  annotate(\"text\", x = 1,   y = -0.13, label = \"95%\",\n           size = 3, colour = \"grey40\") +\n  annotate(\"text\", x = 4.5, y = -0.18, label = \"99%\",\n           size = 3, colour = \"grey40\") +\n  \n  # Titles\n  ggtitle(\"Cumulative Fatality Rate by Cumulative Number of COVID-19 Cases\") +\n  xlab(\"Cumulative Number of COVID-19 Cases\") +\n  ylab(\"Cumulative Fatality Rate\") +\n  \n  theme_light() +\n  theme(\n    plot.title        = element_text(size = 12),\n    legend.position   = c(0.91, 0.85),\n    legend.title      = element_text(size = 7),\n    legend.text       = element_text(size = 7),\n    legend.background = element_rect(colour = \"grey60\", linetype = \"dotted\"),\n    legend.key.height = unit(0.3, \"cm\")\n  )\n\np\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nTip\n\n\n\nReading the funnel plot:\n\nPoints within the 95% band: variation is within expected statistical noise.\nPoints between the 95% and 99.9% bands: moderate evidence of unusual performance.\nPoints outside the 99.9% band: strong evidence the sub-district’s rate differs from the overall average.\n\n\n\n\n\n\n\nWrap the ggplot2 object with ggplotly() to enable hover tooltips showing the sub-district name, case count, and fatality rate.\n\nfp_ggplotly &lt;- ggplotly(p,\n  tooltip = c(\"label\", \"x\", \"y\"))\n\nfp_ggplotly\n\n\n\n\n\n\n\n\n\n\n\nTip\n\n\n\nHover over any point to see the sub-district name, cumulative positive cases, and fatality rate. This makes it easy to identify and investigate outlying sub-districts without cluttering the static chart with labels."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04d.html#summary",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04d.html#summary",
+    "title": "Hands-on Exercise 4d: Building Funnel Plot with R",
+    "section": "",
+    "text": "Method\nPros\nCons\n\n\n\n\nFunnelPlotR\nFast, handles overdispersion automatically\nLimited customisation\n\n\nggplot2 (manual)\nFull control over every visual element\nMore code required\n\n\nplotly + ggplot2\nAdds interactivity with minimal extra code\nRequires label aesthetic on geom_point\n\n\n\nA funnel plot is most valuable when we need to compare many units (e.g., hospitals, districts) while accounting for the fact that smaller units have more variability — the narrowing funnel shape naturally encodes this statistical reality."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04d.html#reference",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04d.html#reference",
+    "title": "Hands-on Exercise 4d: Building Funnel Plot with R",
+    "section": "",
+    "text": "Kam, T.S. (2023). Funnel Plots for Fair Comparisons."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html",
+    "href": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html",
+    "title": "Hands-on Exercise 3b: Programming Animated Statistical Graphics with R",
+    "section": "",
+    "text": "When creating animations, the plot does not actually move. Instead, many individual plots are built and then stitched together as movie frames, like an old-school flip book or cartoon. Each frame is a different plot when conveying motion, built using a relevant subset of the aggregate data. The subset drives the flow of the animation when stitched back together.\nBefore diving in, it is important to understand some key concepts:\n\nFrame: Each frame represents a different point in time or category. When the frame changes, the data points on the graph update to reflect the new data.\nAnimation Attributes: Settings that control how the animation behaves — for example, the duration of each frame, the easing function used to transition between frames, and whether to start from the current frame or the beginning."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html#basic-concepts-of-animation",
+    "href": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html#basic-concepts-of-animation",
+    "title": "Hands-on Exercise 3b: Programming Animated Statistical Graphics with R",
+    "section": "",
+    "text": "When creating animations, the plot does not actually move. Instead, many individual plots are built and then stitched together as movie frames, like an old-school flip book or cartoon. Each frame is a different plot when conveying motion, built using a relevant subset of the aggregate data. The subset drives the flow of the animation when stitched back together.\nBefore diving in, it is important to understand some key concepts:\n\nFrame: Each frame represents a different point in time or category. When the frame changes, the data points on the graph update to reflect the new data.\nAnimation Attributes: Settings that control how the animation behaves — for example, the duration of each frame, the easing function used to transition between frames, and whether to start from the current frame or the beginning."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html#getting-started",
+    "href": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html#getting-started",
+    "title": "Hands-on Exercise 3b: Programming Animated Statistical Graphics with R",
+    "section": "Getting Started",
+    "text": "Getting Started\n\nLoading the R Packages\nThe following packages are used in this chapter:\n\nplotly for plotting interactive statistical graphs\ngganimate: a ggplot2 extension for animated statistical graphs\ngifski converts video frames to GIF animations using efficient cross-frame palettes and temporal dithering\ngapminder provides the country_colors colour scheme used in the plots\ntidyverse for data wrangling, transformation, and static graphics\n\n\npacman::p_load(readxl, gifski, gapminder,\n               plotly, gganimate, tidyverse)\n\n\n\nImporting the Data\nThe Data worksheet from the GlobalPopulation Excel workbook is used throughout this chapter.\n\ncol &lt;- c(\"Country\", \"Continent\")\nglobalPop &lt;- read_xls(\"data/GlobalPopulation.xls\",\n                      sheet = \"Data\") %&gt;%\n  mutate(across(col, as.factor)) %&gt;%\n  mutate(Year = as.integer(Year))\n\n\n\n\n\n\n\nNote\n\n\n\nThings to learn from the code chunk above:\n\nread_xls() from readxl imports the Excel worksheet.\nmutate(across()) converts the Country and Continent character columns to factors. This replaces the deprecated mutate_each_() and mutate_at() approaches from older dplyr versions.\nmutate(Year = as.integer(Year)) converts the Year field to integer type."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html#animated-data-visualisation-gganimate-methods",
+    "href": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html#animated-data-visualisation-gganimate-methods",
+    "title": "Hands-on Exercise 3b: Programming Animated Statistical Graphics with R",
+    "section": "Animated Data Visualisation: gganimate Methods",
+    "text": "Animated Data Visualisation: gganimate Methods\ngganimate extends the grammar of graphics implemented by ggplot2 to include animation. It provides a range of new grammar classes that can be added to the plot object:\n\n\n\n\n\n\n\nFunction\nPurpose\n\n\n\n\ntransition_*()\nDefines how data spreads across time\n\n\nview_*()\nDefines how positional scales change during animation\n\n\nshadow_*()\nDefines how data from other time points is displayed\n\n\nenter_*()/exit_*()\nDefines how new/old data appears and disappears\n\n\nease_aes()\nDefines how aesthetics are eased during transitions\n\n\n\n\nBuilding a Static Population Bubble Plot\nThe basic ggplot2 functions are used to create a static bubble plot first. This is the foundation before animating.\n\nggplot(globalPop, aes(x = Old, y = Young,\n                      size = Population,\n                      colour = Country)) +\n  geom_point(alpha = 0.7,\n             show.legend = FALSE) +\n  scale_colour_manual(values = country_colors) +\n  scale_size(range = c(2, 12)) +\n  labs(title = 'Year: {frame_time}',\n       x = '% Aged',\n       y = '% Young')\n\n\n\n\n\n\n\n\n\n\nBuilding the Animated Bubble Plot\nTwo gganimate functions are added to bring the plot to life:\n\ntransition_time(): creates transitions through distinct states in time (i.e. Year)\nease_aes(): controls easing of aesthetics during transitions. The default is linear, other options include quadratic, cubic, sine, elastic, bounce, and more.\n\n\nggplot(globalPop, aes(x = Old, y = Young,\n                      size = Population,\n                      colour = Country)) +\n  geom_point(alpha = 0.7,\n             show.legend = FALSE) +\n  scale_colour_manual(values = country_colors) +\n  scale_size(range = c(2, 12)) +\n  labs(title = 'Year: {frame_time}',\n       x = '% Aged',\n       y = '% Young') +\n  transition_time(Year) +\n  ease_aes('linear')"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html#animated-data-visualisation-plotly",
+    "href": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html#animated-data-visualisation-plotly",
+    "title": "Hands-on Exercise 3b: Programming Animated Statistical Graphics with R",
+    "section": "Animated Data Visualisation: plotly",
+    "text": "Animated Data Visualisation: plotly\nIn Plotly R, both ggplotly() and plot_ly() support key frame animations through the frame argument/aesthetic. They also support an ids argument/aesthetic to ensure smooth transitions between objects with the same id (facilitating object constancy).\n\nBuilding an Animated Bubble Plot: ggplotly() Method\nThe animated bubble plot produced with ggplotly() includes a play/pause button and a slider component for controlling the animation.\n\ngg &lt;- ggplot(globalPop,\n       aes(x = Old,\n           y = Young,\n           size = Population,\n           colour = Country)) +\n  geom_point(aes(size = Population,\n                 frame = Year),\n             alpha = 0.7) +\n  scale_colour_manual(values = country_colors) +\n  scale_size(range = c(2, 12)) +\n  labs(x = '% Aged',\n       y = '% Young') +\n  theme(legend.position = 'none')\n\nggplotly(gg)\n\n\n\n\n\n\n\n\n\n\n\nNote\n\n\n\nThings to learn from the code chunk above:\n\nA static bubble plot is built with ggplot2 and saved as the R object gg.\nggplotly() converts the R graphic object into an animated SVG object.\ntheme(legend.position = 'none') is required to suppress the legend.\nUsing show.legend = FALSE inside geom_point() does not remove it in plotly.\n\n\n\n\n\nBuilding an Animated Bubble Plot: plot_ly() Method\nThe plot_ly() method provides a more direct plotly interface, colouring bubbles by Continent and using hoverinfo to show country names on hover.\n\nbp &lt;- globalPop %&gt;%\n  plot_ly(x = ~Old,\n          y = ~Young,\n          size = ~Population,\n          color = ~Continent,\n          sizes = c(2, 100),\n          frame = ~Year,\n          text = ~Country,\n          hoverinfo = \"text\",\n          type = 'scatter',\n          mode = 'markers'\n          ) %&gt;%\n  layout(showlegend = FALSE)\n\nbp"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html#reference",
+    "href": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html#reference",
+    "title": "Hands-on Exercise 3b: Programming Animated Statistical Graphics with R",
+    "section": "Reference",
+    "text": "Reference\nKam, T. S. (2023) R for Visual Analytics"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html",
+    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html",
+    "title": "Hands-on Exercise 2: Beyond ggplot2 Fundamentals",
+    "section": "",
+    "text": "Beside tidyverse, four R packages will be used. Here is a table for the packages, their purpose and primary functions:\n\n\n\n\n\n\n\n\nPackage\nPurpose\nPrimary Functions\n\n\n\n\nggrepel\nRepel overlapping text and label geoms\ngeom_text_repel(), geom_label_repel()\n\n\npatchwork\nCompose multiple ggplots into a single figure\n+, /, \\|, plot_layout(), plot_annotation()\n\n\nggthemes\nExtra themes inspired by news and science outlets\ntheme_economist(), theme_wsj(), theme_tufte()\n\n\nhrbrthemes\nTypography-centric, publication-ready themes\ntheme_ipsum(), theme_ipsum_rc(), theme_modern_rc()\n\n\ntidyverse\nCore data wrangling and ggplot2 visualisation\nggplot(), dplyr, tidyr, readr\n\n\n\nCheck the installation:\n\npacman::p_load(ggrepel, patchwork, \n               ggthemes, hrbrthemes,\n               tidyverse) \n\nImport the data:\n\nexam_data &lt;- read_csv(\"data/Exam_data.csv\")"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#beyond-ggplot2-fundamentals",
+    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#beyond-ggplot2-fundamentals",
+    "title": "Hands-on Exercise 2: Beyond ggplot2 Fundamentals",
+    "section": "",
+    "text": "Beside tidyverse, four R packages will be used. Here is a table for the packages, their purpose and primary functions:\n\n\n\n\n\n\n\n\nPackage\nPurpose\nPrimary Functions\n\n\n\n\nggrepel\nRepel overlapping text and label geoms\ngeom_text_repel(), geom_label_repel()\n\n\npatchwork\nCompose multiple ggplots into a single figure\n+, /, \\|, plot_layout(), plot_annotation()\n\n\nggthemes\nExtra themes inspired by news and science outlets\ntheme_economist(), theme_wsj(), theme_tufte()\n\n\nhrbrthemes\nTypography-centric, publication-ready themes\ntheme_ipsum(), theme_ipsum_rc(), theme_modern_rc()\n\n\ntidyverse\nCore data wrangling and ggplot2 visualisation\nggplot(), dplyr, tidyr, readr\n\n\n\nCheck the installation:\n\npacman::p_load(ggrepel, patchwork, \n               ggthemes, hrbrthemes,\n               tidyverse) \n\nImport the data:\n\nexam_data &lt;- read_csv(\"data/Exam_data.csv\")"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#beyond-ggplot2-annotation-ggrepel",
+    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#beyond-ggplot2-annotation-ggrepel",
+    "title": "Hands-on Exercise 2: Beyond ggplot2 Fundamentals",
+    "section": "Beyond ggplot2 Annotation: ggrepel",
+    "text": "Beyond ggplot2 Annotation: ggrepel\nOne of the challenge in plotting statistical graph is annotation, especially with large number of data points.\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\nggplot(data = exam_data,\n       aes(x = MATHS,\n           y = ENGLISH)) +\n  geom_point() +\n  geom_smooth(method = lm,\n              size = 0.5) +\n  geom_label(aes(label = ID),\n             hjust = .5,\n             vjust = -.5) +\n  coord_cartesian(xlim = c(0, 100),\n                  ylim = c(0, 100)) +\n  ggtitle(\"English scores versus Maths scores for Primary 3\")"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#working-with-ggrepel",
+    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#working-with-ggrepel",
+    "title": "Hands-on Exercise 2: Beyond ggplot2 Fundamentals",
+    "section": "Working with ggrepel",
+    "text": "Working with ggrepel\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\nggplot(data = exam_data,\n       aes(x = MATHS,\n           y = ENGLISH)) +\n  geom_point() +\n  geom_smooth(method = lm,\n              size = 0.5) +\n  geom_label_repel(aes(label = ID),\n                   fontface = \"bold\") +\n  coord_cartesian(xlim = c(0, 100),\n                  ylim = c(0, 100)) +\n  ggtitle(\"English scores versus Maths scores for Primary 3\")"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#beyond-ggplots-themes-ggthemes-hrbrthemes",
+    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#beyond-ggplots-themes-ggthemes-hrbrthemes",
+    "title": "Hands-on Exercise 2: Beyond ggplot2 Fundamentals",
+    "section": "Beyond ggplots Themes: ggthemes & hrbrthemes",
+    "text": "Beyond ggplots Themes: ggthemes & hrbrthemes\nggplot2 comes with eight built-in themes, they are: theme_gray(), theme_bw(), theme_classic(), theme_dark(), theme_light(), theme_linedraw(), theme_minimal(), and theme_void().\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\nggplot(data = exam_data,\n       aes(x = MATHS)) +\n  geom_histogram(bins = 20,\n                 boundary = 100,\n                 color = \"grey25\",\n                 fill = \"grey90\") +\n  theme_gray() +\n  ggtitle(\"Distribution of Maths scores\")\n\n\n\nRefer to this link to learn more about ggplot2 Themes"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#working-with-ggtheme",
+    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#working-with-ggtheme",
+    "title": "Hands-on Exercise 2: Beyond ggplot2 Fundamentals",
+    "section": "Working with ggtheme",
+    "text": "Working with ggtheme\nggthemes provides ‘ggplot2’ themes that replicate the look of plots by Edward Tufte, Stephen Few, Fivethirtyeight, The Economist, ‘Stata’, ‘Excel’, and The Wall Street Journal, among others.\nIn the example below, The Economist theme is used.\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\nggplot(data = exam_data,\n       aes(x = MATHS)) +\n  geom_histogram(bins = 20,\n                 boundary = 100,\n                 color = \"grey25\",\n                 fill = \"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_economist()"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#working-with-hrbrthemes",
+    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#working-with-hrbrthemes",
+    "title": "Hands-on Exercise 2: Beyond ggplot2 Fundamentals",
+    "section": "Working with hrbrthemes",
+    "text": "Working with hrbrthemes\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\nggplot(data = exam_data,\n       aes(x = MATHS)) +\n  geom_histogram(bins = 20,\n                 boundary = 100,\n                 color = \"grey25\",\n                 fill = \"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_ipsum(axis_title_size = 18,\n              base_size = 15,\n              grid = \"Y\")\n\n\n\n\n\n\n\n\n\nTipWhat can we learn from the code chunk above?\n\n\n\n\naxis_title_size argument is used to increase the font size of the axis title to 18,\nbase_size argument is used to increase the default axis label to 15, and\ngrid argument is used to remove the x-axis grid lines."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#beyond-single-graph",
+    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#beyond-single-graph",
+    "title": "Hands-on Exercise 2: Beyond ggplot2 Fundamentals",
+    "section": "Beyond Single Graph",
+    "text": "Beyond Single Graph\nPlotting below 3 single graphs for composition.\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\np1 &lt;- ggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") + \n  coord_cartesian(xlim=c(0,100)) +\n  ggtitle(\"Distribution of Maths scores\")\n\n\n\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\np2 &lt;- ggplot(data=exam_data, \n             aes(x = ENGLISH)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  coord_cartesian(xlim=c(0,100)) +\n  ggtitle(\"Distribution of English scores\")\n\n\n\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\np3 &lt;- ggplot(data=exam_data, \n             aes(x= MATHS, \n                 y=ENGLISH)) +\n  geom_point() +\n  geom_smooth(method=lm, \n              size=0.5) +  \n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100)) +\n  ggtitle(\"English scores versus Maths scores for Primary 3\")"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#creating-composite-graphics-pathwork-methods",
+    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#creating-composite-graphics-pathwork-methods",
+    "title": "Hands-on Exercise 2: Beyond ggplot2 Fundamentals",
+    "section": "Creating Composite Graphics: pathwork methods",
+    "text": "Creating Composite Graphics: pathwork methods\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\n(p1 / p2) | p3"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this site\n\n1 + 1\n\n[1] 2"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html",
+    "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html",
+    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics - ggplot2 methods",
+    "section": "",
+    "text": "Use p_load() function to install the collection of R packages under tidyverse, which will include the ggplot2, often used to create data-driven graphics based on The Grammar of Graphics.\n\npacman::p_load(tidyverse)\n\n\nexam_data &lt;- read_csv(\"data/Exam_data.csv\")\n\nWe got 322 rows of data with 7 attributes.\n\nThe categorical attributes are: ID, CLASS, GENDER and RACE.\nThe continuous attributes are: MATHS, ENGLISH and SCIENCE."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#getting-started-with-ggplot2",
+    "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#getting-started-with-ggplot2",
+    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics - ggplot2 methods",
+    "section": "",
+    "text": "Use p_load() function to install the collection of R packages under tidyverse, which will include the ggplot2, often used to create data-driven graphics based on The Grammar of Graphics.\n\npacman::p_load(tidyverse)\n\n\nexam_data &lt;- read_csv(\"data/Exam_data.csv\")\n\nWe got 322 rows of data with 7 attributes.\n\nThe categorical attributes are: ID, CLASS, GENDER and RACE.\nThe continuous attributes are: MATHS, ENGLISH and SCIENCE."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#histogram-of-maths-scores",
+    "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#histogram-of-maths-scores",
+    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics - ggplot2 methods",
+    "section": "Histogram of Maths Scores",
+    "text": "Histogram of Maths Scores\nHere, you can compare the difference between R Graphics, the core graphical function of Base R, and ggplot plotting a histogram.\n\nR Graphicsggplot2\n\n\n\nhist(exam_data$MATHS)\n\n\n\n\n\n\n\n\n\n\n\nggplot(exam_data, aes(x = MATHS)) +\n  geom_histogram(bins = 10, color = \"black\", fill = \"lightgrey\") +\n  labs(title = \"Histogram of exam_data$MATHS\",\n       x = \"exam_data$MATHS\",\n       y = \"Frequency\") +\n  theme_bw()\n\n\n\n\n\n\n\n\n\n\n\nAs we can see, the difference is obvious. As quoted from Hadley Wickham:\n\nThe transferable skills from ggplot2 are not the idiosyncrasies of plotting syntax, but a powerful way of thinking about visualisation, as a way of mapping between variables and the visual properties of geometric objects that you can perceive."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#grammar-of-graphics",
+    "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#grammar-of-graphics",
+    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics - ggplot2 methods",
+    "section": "Grammar of Graphics",
+    "text": "Grammar of Graphics\nThe ggplot2 follows a layered grammer of graphics, the 7 layers can be described as follow:\n\nData: The dataset being plotted.\nAesthetics: It take attributes of the data and use them to influence visual characteristics, such as position, colours, size, shape, or transparency.\nGeometrics: The visual elements used for our data, such as point, bar or line.\nFacets: Split the data into subsets to create multiple variations of the same graph (paneling, multiple plots).\nStatistics: Statiscal transformations that summarise data (e.g. mean, confidence intervals).\nCoordinate: It defines the plane on which data are mapped on the graphic.\nThemes: Modify all non-data components of a plot, such as main title, sub-title, y-aixs title, or legend background."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#reference",
+    "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#reference",
+    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics - ggplot2 methods",
+    "section": "Reference",
+    "text": "Reference\n\nProf. Kam Tin Seong R for Visual Analytics."
+  },
+  {
     "objectID": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03a.html",
     "href": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03a.html",
     "title": "Hands-on Exercise 3a: Programming Interactive Data Visualization with R",
@@ -140,111 +308,6 @@
     "text": "Business Insights from the Superstore Data\n\nTables and Bookcases are money-losers. Despite Table’s ranking as the 4th highest revenue sub-category, it runs at a negative average profit margin. Discounting in Furniture is likely the culprit.\nDiscounts over 40% are almost never profitable. The discount–profit scatter shows a clear inflection point around 40%. Any discount above that level correlates strongly with negative profit.\nTechnology has the best margin quality. Despite not being the top revenue category, Technology generates the highest total profit, where it was driven by Copiers and Accessories, both of which have strong positive margins.\nThe West region leads profitability across all three customer segments. The Central region is the most volatile.\nSales volume alone is a misleading KPI. Chairs are the #1 sub-category by revenue but sit in the middle of profit rankings. Any sales dashboard that shows only revenue is hiding the costs."
   },
   {
-    "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html",
-    "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html",
-    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics - ggplot2 methods",
-    "section": "",
-    "text": "Use p_load() function to install the collection of R packages under tidyverse, which will include the ggplot2, often used to create data-driven graphics based on The Grammar of Graphics.\n\npacman::p_load(tidyverse)\n\n\nexam_data &lt;- read_csv(\"data/Exam_data.csv\")\n\nWe got 322 rows of data with 7 attributes.\n\nThe categorical attributes are: ID, CLASS, GENDER and RACE.\nThe continuous attributes are: MATHS, ENGLISH and SCIENCE."
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#getting-started-with-ggplot2",
-    "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#getting-started-with-ggplot2",
-    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics - ggplot2 methods",
-    "section": "",
-    "text": "Use p_load() function to install the collection of R packages under tidyverse, which will include the ggplot2, often used to create data-driven graphics based on The Grammar of Graphics.\n\npacman::p_load(tidyverse)\n\n\nexam_data &lt;- read_csv(\"data/Exam_data.csv\")\n\nWe got 322 rows of data with 7 attributes.\n\nThe categorical attributes are: ID, CLASS, GENDER and RACE.\nThe continuous attributes are: MATHS, ENGLISH and SCIENCE."
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#histogram-of-maths-scores",
-    "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#histogram-of-maths-scores",
-    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics - ggplot2 methods",
-    "section": "Histogram of Maths Scores",
-    "text": "Histogram of Maths Scores\nHere, you can compare the difference between R Graphics, the core graphical function of Base R, and ggplot plotting a histogram.\n\nR Graphicsggplot2\n\n\n\nhist(exam_data$MATHS)\n\n\n\n\n\n\n\n\n\n\n\nggplot(exam_data, aes(x = MATHS)) +\n  geom_histogram(bins = 10, color = \"black\", fill = \"lightgrey\") +\n  labs(title = \"Histogram of exam_data$MATHS\",\n       x = \"exam_data$MATHS\",\n       y = \"Frequency\") +\n  theme_bw()\n\n\n\n\n\n\n\n\n\n\n\nAs we can see, the difference is obvious. As quoted from Hadley Wickham:\n\nThe transferable skills from ggplot2 are not the idiosyncrasies of plotting syntax, but a powerful way of thinking about visualisation, as a way of mapping between variables and the visual properties of geometric objects that you can perceive."
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#grammar-of-graphics",
-    "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#grammar-of-graphics",
-    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics - ggplot2 methods",
-    "section": "Grammar of Graphics",
-    "text": "Grammar of Graphics\nThe ggplot2 follows a layered grammer of graphics, the 7 layers can be described as follow:\n\nData: The dataset being plotted.\nAesthetics: It take attributes of the data and use them to influence visual characteristics, such as position, colours, size, shape, or transparency.\nGeometrics: The visual elements used for our data, such as point, bar or line.\nFacets: Split the data into subsets to create multiple variations of the same graph (paneling, multiple plots).\nStatistics: Statiscal transformations that summarise data (e.g. mean, confidence intervals).\nCoordinate: It defines the plane on which data are mapped on the graphic.\nThemes: Modify all non-data components of a plot, such as main title, sub-title, y-aixs title, or legend background."
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#reference",
-    "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#reference",
-    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics - ggplot2 methods",
-    "section": "Reference",
-    "text": "Reference\n\nProf. Kam Tin Seong R for Visual Analytics."
-  },
-  {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
-    "section": "",
-    "text": "About this site\n\n1 + 1\n\n[1] 2"
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html",
-    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html",
-    "title": "Hands-on Exercise 2: Beyond ggplot2 Fundamentals",
-    "section": "",
-    "text": "Beside tidyverse, four R packages will be used. Here is a table for the packages, their purpose and primary functions:\n\n\n\n\n\n\n\n\nPackage\nPurpose\nPrimary Functions\n\n\n\n\nggrepel\nRepel overlapping text and label geoms\ngeom_text_repel(), geom_label_repel()\n\n\npatchwork\nCompose multiple ggplots into a single figure\n+, /, \\|, plot_layout(), plot_annotation()\n\n\nggthemes\nExtra themes inspired by news and science outlets\ntheme_economist(), theme_wsj(), theme_tufte()\n\n\nhrbrthemes\nTypography-centric, publication-ready themes\ntheme_ipsum(), theme_ipsum_rc(), theme_modern_rc()\n\n\ntidyverse\nCore data wrangling and ggplot2 visualisation\nggplot(), dplyr, tidyr, readr\n\n\n\nCheck the installation:\n\npacman::p_load(ggrepel, patchwork, \n               ggthemes, hrbrthemes,\n               tidyverse) \n\nImport the data:\n\nexam_data &lt;- read_csv(\"data/Exam_data.csv\")"
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#beyond-ggplot2-fundamentals",
-    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#beyond-ggplot2-fundamentals",
-    "title": "Hands-on Exercise 2: Beyond ggplot2 Fundamentals",
-    "section": "",
-    "text": "Beside tidyverse, four R packages will be used. Here is a table for the packages, their purpose and primary functions:\n\n\n\n\n\n\n\n\nPackage\nPurpose\nPrimary Functions\n\n\n\n\nggrepel\nRepel overlapping text and label geoms\ngeom_text_repel(), geom_label_repel()\n\n\npatchwork\nCompose multiple ggplots into a single figure\n+, /, \\|, plot_layout(), plot_annotation()\n\n\nggthemes\nExtra themes inspired by news and science outlets\ntheme_economist(), theme_wsj(), theme_tufte()\n\n\nhrbrthemes\nTypography-centric, publication-ready themes\ntheme_ipsum(), theme_ipsum_rc(), theme_modern_rc()\n\n\ntidyverse\nCore data wrangling and ggplot2 visualisation\nggplot(), dplyr, tidyr, readr\n\n\n\nCheck the installation:\n\npacman::p_load(ggrepel, patchwork, \n               ggthemes, hrbrthemes,\n               tidyverse) \n\nImport the data:\n\nexam_data &lt;- read_csv(\"data/Exam_data.csv\")"
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#beyond-ggplot2-annotation-ggrepel",
-    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#beyond-ggplot2-annotation-ggrepel",
-    "title": "Hands-on Exercise 2: Beyond ggplot2 Fundamentals",
-    "section": "Beyond ggplot2 Annotation: ggrepel",
-    "text": "Beyond ggplot2 Annotation: ggrepel\nOne of the challenge in plotting statistical graph is annotation, especially with large number of data points.\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\nggplot(data = exam_data,\n       aes(x = MATHS,\n           y = ENGLISH)) +\n  geom_point() +\n  geom_smooth(method = lm,\n              size = 0.5) +\n  geom_label(aes(label = ID),\n             hjust = .5,\n             vjust = -.5) +\n  coord_cartesian(xlim = c(0, 100),\n                  ylim = c(0, 100)) +\n  ggtitle(\"English scores versus Maths scores for Primary 3\")"
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#working-with-ggrepel",
-    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#working-with-ggrepel",
-    "title": "Hands-on Exercise 2: Beyond ggplot2 Fundamentals",
-    "section": "Working with ggrepel",
-    "text": "Working with ggrepel\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\nggplot(data = exam_data,\n       aes(x = MATHS,\n           y = ENGLISH)) +\n  geom_point() +\n  geom_smooth(method = lm,\n              size = 0.5) +\n  geom_label_repel(aes(label = ID),\n                   fontface = \"bold\") +\n  coord_cartesian(xlim = c(0, 100),\n                  ylim = c(0, 100)) +\n  ggtitle(\"English scores versus Maths scores for Primary 3\")"
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#beyond-ggplots-themes-ggthemes-hrbrthemes",
-    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#beyond-ggplots-themes-ggthemes-hrbrthemes",
-    "title": "Hands-on Exercise 2: Beyond ggplot2 Fundamentals",
-    "section": "Beyond ggplots Themes: ggthemes & hrbrthemes",
-    "text": "Beyond ggplots Themes: ggthemes & hrbrthemes\nggplot2 comes with eight built-in themes, they are: theme_gray(), theme_bw(), theme_classic(), theme_dark(), theme_light(), theme_linedraw(), theme_minimal(), and theme_void().\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\nggplot(data = exam_data,\n       aes(x = MATHS)) +\n  geom_histogram(bins = 20,\n                 boundary = 100,\n                 color = \"grey25\",\n                 fill = \"grey90\") +\n  theme_gray() +\n  ggtitle(\"Distribution of Maths scores\")\n\n\n\nRefer to this link to learn more about ggplot2 Themes"
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#working-with-ggtheme",
-    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#working-with-ggtheme",
-    "title": "Hands-on Exercise 2: Beyond ggplot2 Fundamentals",
-    "section": "Working with ggtheme",
-    "text": "Working with ggtheme\nggthemes provides ‘ggplot2’ themes that replicate the look of plots by Edward Tufte, Stephen Few, Fivethirtyeight, The Economist, ‘Stata’, ‘Excel’, and The Wall Street Journal, among others.\nIn the example below, The Economist theme is used.\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\nggplot(data = exam_data,\n       aes(x = MATHS)) +\n  geom_histogram(bins = 20,\n                 boundary = 100,\n                 color = \"grey25\",\n                 fill = \"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_economist()"
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#working-with-hrbrthemes",
-    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#working-with-hrbrthemes",
-    "title": "Hands-on Exercise 2: Beyond ggplot2 Fundamentals",
-    "section": "Working with hrbrthemes",
-    "text": "Working with hrbrthemes\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\nggplot(data = exam_data,\n       aes(x = MATHS)) +\n  geom_histogram(bins = 20,\n                 boundary = 100,\n                 color = \"grey25\",\n                 fill = \"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_ipsum(axis_title_size = 18,\n              base_size = 15,\n              grid = \"Y\")\n\n\n\n\n\n\n\n\n\nTipWhat can we learn from the code chunk above?\n\n\n\n\naxis_title_size argument is used to increase the font size of the axis title to 18,\nbase_size argument is used to increase the default axis label to 15, and\ngrid argument is used to remove the x-axis grid lines."
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#beyond-single-graph",
-    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#beyond-single-graph",
-    "title": "Hands-on Exercise 2: Beyond ggplot2 Fundamentals",
-    "section": "Beyond Single Graph",
-    "text": "Beyond Single Graph\nPlotting below 3 single graphs for composition.\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\np1 &lt;- ggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") + \n  coord_cartesian(xlim=c(0,100)) +\n  ggtitle(\"Distribution of Maths scores\")\n\n\n\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\np2 &lt;- ggplot(data=exam_data, \n             aes(x = ENGLISH)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  coord_cartesian(xlim=c(0,100)) +\n  ggtitle(\"Distribution of English scores\")\n\n\n\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\np3 &lt;- ggplot(data=exam_data, \n             aes(x= MATHS, \n                 y=ENGLISH)) +\n  geom_point() +\n  geom_smooth(method=lm, \n              size=0.5) +  \n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100)) +\n  ggtitle(\"English scores versus Maths scores for Primary 3\")"
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#creating-composite-graphics-pathwork-methods",
-    "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#creating-composite-graphics-pathwork-methods",
-    "title": "Hands-on Exercise 2: Beyond ggplot2 Fundamentals",
-    "section": "Creating Composite Graphics: pathwork methods",
-    "text": "Creating Composite Graphics: pathwork methods\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\n(p1 / p2) | p3"
-  },
-  {
     "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04a.html",
     "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04a.html",
     "title": "4a. Visualizing Distribution",
@@ -287,73 +350,10 @@
     "text": "A Raincloud plot overlays three visual layers to give a complete picture of the distribution:\n\n\n\n\n\n\n\n\nLayer\nGeom\nWhat it shows\n\n\n\n\nHalf-density (“cloud”)\nstat_halfeye()\nOverall shape, skewness, modes\n\n\nBoxplot\ngeom_boxplot()\nMedian, IQR, outliers\n\n\nDot plot (“rain”)\nstat_dots()\nIndividual data points, sample size\n\n\n\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\nFigure 6: Raincloud plot: Maths scores by Gender.\n\n\n\n\n\n\n\n\nggplot(exam,\n       aes(x = GENDER,\n           y = MATHS)) +\n  stat_halfeye(\n    adjust        = 0.5,\n    justification = -0.2,\n    .width        = 0,\n    point_colour  = NA\n  ) +\n  geom_boxplot(\n    width         = 0.20,\n    outlier.shape = NA\n  ) +\n  stat_dots(\n    side          = \"left\",\n    justification = 1.2,\n    binwidth      = 0.5,\n    dotsize       = 1.5\n  ) +\n  coord_flip() +\n  theme_economist()"
   },
   {
-    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04d.html#building-a-funnel-plot-from-scratch-with-ggplot2",
-    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04d.html#building-a-funnel-plot-from-scratch-with-ggplot2",
-    "title": "Hands-on Exercise 4d: Building Funnel Plot with R",
-    "section": "",
-    "text": "Using FunnelPlotR is convenient, but building the plot manually with ggplot2 gives full control over every visual element.\n\n\nCompute the death rate and its standard error for each sub-district, then filter out zero-rate sub-districts.\n\ndf &lt;- covid19 %&gt;%\n  mutate(rate    = Death / Positive,\n         rate.se = sqrt((rate * (1 - rate)) / Positive)) %&gt;%\n  filter(rate &gt; 0)\n\nglimpse(df)\n\nRows: 266\nColumns: 9\n$ `Sub-district ID` &lt;dbl&gt; 3172051003, 3173041007, 3175041005, 3175031003, 3175…\n$ City              &lt;fct&gt; JAKARTA UTARA, JAKARTA BARAT, JAKARTA TIMUR, JAKARTA…\n$ District          &lt;fct&gt; PADEMANGAN, TAMBORA, KRAMAT JATI, JATINEGARA, CIPAYU…\n$ `Sub-district`    &lt;fct&gt; ANCOL, ANGKE, BALE KAMBANG, BALI MESTER, BAMBU APUS,…\n$ Positive          &lt;dbl&gt; 1776, 1783, 2049, 827, 2866, 1828, 2541, 3608, 2012,…\n$ Recovered         &lt;dbl&gt; 1691, 1720, 1964, 797, 2792, 1757, 2433, 3445, 1937,…\n$ Death             &lt;dbl&gt; 26, 29, 31, 13, 27, 26, 37, 68, 38, 52, 72, 28, 25, …\n$ rate              &lt;dbl&gt; 0.014639640, 0.016264722, 0.015129331, 0.015719468, …\n$ rate.se           &lt;dbl&gt; 0.002849976, 0.002995620, 0.002696674, 0.004325393, …\n\n\nCompute the weighted grand mean rate (inverse-variance weighting):\n\nfit.mean &lt;- weighted.mean(df$rate, 1 / df$rate.se^2)\nfit.mean\n\n[1] 0.01496959\n\n\n\n\n\n\nGenerate a sequence of denominator values from 1 to the maximum, then compute lower/upper funnel limits at both confidence levels.\n\nnumber.seq   &lt;- seq(1, max(df$Positive), 1)\n\nnumber.ll95  &lt;- fit.mean - 1.96 * sqrt((fit.mean * (1 - fit.mean)) / number.seq)\nnumber.ul95  &lt;- fit.mean + 1.96 * sqrt((fit.mean * (1 - fit.mean)) / number.seq)\nnumber.ll999 &lt;- fit.mean - 3.29 * sqrt((fit.mean * (1 - fit.mean)) / number.seq)\nnumber.ul999 &lt;- fit.mean + 3.29 * sqrt((fit.mean * (1 - fit.mean)) / number.seq)\n\ndfCI &lt;- data.frame(\n  number.seq, fit.mean,\n  number.ll95, number.ul95,\n  number.ll999, number.ul999\n)\n\nhead(dfCI)\n\n  number.seq   fit.mean number.ll95 number.ul95 number.ll999 number.ul999\n1          1 0.01496959 -0.22303528   0.2529745   -0.3845386    0.4144778\n2          2 0.01496959 -0.15332527   0.1832645   -0.2675254    0.2974645\n3          3 0.01496959 -0.12244259   0.1523818   -0.2156866    0.2456257\n4          4 0.01496959 -0.10403285   0.1339720   -0.1847845    0.2147237\n5          5 0.01496959 -0.09146942   0.1214086   -0.1636959    0.1936351\n6          6 0.01496959 -0.08219549   0.1121347   -0.1481289    0.1780681\n\n\n\n\n\n\n\n\nNote\n\n\n\nWhy these multipliers?\n\n\n\nLimit\nMultiplier\nInterpretation\n\n\n\n\n95% CI\n1.96\n~2 SD from mean; “common cause” variation\n\n\n99.9% CI\n3.29\n~3.3 SD from mean; strong evidence of outlier\n\n\n\n\n\n\n\n\n\nLayer the data points, funnel bands, and a mean reference line.\n\np &lt;- ggplot(df, aes(x = Positive, y = rate)) +\n  \n  # Data points\n  geom_point(aes(label = `Sub-district`),\n             alpha = 0.4) +\n  \n  # 95% lower limit (dashed)\n  geom_line(data = dfCI,\n            aes(x = number.seq, y = number.ll95),\n            size = 0.4, colour = \"grey40\", linetype = \"dashed\") +\n  \n  # 95% upper limit (dashed)\n  geom_line(data = dfCI,\n            aes(x = number.seq, y = number.ul95),\n            size = 0.4, colour = \"grey40\", linetype = \"dashed\") +\n  \n  # 99.9% lower limit (solid)\n  geom_line(data = dfCI,\n            aes(x = number.seq, y = number.ll999),\n            size = 0.4, colour = \"grey40\") +\n  \n  # 99.9% upper limit (solid)\n  geom_line(data = dfCI,\n            aes(x = number.seq, y = number.ul999),\n            size = 0.4, colour = \"grey40\") +\n  \n  # Grand mean reference line\n  geom_hline(data = dfCI,\n             aes(yintercept = fit.mean),\n             size = 0.4, colour = \"grey40\") +\n  \n  # Zoom y-axis without clipping CI lines\n  coord_cartesian(ylim = c(0, 0.05)) +\n  \n  # CI band labels\n  annotate(\"text\", x = 1,   y = -0.13, label = \"95%\",\n           size = 3, colour = \"grey40\") +\n  annotate(\"text\", x = 4.5, y = -0.18, label = \"99%\",\n           size = 3, colour = \"grey40\") +\n  \n  # Titles\n  ggtitle(\"Cumulative Fatality Rate by Cumulative Number of COVID-19 Cases\") +\n  xlab(\"Cumulative Number of COVID-19 Cases\") +\n  ylab(\"Cumulative Fatality Rate\") +\n  \n  theme_light() +\n  theme(\n    plot.title        = element_text(size = 12),\n    legend.position   = c(0.91, 0.85),\n    legend.title      = element_text(size = 7),\n    legend.text       = element_text(size = 7),\n    legend.background = element_rect(colour = \"grey60\", linetype = \"dotted\"),\n    legend.key.height = unit(0.3, \"cm\")\n  )\n\np\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nTip\n\n\n\nReading the funnel plot:\n\nPoints within the 95% band: variation is within expected statistical noise.\nPoints between the 95% and 99.9% bands: moderate evidence of unusual performance.\nPoints outside the 99.9% band: strong evidence the sub-district’s rate differs from the overall average.\n\n\n\n\n\n\n\nWrap the ggplot2 object with ggplotly() to enable hover tooltips showing the sub-district name, case count, and fatality rate.\n\nfp_ggplotly &lt;- ggplotly(p,\n  tooltip = c(\"label\", \"x\", \"y\"))\n\nfp_ggplotly\n\n\n\n\n\n\n\n\n\n\n\nTip\n\n\n\nHover over any point to see the sub-district name, cumulative positive cases, and fatality rate. This makes it easy to identify and investigate outlying sub-districts without cluttering the static chart with labels."
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04d.html#summary",
-    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04d.html#summary",
-    "title": "Hands-on Exercise 4d: Building Funnel Plot with R",
-    "section": "",
-    "text": "Method\nPros\nCons\n\n\n\n\nFunnelPlotR\nFast, handles overdispersion automatically\nLimited customisation\n\n\nggplot2 (manual)\nFull control over every visual element\nMore code required\n\n\nplotly + ggplot2\nAdds interactivity with minimal extra code\nRequires label aesthetic on geom_point\n\n\n\nA funnel plot is most valuable when we need to compare many units (e.g., hospitals, districts) while accounting for the fact that smaller units have more variability — the narrowing funnel shape naturally encodes this statistical reality."
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04d.html#reference",
-    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04d.html#reference",
-    "title": "Hands-on Exercise 4d: Building Funnel Plot with R",
-    "section": "",
-    "text": "Kam, T.S. (2023). Funnel Plots for Fair Comparisons."
-  },
-  {
     "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04a.html#reference",
     "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04a.html#reference",
     "title": "4a. Visualizing Distribution",
     "section": "",
     "text": "Kam, T.S. (2023). Visualising Distribution."
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html",
-    "href": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html",
-    "title": "Hands-on Exercise 3b: Programming Animated Statistical Graphics with R",
-    "section": "",
-    "text": "When creating animations, the plot does not actually move. Instead, many individual plots are built and then stitched together as movie frames, like an old-school flip book or cartoon. Each frame is a different plot when conveying motion, built using a relevant subset of the aggregate data. The subset drives the flow of the animation when stitched back together.\nBefore diving in, it is important to understand some key concepts:\n\nFrame: Each frame represents a different point in time or category. When the frame changes, the data points on the graph update to reflect the new data.\nAnimation Attributes: Settings that control how the animation behaves — for example, the duration of each frame, the easing function used to transition between frames, and whether to start from the current frame or the beginning."
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html#basic-concepts-of-animation",
-    "href": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html#basic-concepts-of-animation",
-    "title": "Hands-on Exercise 3b: Programming Animated Statistical Graphics with R",
-    "section": "",
-    "text": "When creating animations, the plot does not actually move. Instead, many individual plots are built and then stitched together as movie frames, like an old-school flip book or cartoon. Each frame is a different plot when conveying motion, built using a relevant subset of the aggregate data. The subset drives the flow of the animation when stitched back together.\nBefore diving in, it is important to understand some key concepts:\n\nFrame: Each frame represents a different point in time or category. When the frame changes, the data points on the graph update to reflect the new data.\nAnimation Attributes: Settings that control how the animation behaves — for example, the duration of each frame, the easing function used to transition between frames, and whether to start from the current frame or the beginning."
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html#getting-started",
-    "href": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html#getting-started",
-    "title": "Hands-on Exercise 3b: Programming Animated Statistical Graphics with R",
-    "section": "Getting Started",
-    "text": "Getting Started\n\nLoading the R Packages\nThe following packages are used in this chapter:\n\nplotly for plotting interactive statistical graphs\ngganimate: a ggplot2 extension for animated statistical graphs\ngifski converts video frames to GIF animations using efficient cross-frame palettes and temporal dithering\ngapminder provides the country_colors colour scheme used in the plots\ntidyverse for data wrangling, transformation, and static graphics\n\n\npacman::p_load(readxl, gifski, gapminder,\n               plotly, gganimate, tidyverse)\n\n\n\nImporting the Data\nThe Data worksheet from the GlobalPopulation Excel workbook is used throughout this chapter.\n\ncol &lt;- c(\"Country\", \"Continent\")\nglobalPop &lt;- read_xls(\"data/GlobalPopulation.xls\",\n                      sheet = \"Data\") %&gt;%\n  mutate(across(col, as.factor)) %&gt;%\n  mutate(Year = as.integer(Year))\n\n\n\n\n\n\n\nNote\n\n\n\nThings to learn from the code chunk above:\n\nread_xls() from readxl imports the Excel worksheet.\nmutate(across()) converts the Country and Continent character columns to factors. This replaces the deprecated mutate_each_() and mutate_at() approaches from older dplyr versions.\nmutate(Year = as.integer(Year)) converts the Year field to integer type."
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html#animated-data-visualisation-gganimate-methods",
-    "href": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html#animated-data-visualisation-gganimate-methods",
-    "title": "Hands-on Exercise 3b: Programming Animated Statistical Graphics with R",
-    "section": "Animated Data Visualisation: gganimate Methods",
-    "text": "Animated Data Visualisation: gganimate Methods\ngganimate extends the grammar of graphics implemented by ggplot2 to include animation. It provides a range of new grammar classes that can be added to the plot object:\n\n\n\n\n\n\n\nFunction\nPurpose\n\n\n\n\ntransition_*()\nDefines how data spreads across time\n\n\nview_*()\nDefines how positional scales change during animation\n\n\nshadow_*()\nDefines how data from other time points is displayed\n\n\nenter_*()/exit_*()\nDefines how new/old data appears and disappears\n\n\nease_aes()\nDefines how aesthetics are eased during transitions\n\n\n\n\nBuilding a Static Population Bubble Plot\nThe basic ggplot2 functions are used to create a static bubble plot first. This is the foundation before animating.\n\nggplot(globalPop, aes(x = Old, y = Young,\n                      size = Population,\n                      colour = Country)) +\n  geom_point(alpha = 0.7,\n             show.legend = FALSE) +\n  scale_colour_manual(values = country_colors) +\n  scale_size(range = c(2, 12)) +\n  labs(title = 'Year: {frame_time}',\n       x = '% Aged',\n       y = '% Young')\n\n\n\n\n\n\n\n\n\n\nBuilding the Animated Bubble Plot\nTwo gganimate functions are added to bring the plot to life:\n\ntransition_time(): creates transitions through distinct states in time (i.e. Year)\nease_aes(): controls easing of aesthetics during transitions. The default is linear, other options include quadratic, cubic, sine, elastic, bounce, and more.\n\n\nggplot(globalPop, aes(x = Old, y = Young,\n                      size = Population,\n                      colour = Country)) +\n  geom_point(alpha = 0.7,\n             show.legend = FALSE) +\n  scale_colour_manual(values = country_colors) +\n  scale_size(range = c(2, 12)) +\n  labs(title = 'Year: {frame_time}',\n       x = '% Aged',\n       y = '% Young') +\n  transition_time(Year) +\n  ease_aes('linear')"
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html#animated-data-visualisation-plotly",
-    "href": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html#animated-data-visualisation-plotly",
-    "title": "Hands-on Exercise 3b: Programming Animated Statistical Graphics with R",
-    "section": "Animated Data Visualisation: plotly",
-    "text": "Animated Data Visualisation: plotly\nIn Plotly R, both ggplotly() and plot_ly() support key frame animations through the frame argument/aesthetic. They also support an ids argument/aesthetic to ensure smooth transitions between objects with the same id (facilitating object constancy).\n\nBuilding an Animated Bubble Plot: ggplotly() Method\nThe animated bubble plot produced with ggplotly() includes a play/pause button and a slider component for controlling the animation.\n\ngg &lt;- ggplot(globalPop,\n       aes(x = Old,\n           y = Young,\n           size = Population,\n           colour = Country)) +\n  geom_point(aes(size = Population,\n                 frame = Year),\n             alpha = 0.7) +\n  scale_colour_manual(values = country_colors) +\n  scale_size(range = c(2, 12)) +\n  labs(x = '% Aged',\n       y = '% Young') +\n  theme(legend.position = 'none')\n\nggplotly(gg)\n\n\n\n\n\n\n\n\n\n\n\nNote\n\n\n\nThings to learn from the code chunk above:\n\nA static bubble plot is built with ggplot2 and saved as the R object gg.\nggplotly() converts the R graphic object into an animated SVG object.\ntheme(legend.position = 'none') is required to suppress the legend.\nUsing show.legend = FALSE inside geom_point() does not remove it in plotly.\n\n\n\n\n\nBuilding an Animated Bubble Plot: plot_ly() Method\nThe plot_ly() method provides a more direct plotly interface, colouring bubbles by Continent and using hoverinfo to show country names on hover.\n\nbp &lt;- globalPop %&gt;%\n  plot_ly(x = ~Old,\n          y = ~Young,\n          size = ~Population,\n          color = ~Continent,\n          sizes = c(2, 100),\n          frame = ~Year,\n          text = ~Country,\n          hoverinfo = \"text\",\n          type = 'scatter',\n          mode = 'markers'\n          ) %&gt;%\n  layout(showlegend = FALSE)\n\nbp"
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html#reference",
-    "href": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html#reference",
-    "title": "Hands-on Exercise 3b: Programming Animated Statistical Graphics with R",
-    "section": "Reference",
-    "text": "Reference\nKam, T. S. (2023) R for Visual Analytics"
   }
 ]
