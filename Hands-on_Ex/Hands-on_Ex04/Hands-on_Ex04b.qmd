@@ -1,0 +1,263 @@
+---
+title: "Hands-on Exercise 4b: Visual Statistical Analysis"
+author: "Lei Yuhe"
+date: "May 10, 2026"
+date-modified: "last-modified"
+execute:
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+---
+
+## Overview
+
+Key things covered:
+
+-   `ggstatsplot` for visual + statistical output in a single chart
+-   One-sample tests, two-sample tests, ANOVA, correlation, and association tests
+-   What Bayes Factors actually mean
+
+## Setting Up
+
+### Packages
+
+```{r}
+pacman::p_load(ggstatsplot, tidyverse)
+```
+
+[`ggstatsplot`](https://www.indrapatil.com/ggstatsplot/index.html) is built on top of [`ggplot2`](https://ggplot2.tidyverse.org/), it follows the APA standard for reporting statistics, which means the output is actually publication-ready.
+
+### Load the Data
+
+```{r}
+exam <- read_csv("data/Exam_data.csv")
+glimpse(exam)
+```
+
+The dataset has 322 students with scores in English, Maths, and Science, plus demographic info like Class, Gender, and Race.
+
+------------------------------------------------------------------------
+
+## One-Sample Test with `gghistostats()`
+
+**Question**: Is the *average* English score significantly different from 60?
+
+```{r}
+set.seed(1234)
+
+gghistostats(
+  data = exam,
+  x = ENGLISH,
+  type = "bayes",       # using Bayesian inference
+  test.value = 60,      # testing against this benchmark
+  xlab = "English scores"
+)
+```
+
+::: {.callout-note}
+`type = "bayes"` runs a **Bayesian one-sample t-test** rather than the classic frequentist version.
+:::
+
+- log_e(BF₀₁) = −31.45, this is the log Bayes Factor in favour of H0. It's massively negative, meaning the evidence is overwhelmingly against H0 (that the mean = 60). Flipping it: BF₁₀ is enormous, so we have extreme evidence that the true mean is not 60.
+- δ̂ posterior difference = 7.16,  the standardised effect size
+- CI⁹⁵% [5.54, 8.75], 95% credible interval for that effect
+- r_Cauchy = 0.71, the prior scale used for the Bayesian test
+
+## Understanding the Bayes Factor
+
+A **Bayes Factor (BF₁₀)** compares two hypotheses:
+
+- **H0**: the null hypothesis (e.g., mean = 60)
+- **H1**: the alternate hypothesis (e.g., mean ≠ 60)
+
+$$BF_{10} = \frac{P(\text{data} \mid H_1)}{P(\text{data} \mid H_0)}$$
+One practical way to estimate it is using the [**Schwarz/BIC criterion**](https://www.statisticshowto.com/bayesian-information-criterion/). It's a rougher approximation but much easier to compute.
+
+### Interpreting BF₁₀ Values
+
+| Bayes Factor | Interpretation |
+|---|---|
+| > 100 | Extreme evidence for H1 |
+| 30 – 100 | Very strong evidence for H1 |
+| 10 – 30 | Strong evidence for H1 |
+| 3 – 10 | Moderate evidence for H1 |
+| 1 – 3 | Anecdotal evidence for H1 |
+| 1 | No evidence either way |
+| 1/3 – 1 | Anecdotal evidence for H0 |
+| 1/10 – 1/3 | Moderate evidence for H0 |
+| < 1/10 | Strong evidence for H0 |
+
+---
+
+## Two-Sample Mean Test with `ggbetweenstats()`
+
+**Question:** Do Male and Female students score differently in Maths?
+
+### Testing for normality 
+- Step 1: Test normality for each gender group
+```{r}
+exam %>%
+  group_by(GENDER) %>%
+  summarise(
+    shapiro_p = shapiro.test(MATHS)$p.value,
+    n = n()
+  )
+```
+
+- Step 2: Visualise the distribution
+```{r}
+ggplot(exam, aes(sample = MATHS, color = GENDER)) +
+  stat_qq() +
+  stat_qq_line() +
+  facet_wrap(~GENDER) +
+  labs(title = "Q-Q Plot of Maths Scores by Gender")
+```
+- Step 3: Choose test based on normality result
+  - If Shapiro-Wilk p > 0.05 → normality holds → use "p" (parametric, Student's t-test)
+  - If Shapiro-Wilk p < 0.05 → normality violated → use "np" (non-parametric, Mann-Whitney U)
+
+
+```{r}
+ggbetweenstats(
+  data = exam,
+  x = GENDER,
+  y = MATHS,
+  type = "np",        # non-parametric test (Mann-Whitney U)
+  messages = FALSE
+)
+```
+
+`type = "np"` was used here for a **non-parametric test**, as the data violates normality assumption based on the Shapiro-Wilk's test. 
+The plot shows the data distribution (violin + boxplot + points) alongside the test statistic.
+
+---
+
+## One-Way ANOVA with `ggbetweenstats()`
+
+The same function handles ANOVA when there are more than 2 groups. Here I'm checking if English scores differ across racial groups.
+
+```{r}
+ggbetweenstats(
+  data = exam,
+  x = RACE,
+  y = ENGLISH,
+  type = "p",                      # parametric (standard ANOVA)
+  mean.ci = TRUE,                  # show confidence intervals for means
+  pairwise.comparisons = TRUE,     # run post-hoc pairwise tests
+  pairwise.display = "s",          # "s" = show only significant pairs
+  p.adjust.method = "fdr",         # False Discovery Rate correction
+  messages = FALSE
+)
+```
+
+
+### Options for `pairwise.display`
+
+| Value | What it shows |
+|---|---|
+| `"s"` | Only significant pairwise comparisons |
+| `"ns"` | Only non-significant comparisons |
+| `"all"` | All pairwise comparisons |
+
+### Which test runs under the hood?
+
+`ggbetweenstats` is smart about picking the right test depending on `type` and group count:
+
+| Scenario | `type = "p"` | `type = "np"` | `type = "r"` (robust) | `type = "bayes"` |
+|---|---|---|---|---|
+| 2 groups | Student's t | Mann-Whitney U | Yuen's t | Bayes t-test |
+| 3+ groups | Fisher's ANOVA | Kruskal-Wallis | Trimmed means ANOVA | Bayes ANOVA |
+
+Post-hoc pairwise comparisons are adjusted. FDR (`"fdr"`) is a good choice to control false discoveries when there are many comparisons.
+
+---
+
+## Correlation Test with `ggscatterstats()`
+
+**Question**: Is there a significant correlation between Maths and English scores?
+
+```{r}
+ggscatterstats(
+  data = exam,
+  x = MATHS,
+  y = ENGLISH,
+  marginal = FALSE    # set TRUE to add marginal distributions on the sides
+)
+```
+
+The scatterplot comes with:
+
+- A fitted regression line
+- Confidence band
+- Correlation coefficient and p-value right in the subtitle
+
+Setting `marginal = TRUE` would add density/histogram plots along the axes — useful but can be visually busy.
+
+---
+
+## Association Test with `ggbarstats()`
+
+**Question**: Is there a significant association between Maths performance bands and Gender?
+
+First, I need to bin the continuous Maths score into categories:
+
+```{r}
+exam1 <- exam %>%
+  mutate(
+    MATHS_bins = cut(
+      MATHS,
+      breaks = c(0, 60, 75, 85, 100),
+      labels = c("Fail (<60)", "Pass (60-75)", "Good (75-85)", "Excellent (85+)")
+    )
+  )
+```
+
+Then plot:
+
+```{r}
+ggbarstats(
+  data = exam1,
+  x = MATHS_bins,
+  y = GENDER
+)
+```
+
+This runs a **chi-square test of independence** and displays:
+
+- Stacked bar proportions by gender
+- Chi-square statistic, degrees of freedom, p-value
+- Cramér's V (effect size)
+
+The `cut()` function is important here — I defined breaks at 0, 60, 75, 85, 100 to create meaningful academic performance bands.
+
+---
+
+## Summary
+
+| Goal | Function | Key argument |
+|---|---|---|
+| Test one sample against a value | `gghistostats()` | `test.value` |
+| Compare two groups | `ggbetweenstats()` | `x` = grouping (2 levels) |
+| Compare 3+ groups (ANOVA) | `ggbetweenstats()` | `x` = grouping (3+ levels) |
+| Test correlation | `ggscatterstats()` | `x`, `y` continuous |
+| Test association (categorical) | `ggbarstats()` | `x` = binned/categorical |
+
+## Reference
+Kam, T. S. (2023) [R for Visual Analytics](https://r4va.netlify.app/chap10)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

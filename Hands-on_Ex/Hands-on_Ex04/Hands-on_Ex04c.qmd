@@ -1,0 +1,12 @@
+---
+title: "Hands-on Exercise 4c: Visualising Uncertainty"
+author: "Lei Yuhe"
+date: "May 10, 2026"
+date-modified: "last-modified"
+execute:
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+---
+

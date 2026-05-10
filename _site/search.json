@@ -355,5 +355,82 @@
     "title": "4a. Visualizing Distribution",
     "section": "",
     "text": "Kam, T.S. (2023). Visualising Distribution."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04b.html",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04b.html",
+    "title": "Hands-on Exercise 4b: Visual Statistical Analysis",
+    "section": "",
+    "text": "Key things covered:\n\nggstatsplot for visual + statistical output in a single chart\nOne-sample tests, two-sample tests, ANOVA, correlation, and association tests\nWhat Bayes Factors actually mean"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04b.html#overview",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04b.html#overview",
+    "title": "Hands-on Exercise 4b: Visual Statistical Analysis",
+    "section": "",
+    "text": "Key things covered:\n\nggstatsplot for visual + statistical output in a single chart\nOne-sample tests, two-sample tests, ANOVA, correlation, and association tests\nWhat Bayes Factors actually mean"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04b.html#setting-up",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04b.html#setting-up",
+    "title": "Hands-on Exercise 4b: Visual Statistical Analysis",
+    "section": "Setting Up",
+    "text": "Setting Up\n\nPackages\n\npacman::p_load(ggstatsplot, tidyverse)\n\nggstatsplot is built on top of ggplot2, it follows the APA standard for reporting statistics, which means the output is actually publication-ready.\n\n\nLoad the Data\n\nexam &lt;- read_csv(\"data/Exam_data.csv\")\nglimpse(exam)\n\nRows: 322\nColumns: 7\n$ ID      &lt;chr&gt; \"Student321\", \"Student305\", \"Student289\", \"Student227\", \"Stude…\n$ CLASS   &lt;chr&gt; \"3I\", \"3I\", \"3H\", \"3F\", \"3I\", \"3I\", \"3I\", \"3I\", \"3I\", \"3H\", \"3…\n$ GENDER  &lt;chr&gt; \"Male\", \"Female\", \"Male\", \"Male\", \"Male\", \"Female\", \"Male\", \"M…\n$ RACE    &lt;chr&gt; \"Malay\", \"Malay\", \"Chinese\", \"Chinese\", \"Malay\", \"Malay\", \"Chi…\n$ ENGLISH &lt;dbl&gt; 21, 24, 26, 27, 27, 31, 31, 31, 33, 34, 34, 36, 36, 36, 37, 38…\n$ MATHS   &lt;dbl&gt; 9, 22, 16, 77, 11, 16, 21, 18, 19, 49, 39, 35, 23, 36, 49, 30,…\n$ SCIENCE &lt;dbl&gt; 15, 16, 16, 31, 25, 16, 25, 27, 15, 37, 42, 22, 32, 36, 35, 45…\n\n\nThe dataset has 322 students with scores in English, Maths, and Science, plus demographic info like Class, Gender, and Race."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04b.html#one-sample-test-with-gghistostats",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04b.html#one-sample-test-with-gghistostats",
+    "title": "Hands-on Exercise 4b: Visual Statistical Analysis",
+    "section": "One-Sample Test with gghistostats()",
+    "text": "One-Sample Test with gghistostats()\nQuestion: Is the average English score significantly different from 60?\n\nset.seed(1234)\n\ngghistostats(\n  data = exam,\n  x = ENGLISH,\n  type = \"bayes\",       # using Bayesian inference\n  test.value = 60,      # testing against this benchmark\n  xlab = \"English scores\"\n)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNote\n\n\n\ntype = \"bayes\" runs a Bayesian one-sample t-test rather than the classic frequentist version.\n\n\n\nlog_e(BF₀₁) = −31.45, this is the log Bayes Factor in favour of H0. It’s massively negative, meaning the evidence is overwhelmingly against H0 (that the mean = 60). Flipping it: BF₁₀ is enormous, so we have extreme evidence that the true mean is not 60.\nδ̂ posterior difference = 7.16, the standardised effect size\nCI⁹⁵% [5.54, 8.75], 95% credible interval for that effect\nr_Cauchy = 0.71, the prior scale used for the Bayesian test"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04b.html#understanding-the-bayes-factor",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04b.html#understanding-the-bayes-factor",
+    "title": "Hands-on Exercise 4b: Visual Statistical Analysis",
+    "section": "Understanding the Bayes Factor",
+    "text": "Understanding the Bayes Factor\nA Bayes Factor (BF₁₀) compares two hypotheses:\n\nH0: the null hypothesis (e.g., mean = 60)\nH1: the alternate hypothesis (e.g., mean ≠ 60)\n\n\\[BF_{10} = \\frac{P(\\text{data} \\mid H_1)}{P(\\text{data} \\mid H_0)}\\] One practical way to estimate it is using the Schwarz/BIC criterion. It’s a rougher approximation but much easier to compute.\n\nInterpreting BF₁₀ Values\n\n\n\nBayes Factor\nInterpretation\n\n\n\n\n&gt; 100\nExtreme evidence for H1\n\n\n30 – 100\nVery strong evidence for H1\n\n\n10 – 30\nStrong evidence for H1\n\n\n3 – 10\nModerate evidence for H1\n\n\n1 – 3\nAnecdotal evidence for H1\n\n\n1\nNo evidence either way\n\n\n1/3 – 1\nAnecdotal evidence for H0\n\n\n1/10 – 1/3\nModerate evidence for H0\n\n\n&lt; 1/10\nStrong evidence for H0"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04b.html#two-sample-mean-test-with-ggbetweenstats",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04b.html#two-sample-mean-test-with-ggbetweenstats",
+    "title": "Hands-on Exercise 4b: Visual Statistical Analysis",
+    "section": "Two-Sample Mean Test with ggbetweenstats()",
+    "text": "Two-Sample Mean Test with ggbetweenstats()\nQuestion: Do Male and Female students score differently in Maths?\n\nTesting for normality\n\nStep 1: Test normality for each gender group\n\n\nexam %&gt;%\n  group_by(GENDER) %&gt;%\n  summarise(\n    shapiro_p = shapiro.test(MATHS)$p.value,\n    n = n()\n  )\n\n# A tibble: 2 × 3\n  GENDER    shapiro_p     n\n  &lt;chr&gt;         &lt;dbl&gt; &lt;int&gt;\n1 Female 0.000000160    170\n2 Male   0.0000000627   152\n\n\n\nStep 2: Visualise the distribution\n\n\nggplot(exam, aes(sample = MATHS, color = GENDER)) +\n  stat_qq() +\n  stat_qq_line() +\n  facet_wrap(~GENDER) +\n  labs(title = \"Q-Q Plot of Maths Scores by Gender\")\n\n\n\n\n\n\n\n\n\nStep 3: Choose test based on normality result\n\nIf Shapiro-Wilk p &gt; 0.05 → normality holds → use “p” (parametric, Student’s t-test)\nIf Shapiro-Wilk p &lt; 0.05 → normality violated → use “np” (non-parametric, Mann-Whitney U)\n\n\n\nggbetweenstats(\n  data = exam,\n  x = GENDER,\n  y = MATHS,\n  type = \"np\",        # non-parametric test (Mann-Whitney U)\n  messages = FALSE\n)\n\n\n\n\n\n\n\n\ntype = \"np\" was used here for a non-parametric test, as the data violates normality assumption based on the Shapiro-Wilk’s test. The plot shows the data distribution (violin + boxplot + points) alongside the test statistic."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04b.html#one-way-anova-with-ggbetweenstats",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04b.html#one-way-anova-with-ggbetweenstats",
+    "title": "Hands-on Exercise 4b: Visual Statistical Analysis",
+    "section": "One-Way ANOVA with ggbetweenstats()",
+    "text": "One-Way ANOVA with ggbetweenstats()\nThe same function handles ANOVA when there are more than 2 groups. Here I’m checking if English scores differ across racial groups.\n\nggbetweenstats(\n  data = exam,\n  x = RACE,\n  y = ENGLISH,\n  type = \"p\",                      # parametric (standard ANOVA)\n  mean.ci = TRUE,                  # show confidence intervals for means\n  pairwise.comparisons = TRUE,     # run post-hoc pairwise tests\n  pairwise.display = \"s\",          # \"s\" = show only significant pairs\n  p.adjust.method = \"fdr\",         # False Discovery Rate correction\n  messages = FALSE\n)\n\n\n\n\n\n\n\n\n\nOptions for pairwise.display\n\n\n\nValue\nWhat it shows\n\n\n\n\n\"s\"\nOnly significant pairwise comparisons\n\n\n\"ns\"\nOnly non-significant comparisons\n\n\n\"all\"\nAll pairwise comparisons\n\n\n\n\n\nWhich test runs under the hood?\nggbetweenstats is smart about picking the right test depending on type and group count:\n\n\n\n\n\n\n\n\n\n\nScenario\ntype = \"p\"\ntype = \"np\"\ntype = \"r\" (robust)\ntype = \"bayes\"\n\n\n\n\n2 groups\nStudent’s t\nMann-Whitney U\nYuen’s t\nBayes t-test\n\n\n3+ groups\nFisher’s ANOVA\nKruskal-Wallis\nTrimmed means ANOVA\nBayes ANOVA\n\n\n\nPost-hoc pairwise comparisons are adjusted. FDR (\"fdr\") is a good choice to control false discoveries when there are many comparisons."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04b.html#correlation-test-with-ggscatterstats",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04b.html#correlation-test-with-ggscatterstats",
+    "title": "Hands-on Exercise 4b: Visual Statistical Analysis",
+    "section": "Correlation Test with ggscatterstats()",
+    "text": "Correlation Test with ggscatterstats()\nQuestion: Is there a significant correlation between Maths and English scores?\n\nggscatterstats(\n  data = exam,\n  x = MATHS,\n  y = ENGLISH,\n  marginal = FALSE    # set TRUE to add marginal distributions on the sides\n)\n\n\n\n\n\n\n\n\nThe scatterplot comes with:\n\nA fitted regression line\nConfidence band\nCorrelation coefficient and p-value right in the subtitle\n\nSetting marginal = TRUE would add density/histogram plots along the axes — useful but can be visually busy."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04b.html#association-test-with-ggbarstats",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04b.html#association-test-with-ggbarstats",
+    "title": "Hands-on Exercise 4b: Visual Statistical Analysis",
+    "section": "Association Test with ggbarstats()",
+    "text": "Association Test with ggbarstats()\nQuestion: Is there a significant association between Maths performance bands and Gender?\nFirst, I need to bin the continuous Maths score into categories:\n\nexam1 &lt;- exam %&gt;%\n  mutate(\n    MATHS_bins = cut(\n      MATHS,\n      breaks = c(0, 60, 75, 85, 100),\n      labels = c(\"Fail (&lt;60)\", \"Pass (60-75)\", \"Good (75-85)\", \"Excellent (85+)\")\n    )\n  )\n\nThen plot:\n\nggbarstats(\n  data = exam1,\n  x = MATHS_bins,\n  y = GENDER\n)\n\n\n\n\n\n\n\n\nThis runs a chi-square test of independence and displays:\n\nStacked bar proportions by gender\nChi-square statistic, degrees of freedom, p-value\nCramér’s V (effect size)\n\nThe cut() function is important here — I defined breaks at 0, 60, 75, 85, 100 to create meaningful academic performance bands."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04b.html#summary",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04b.html#summary",
+    "title": "Hands-on Exercise 4b: Visual Statistical Analysis",
+    "section": "Summary",
+    "text": "Summary\n\n\n\n\n\n\n\n\nGoal\nFunction\nKey argument\n\n\n\n\nTest one sample against a value\ngghistostats()\ntest.value\n\n\nCompare two groups\nggbetweenstats()\nx = grouping (2 levels)\n\n\nCompare 3+ groups (ANOVA)\nggbetweenstats()\nx = grouping (3+ levels)\n\n\nTest correlation\nggscatterstats()\nx, y continuous\n\n\nTest association (categorical)\nggbarstats()\nx = binned/categorical"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04b.html#reference",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04b.html#reference",
+    "title": "Hands-on Exercise 4b: Visual Statistical Analysis",
+    "section": "Reference",
+    "text": "Reference\nKam, T. S. (2023) R for Visual Analytics"
   }
 ]
