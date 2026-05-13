@@ -10,3 +10,482 @@ execute:
   freeze: true
 ---
 
+# Overview
+
+Raw summary statistics (e.g. a mean value) are **point estimates**, they tell us nothing about how confident we should be in that number. Communicating uncertainty helps us make better decisions and avoids misleading conclusions.
+
+These will be covered below: 
+
+- Plot **standard error bars** using `ggplot2`. 
+- Plot **confidence interval** error bars using `ggplot2`. 
+- Create **interactive error bars** by combining `ggplot2`, `plotly`, and `DT`. 
+- Build advanced uncertainty visuals using the **`ggdist`** package. 
+- Create **Hypothetical Outcome Plots (HOPs)** using the `ungeviz` package.
+
+---
+
+# Setup
+
+## Key Terms
+
+| Term | What it measures | Formula |
+|---|---|---|
+| **Standard Deviation (SD)** | Spread of individual observations | $s$ |
+| **Standard Error (SE)** | Uncertainty of the sample *mean* | $SE = s / \sqrt{n-1}$ |
+| **Confidence Interval (CI)** | Plausible range for the true mean | $\bar{x} \pm z \times SE$ |
+
+> **Important:** Do **not** confuse the uncertainty of a point estimate (SE / CI)
+> with the variation in the sample (SD). They answer different questions.
+
+## Installing and Loading Packages
+
+```{r}
+#| label: load-packages
+
+pacman::p_load(
+  plotly,       # Interactive plots
+  crosstalk,    # Cross-widget interactions (linked brushing/filtering)
+  DT,           # Interactive HTML tables
+  ggdist,       # Distribution and uncertainty visualisation
+  ggridges,     # Ridgeline plots
+  colorspace,   # Colour palette utilities
+  gganimate,    # Animated plots
+  tidyverse     # Core data science packages (ggplot2, dplyr, etc.)
+)
+```
+
+## Data Import
+
+We use `Exam_data.csv`, which contains exam scores (Maths, English, Science) for
+primary school students, along with demographic variables such as `RACE`, `GENDER`,
+and `CLASS`.
+
+```{r}
+#| label: import-data
+
+exam <- read_csv("data/Exam_data.csv")
+glimpse(exam)
+```
+
+---
+
+# Visualising Uncertainty with ggplot2
+
+## Deriving Summary Statistics
+
+To plot error bars we first need to compute, per group:
+
+- **n**: number of observations
+- **mean**: average Maths score
+- **sd**: standard deviation
+- **se**: standard error = $sd / \sqrt{n-1}$
+
+```{r}
+#| label: summary-stats
+
+my_sum <- exam %>%
+  group_by(RACE) %>%
+  summarise(
+    n    = n(),
+    mean = mean(MATHS),
+    sd   = sd(MATHS)
+  ) %>%
+  mutate(se = sd / sqrt(n - 1))
+
+knitr::kable(my_sum, format = "html", digits = 2,
+             caption = "Summary statistics of Maths scores by Race")
+```
+
+**Reading the table:**
+
+- Chinese pupils have the largest group ($n = 193$) and the smallest SE ($\approx 1.13$),
+  which means we have a precise estimate of their mean.
+- Indian pupils have the smallest group ($n = 12$) and a very large SE ($\approx 7.04$),
+  reflecting much greater uncertainty about their true mean.
+
+---
+
+## Standard Error Bars
+
+Standard error bars extend one SE above and below the mean. They communicate
+**how precisely** the sample mean estimates the population mean. Narrower bars
+mean more precision.
+
+```{r}
+#| label: fig-se-bars
+#| fig-cap: "Standard error bars of mean Maths score by race. Red dots = sample means; bars = ±1 SE."
+
+ggplot(my_sum) +
+  geom_errorbar(
+    aes(x = RACE, ymin = mean - se, ymax = mean + se),
+    width     = 0.2,
+    colour    = "black",
+    alpha     = 0.9,
+    linewidth = 0.5
+  ) +
+  geom_point(
+    aes(x = RACE, y = mean),
+    stat  = "identity",
+    color = "red",
+    size  = 1.5,
+    alpha = 1
+  ) +
+  labs(
+    title = "Standard Error of Mean Maths Score by Race",
+    x     = "Race",
+    y     = "Mean Maths Score"
+  ) +
+  theme_minimal()
+```
+
+**What to notice:**
+
+- The Chinese group has a very tight error bar (large sample, high precision).
+- The Indian and Others groups have much wider bars (small samples, low precision).
+- The visual inequality in bar widths reinforces why sample size matters when
+  comparing groups.
+  
+---
+
+## 95% Confidence Interval Bars
+
+A 95% CI is computed as $\bar{x} \pm 1.96 \times SE$. It means: if we repeated
+this study many times, ~95% of the constructed intervals would contain the true
+population mean.
+
+The races are **reordered by descending mean** so the plot is easier to read.
+
+```{r}
+#| label: fig-ci95-bars
+#| fig-cap: "95% confidence intervals of mean Maths score by race, sorted by descending mean."
+
+ggplot(my_sum) +
+  geom_errorbar(
+    aes(
+      x    = reorder(RACE, -mean),
+      ymin = mean - 1.96 * se,
+      ymax = mean + 1.96 * se
+    ),
+    width     = 0.2,
+    colour    = "black",
+    alpha     = 0.9,
+    linewidth = 0.5
+  ) +
+  geom_point(
+    aes(x = reorder(RACE, -mean), y = mean),
+    stat  = "identity",
+    color = "red",
+    size  = 1.5,
+    alpha = 1
+  ) +
+  labs(
+    x     = "Race",
+    y     = "Mean Maths Score",
+    title = "95% Confidence Interval of Mean Maths Score by Race"
+  ) +
+  theme_minimal()
+```
+
+**Key difference from SE bars:** The multiplier changes the interval width:
+
+| Confidence Level | Multiplier | Interpretation |
+|---|---|---|
+| ~68% | ±1.00 SE | Equivalent to ±1 SE bars |
+| 95%  | ±1.96 SE | Standard CI in most research |
+| 99%  | ±2.58 SE | More conservative, wider bars |
+
+## Interactive Error Bars (99% CI)
+
+By combining `plotly` (interactive chart), `DT` (interactive table), and
+`crosstalk` (linked selection), we can build a dashboard where clicking a row in
+the table highlights the corresponding bar in the plot.
+
+```{r}
+shared_df = SharedData$new(my_sum)
+
+bscols(widths = c(4,8),
+       ggplotly((ggplot(shared_df) +
+                   geom_errorbar(aes(
+                     x=reorder(RACE, -mean),
+                     ymin=mean-2.58*se, 
+                     ymax=mean+2.58*se), 
+                     width=0.2, 
+                     colour="black", 
+                     alpha=0.9, 
+                     size=0.5) +
+                   geom_point(aes(
+                     x=RACE, 
+                     y=mean, 
+                     text = paste("Race:", `RACE`, 
+                                  "<br>N:", `n`,
+                                  "<br>Avg. Scores:", round(mean, digits = 2),
+                                  "<br>95% CI:[", 
+                                  round((mean-2.58*se), digits = 2), ",",
+                                  round((mean+2.58*se), digits = 2),"]")),
+                     stat="identity", 
+                     color="red", 
+                     size = 1.5, 
+                     alpha=1) + 
+                   xlab("Race") + 
+                   ylab("Average Scores") + 
+                   theme_minimal() + 
+                   theme(axis.text.x = element_text(
+                     angle = 45, vjust = 0.5, hjust=1)) +
+                   ggtitle("99% Confidence interval of average /<br>maths scores by race")), 
+                tooltip = "text"), 
+       DT::datatable(shared_df, 
+                     rownames = FALSE, 
+                     class="compact", 
+                     width="100%", 
+                     options = list(pageLength = 10,
+                                    scrollX=T), 
+                     colnames = c("No. of pupils", 
+                                  "Avg Scores",
+                                  "Std Dev",
+                                  "Std Error")) %>%
+         formatRound(columns=c('mean', 'sd', 'se'),
+                     digits=2))
+
+```
+
+**Why interactivity helps:** Hovering over a point reveals exact values that
+are hard to read off a static plot. The linked table lets you filter by group
+without redrawing the chart.
+
+# Visualising Uncertainty with ggdist
+
+The `ggdist` package extends `ggplot2` with geoms and stats purpose-built for
+distribution and uncertainty visualisation. It works seamlessly for both
+frequentist (CI / SE) and Bayesian (posterior distribution) contexts.
+
+**Core philosophy:** uncertainty *is* a distribution — so draw it like one.
+
+## `stat_pointinterval()` Point + Interval
+
+`stat_pointinterval()` shows a point estimate (default: mean) together with
+multiple nested intervals (default: 66% and 95%).
+
+```{r}
+#| label: fig-pointinterval-default
+#| fig-cap: "Mean and multiple confidence intervals of Maths scores by race using stat_pointinterval()."
+
+exam %>%
+  ggplot(aes(x = RACE, y = MATHS)) +
+  stat_pointinterval() +
+  labs(
+    title    = "Visualising Confidence Intervals of Mean Maths Score",
+    subtitle = "Mean Point + Multiple-interval plot",
+    x        = "Race",
+    y        = "Maths Score"
+  ) +
+  theme_minimal()
+```
+
+The thick inner line = 66% CI; the thin outer line = 95% CI. This **nested
+interval** design lets you read two confidence levels at once.
+
+---
+
+## `stat_pointinterval()` Median + Quantile Interval
+
+We can switch to the **median** as the point summary and use **quantile intervals
+(qi)** instead of the default. This is more appropriate for skewed distributions.
+
+```{r}
+#| label: fig-pointinterval-median
+#| fig-cap: "Median and 95% quantile interval of Maths scores by race."
+
+exam %>%
+  ggplot(aes(x = RACE, y = MATHS)) +
+  stat_pointinterval(
+    .width    = 0.95,
+    .point    = median,
+    .interval = qi
+  ) +
+  labs(
+    title    = "Visualising Confidence Intervals of Median Maths Score",
+    subtitle = "Median Point + 95% Quantile Interval",
+    x        = "Race",
+    y        = "Maths Score"
+  ) +
+  theme_minimal()
+```
+
+**When to use median + qi:**
+
+- When your data may be skewed (median is more robust than mean).
+- When you want a distribution-free summary rather than a Normal-theory CI.
+
+---
+
+## `stat_pointinterval()` Multiple Widths (95% & 99%)
+
+By passing a vector to `.width`, we can display both 95% and 99% CIs
+simultaneously, encoded by line thickness.
+
+```{r}
+#| label: fig-pointinterval-multi
+#| fig-cap: "Mean with 95% and 99% confidence intervals shown simultaneously."
+
+exam %>%
+  ggplot(aes(x = RACE, y = MATHS)) +
+  stat_pointinterval(
+    .width      = c(0.95, 0.99),
+    show.legend = TRUE
+  ) +
+  labs(
+    title    = "95% and 99% Confidence Intervals of Mean Maths Score",
+    subtitle = "Mean Point + Multiple-interval plot",
+    x        = "Race",
+    y        = "Maths Score"
+  ) +
+  theme_minimal()
+```
+
+The thicker inner interval = 95% CI; the thinner outer interval = 99% CI.
+The 99% interval is always wider, as we need a broader net to be more confident
+about catching the true mean.
+
+---
+
+## `stat_gradientinterval()` Gradient Uncertainty
+
+`stat_gradientinterval()` encodes probability density through **colour opacity**:
+regions of higher likelihood are darker/more opaque, fading toward the tails.
+This gives a more intuitive sense of where values are most plausible.
+
+```{r}
+#| label: fig-gradientinterval
+#| fig-cap: "Gradient interval plot: opacity encodes density of plausible values."
+
+exam %>%
+  ggplot(aes(x = RACE, y = MATHS)) +
+  stat_gradientinterval(
+    fill         = "skyblue",
+    show.legend  = TRUE
+  ) +
+  labs(
+    title    = "Visualising Confidence Intervals of Mean Maths Score",
+    subtitle = "Gradient + Interval Plot",
+    x        = "Race",
+    y        = "Maths Score"
+  ) +
+  theme_minimal()
+```
+
+**Why gradient plots are powerful:**
+
+- They avoid the false binary of "inside the interval = plausible, outside =
+  implausible".
+- The continuous fade communicates that probability *decreases gradually* toward
+  the tails.
+- Particularly useful when communicating with non-statistical audiences.
+
+---
+
+# Hypothetical Outcome Plots (HOPs)
+
+## What are HOPs?
+
+A **Hypothetical Outcome Plot** (HOP) is an animated visualisation that cycles
+through a set of plausible outcomes drawn from the uncertainty distribution. Rather
+than showing a static summary (a bar, an interval), it lets the viewer *experience*
+the uncertainty through repeated random draws.
+
+**Cognitive advantage:** Research (Hullman et al., 2015; Kale et al., 2019) shows
+that people reason better about uncertainty when they see animated samples than
+when they see static interval representations.
+
+## Installing the `ungeviz` Package
+
+The `ungeviz` package is not on CRAN and must be installed from GitHub. You only
+need to do this once.
+
+```{r}
+#| label: install-ungeviz
+#| eval: false
+
+devtools::install_github("wilkelab/ungeviz")
+```
+
+```{r}
+#| label: load-ungeviz
+
+library(ungeviz)
+```
+
+
+## Building the HOP
+
+The key functions are:
+
+- `sampler(k, group)`: draws `k` bootstrap samples within each group
+- `geom_hpline()`: draws a short horizontal line at the sample mean for each draw
+- `transition_states(.draw, ...)`: animates through draws using `gganimate`
+
+
+```{r}
+#| label: fig-hops
+#| fig-cap: "Hypothetical Outcome Plot (HOP): each frame shows a bootstrap sample mean per race group. The animation conveys how much the mean could plausibly vary."
+
+ggplot(data = exam, 
+       (aes(x = factor(RACE), 
+            y = MATHS))) +
+  geom_point(position = position_jitter(
+    height = 0.3, 
+    width = 0.05), 
+    size = 0.4, 
+    color = "#0072B2", 
+    alpha = 1/2) +
+  geom_hpline(data = sampler(25, 
+                             group = RACE), 
+              height = 0.6, 
+              color = "#D55E00") +
+  theme_bw() + 
+  transition_states(.draw, 1, 3)
+```
+
+
+**Reading a HOP:**
+
+- Each frame shows one possible sample mean (orange horizontal line) for each race
+  group.
+- Groups with high uncertainty (small $n$, high SD) will show orange lines that
+  jump around a lot between frames.
+- Groups with low uncertainty will show stable orange lines.
+- This directly shows the viewer that "the mean could plausibly be anywhere in
+  this range" rather than asking them to interpret an abstract interval statistic.
+
+---
+
+# Summary
+
+| Method | Package | Best For |
+|---|---|---|
+| `geom_errorbar()` ± SE | `ggplot2` | Simple, traditional SE bars |
+| `geom_errorbar()` ± 1.96·SE | `ggplot2` | Classic 95% CI bars |
+| `ggplotly()` + `DT` + `SharedData` | `plotly`, `crosstalk`, `DT` | Interactive exploration |
+| `stat_pointinterval()` | `ggdist` | Multiple nested CIs at once |
+| `stat_gradientinterval()` | `ggdist` | Continuous density-based uncertainty |
+| `geom_hpline()` + `transition_states()` | `ungeviz`, `gganimate` | Animated HOPs for intuitive communication |
+
+**Core takeaway:** Different audiences need different representations.
+Traditional SE bars work for statistical experts; gradient intervals and HOPs
+are more intuitive for general audiences and improve risk communication.
+
+---
+
+
+# Reference 
+
+Kam T. S. (2023) [R for Visual Analytics](https://r4va.netlify.app/chap11)
+
+
+
+
+
+
+
+
+
+

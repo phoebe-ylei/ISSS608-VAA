@@ -432,5 +432,110 @@
     "title": "Hands-on Exercise 4b: Visual Statistical Analysis",
     "section": "Reference",
     "text": "Reference\nKam, T. S. (2023) R for Visual Analytics"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04c.html",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04c.html",
+    "title": "Hands-on Exercise 4c: Visualising Uncertainty",
+    "section": "",
+    "text": "Raw summary statistics (e.g. a mean value) are point estimates, they tell us nothing about how confident we should be in that number. Communicating uncertainty helps us make better decisions and avoids misleading conclusions.\nThese will be covered below:\n\nPlot standard error bars using ggplot2.\nPlot confidence interval error bars using ggplot2.\nCreate interactive error bars by combining ggplot2, plotly, and DT.\nBuild advanced uncertainty visuals using the ggdist package.\nCreate Hypothetical Outcome Plots (HOPs) using the ungeviz package."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04c.html#key-terms",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04c.html#key-terms",
+    "title": "Hands-on Exercise 4c: Visualising Uncertainty",
+    "section": "Key Terms",
+    "text": "Key Terms\n\n\n\n\n\n\n\n\nTerm\nWhat it measures\nFormula\n\n\n\n\nStandard Deviation (SD)\nSpread of individual observations\n\\(s\\)\n\n\nStandard Error (SE)\nUncertainty of the sample mean\n\\(SE = s / \\sqrt{n-1}\\)\n\n\nConfidence Interval (CI)\nPlausible range for the true mean\n\\(\\bar{x} \\pm z \\times SE\\)\n\n\n\n\nImportant: Do not confuse the uncertainty of a point estimate (SE / CI) with the variation in the sample (SD). They answer different questions."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04c.html#installing-and-loading-packages",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04c.html#installing-and-loading-packages",
+    "title": "Hands-on Exercise 4c: Visualising Uncertainty",
+    "section": "Installing and Loading Packages",
+    "text": "Installing and Loading Packages\n\npacman::p_load(\n  plotly,       # Interactive plots\n  crosstalk,    # Cross-widget interactions (linked brushing/filtering)\n  DT,           # Interactive HTML tables\n  ggdist,       # Distribution and uncertainty visualisation\n  ggridges,     # Ridgeline plots\n  colorspace,   # Colour palette utilities\n  gganimate,    # Animated plots\n  tidyverse     # Core data science packages (ggplot2, dplyr, etc.)\n)"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04c.html#data-import",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04c.html#data-import",
+    "title": "Hands-on Exercise 4c: Visualising Uncertainty",
+    "section": "Data Import",
+    "text": "Data Import\nWe use Exam_data.csv, which contains exam scores (Maths, English, Science) for primary school students, along with demographic variables such as RACE, GENDER, and CLASS.\n\nexam &lt;- read_csv(\"data/Exam_data.csv\")\nglimpse(exam)\n\nRows: 322\nColumns: 7\n$ ID      &lt;chr&gt; \"Student321\", \"Student305\", \"Student289\", \"Student227\", \"Stude…\n$ CLASS   &lt;chr&gt; \"3I\", \"3I\", \"3H\", \"3F\", \"3I\", \"3I\", \"3I\", \"3I\", \"3I\", \"3H\", \"3…\n$ GENDER  &lt;chr&gt; \"Male\", \"Female\", \"Male\", \"Male\", \"Male\", \"Female\", \"Male\", \"M…\n$ RACE    &lt;chr&gt; \"Malay\", \"Malay\", \"Chinese\", \"Chinese\", \"Malay\", \"Malay\", \"Chi…\n$ ENGLISH &lt;dbl&gt; 21, 24, 26, 27, 27, 31, 31, 31, 33, 34, 34, 36, 36, 36, 37, 38…\n$ MATHS   &lt;dbl&gt; 9, 22, 16, 77, 11, 16, 21, 18, 19, 49, 39, 35, 23, 36, 49, 30,…\n$ SCIENCE &lt;dbl&gt; 15, 16, 16, 31, 25, 16, 25, 27, 15, 37, 42, 22, 32, 36, 35, 45…"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04c.html#deriving-summary-statistics",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04c.html#deriving-summary-statistics",
+    "title": "Hands-on Exercise 4c: Visualising Uncertainty",
+    "section": "Deriving Summary Statistics",
+    "text": "Deriving Summary Statistics\nTo plot error bars we first need to compute, per group:\n\nn: number of observations\nmean: average Maths score\nsd: standard deviation\nse: standard error = \\(sd / \\sqrt{n-1}\\)\n\n\nmy_sum &lt;- exam %&gt;%\n  group_by(RACE) %&gt;%\n  summarise(\n    n    = n(),\n    mean = mean(MATHS),\n    sd   = sd(MATHS)\n  ) %&gt;%\n  mutate(se = sd / sqrt(n - 1))\n\nknitr::kable(my_sum, format = \"html\", digits = 2,\n             caption = \"Summary statistics of Maths scores by Race\")\n\n\nSummary statistics of Maths scores by Race\n\n\nRACE\nn\nmean\nsd\nse\n\n\n\n\nChinese\n193\n76.51\n15.69\n1.13\n\n\nIndian\n12\n60.67\n23.35\n7.04\n\n\nMalay\n108\n57.44\n21.13\n2.04\n\n\nOthers\n9\n69.67\n10.72\n3.79\n\n\n\n\n\nReading the table:\n\nChinese pupils have the largest group (\\(n = 193\\)) and the smallest SE (\\(\\approx 1.13\\)), which means we have a precise estimate of their mean.\nIndian pupils have the smallest group (\\(n = 12\\)) and a very large SE (\\(\\approx 7.04\\)), reflecting much greater uncertainty about their true mean."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04c.html#standard-error-bars",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04c.html#standard-error-bars",
+    "title": "Hands-on Exercise 4c: Visualising Uncertainty",
+    "section": "Standard Error Bars",
+    "text": "Standard Error Bars\nStandard error bars extend one SE above and below the mean. They communicate how precisely the sample mean estimates the population mean. Narrower bars mean more precision.\n\nggplot(my_sum) +\n  geom_errorbar(\n    aes(x = RACE, ymin = mean - se, ymax = mean + se),\n    width     = 0.2,\n    colour    = \"black\",\n    alpha     = 0.9,\n    linewidth = 0.5\n  ) +\n  geom_point(\n    aes(x = RACE, y = mean),\n    stat  = \"identity\",\n    color = \"red\",\n    size  = 1.5,\n    alpha = 1\n  ) +\n  labs(\n    title = \"Standard Error of Mean Maths Score by Race\",\n    x     = \"Race\",\n    y     = \"Mean Maths Score\"\n  ) +\n  theme_minimal()\n\n\n\n\n\n\n\nFigure 1: Standard error bars of mean Maths score by race. Red dots = sample means; bars = ±1 SE.\n\n\n\n\n\nWhat to notice:\n\nThe Chinese group has a very tight error bar (large sample, high precision).\nThe Indian and Others groups have much wider bars (small samples, low precision).\nThe visual inequality in bar widths reinforces why sample size matters when comparing groups."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04c.html#confidence-interval-bars",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04c.html#confidence-interval-bars",
+    "title": "Hands-on Exercise 4c: Visualising Uncertainty",
+    "section": "95% Confidence Interval Bars",
+    "text": "95% Confidence Interval Bars\nA 95% CI is computed as \\(\\bar{x} \\pm 1.96 \\times SE\\). It means: if we repeated this study many times, ~95% of the constructed intervals would contain the true population mean.\nThe races are reordered by descending mean so the plot is easier to read.\n\nggplot(my_sum) +\n  geom_errorbar(\n    aes(\n      x    = reorder(RACE, -mean),\n      ymin = mean - 1.96 * se,\n      ymax = mean + 1.96 * se\n    ),\n    width     = 0.2,\n    colour    = \"black\",\n    alpha     = 0.9,\n    linewidth = 0.5\n  ) +\n  geom_point(\n    aes(x = reorder(RACE, -mean), y = mean),\n    stat  = \"identity\",\n    color = \"red\",\n    size  = 1.5,\n    alpha = 1\n  ) +\n  labs(\n    x     = \"Race\",\n    y     = \"Mean Maths Score\",\n    title = \"95% Confidence Interval of Mean Maths Score by Race\"\n  ) +\n  theme_minimal()\n\n\n\n\n\n\n\nFigure 2: 95% confidence intervals of mean Maths score by race, sorted by descending mean.\n\n\n\n\n\nKey difference from SE bars: The multiplier changes the interval width:\n\n\n\nConfidence Level\nMultiplier\nInterpretation\n\n\n\n\n~68%\n±1.00 SE\nEquivalent to ±1 SE bars\n\n\n95%\n±1.96 SE\nStandard CI in most research\n\n\n99%\n±2.58 SE\nMore conservative, wider bars"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04c.html#interactive-error-bars-99-ci",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04c.html#interactive-error-bars-99-ci",
+    "title": "Hands-on Exercise 4c: Visualising Uncertainty",
+    "section": "Interactive Error Bars (99% CI)",
+    "text": "Interactive Error Bars (99% CI)\nBy combining plotly (interactive chart), DT (interactive table), and crosstalk (linked selection), we can build a dashboard where clicking a row in the table highlights the corresponding bar in the plot.\n\nshared_df = SharedData$new(my_sum)\n\nbscols(widths = c(4,8),\n       ggplotly((ggplot(shared_df) +\n                   geom_errorbar(aes(\n                     x=reorder(RACE, -mean),\n                     ymin=mean-2.58*se, \n                     ymax=mean+2.58*se), \n                     width=0.2, \n                     colour=\"black\", \n                     alpha=0.9, \n                     size=0.5) +\n                   geom_point(aes(\n                     x=RACE, \n                     y=mean, \n                     text = paste(\"Race:\", `RACE`, \n                                  \"&lt;br&gt;N:\", `n`,\n                                  \"&lt;br&gt;Avg. Scores:\", round(mean, digits = 2),\n                                  \"&lt;br&gt;95% CI:[\", \n                                  round((mean-2.58*se), digits = 2), \",\",\n                                  round((mean+2.58*se), digits = 2),\"]\")),\n                     stat=\"identity\", \n                     color=\"red\", \n                     size = 1.5, \n                     alpha=1) + \n                   xlab(\"Race\") + \n                   ylab(\"Average Scores\") + \n                   theme_minimal() + \n                   theme(axis.text.x = element_text(\n                     angle = 45, vjust = 0.5, hjust=1)) +\n                   ggtitle(\"99% Confidence interval of average /&lt;br&gt;maths scores by race\")), \n                tooltip = \"text\"), \n       DT::datatable(shared_df, \n                     rownames = FALSE, \n                     class=\"compact\", \n                     width=\"100%\", \n                     options = list(pageLength = 10,\n                                    scrollX=T), \n                     colnames = c(\"No. of pupils\", \n                                  \"Avg Scores\",\n                                  \"Std Dev\",\n                                  \"Std Error\")) %&gt;%\n         formatRound(columns=c('mean', 'sd', 'se'),\n                     digits=2))\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nWhy interactivity helps: Hovering over a point reveals exact values that are hard to read off a static plot. The linked table lets you filter by group without redrawing the chart."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04c.html#stat_pointinterval-point-interval",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04c.html#stat_pointinterval-point-interval",
+    "title": "Hands-on Exercise 4c: Visualising Uncertainty",
+    "section": "stat_pointinterval() Point + Interval",
+    "text": "stat_pointinterval() Point + Interval\nstat_pointinterval() shows a point estimate (default: mean) together with multiple nested intervals (default: 66% and 95%).\n\nexam %&gt;%\n  ggplot(aes(x = RACE, y = MATHS)) +\n  stat_pointinterval() +\n  labs(\n    title    = \"Visualising Confidence Intervals of Mean Maths Score\",\n    subtitle = \"Mean Point + Multiple-interval plot\",\n    x        = \"Race\",\n    y        = \"Maths Score\"\n  ) +\n  theme_minimal()\n\n\n\n\n\n\n\nFigure 3: Mean and multiple confidence intervals of Maths scores by race using stat_pointinterval().\n\n\n\n\n\nThe thick inner line = 66% CI; the thin outer line = 95% CI. This nested interval design lets you read two confidence levels at once."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04c.html#stat_pointinterval-median-quantile-interval",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04c.html#stat_pointinterval-median-quantile-interval",
+    "title": "Hands-on Exercise 4c: Visualising Uncertainty",
+    "section": "stat_pointinterval() Median + Quantile Interval",
+    "text": "stat_pointinterval() Median + Quantile Interval\nWe can switch to the median as the point summary and use quantile intervals (qi) instead of the default. This is more appropriate for skewed distributions.\n\nexam %&gt;%\n  ggplot(aes(x = RACE, y = MATHS)) +\n  stat_pointinterval(\n    .width    = 0.95,\n    .point    = median,\n    .interval = qi\n  ) +\n  labs(\n    title    = \"Visualising Confidence Intervals of Median Maths Score\",\n    subtitle = \"Median Point + 95% Quantile Interval\",\n    x        = \"Race\",\n    y        = \"Maths Score\"\n  ) +\n  theme_minimal()\n\n\n\n\n\n\n\nFigure 4: Median and 95% quantile interval of Maths scores by race.\n\n\n\n\n\nWhen to use median + qi:\n\nWhen your data may be skewed (median is more robust than mean).\nWhen you want a distribution-free summary rather than a Normal-theory CI."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04c.html#stat_pointinterval-multiple-widths-95-99",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04c.html#stat_pointinterval-multiple-widths-95-99",
+    "title": "Hands-on Exercise 4c: Visualising Uncertainty",
+    "section": "stat_pointinterval() Multiple Widths (95% & 99%)",
+    "text": "stat_pointinterval() Multiple Widths (95% & 99%)\nBy passing a vector to .width, we can display both 95% and 99% CIs simultaneously, encoded by line thickness.\n\nexam %&gt;%\n  ggplot(aes(x = RACE, y = MATHS)) +\n  stat_pointinterval(\n    .width      = c(0.95, 0.99),\n    show.legend = TRUE\n  ) +\n  labs(\n    title    = \"95% and 99% Confidence Intervals of Mean Maths Score\",\n    subtitle = \"Mean Point + Multiple-interval plot\",\n    x        = \"Race\",\n    y        = \"Maths Score\"\n  ) +\n  theme_minimal()\n\n\n\n\n\n\n\nFigure 5: Mean with 95% and 99% confidence intervals shown simultaneously.\n\n\n\n\n\nThe thicker inner interval = 95% CI; the thinner outer interval = 99% CI. The 99% interval is always wider, as we need a broader net to be more confident about catching the true mean."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04c.html#stat_gradientinterval-gradient-uncertainty",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04c.html#stat_gradientinterval-gradient-uncertainty",
+    "title": "Hands-on Exercise 4c: Visualising Uncertainty",
+    "section": "stat_gradientinterval() Gradient Uncertainty",
+    "text": "stat_gradientinterval() Gradient Uncertainty\nstat_gradientinterval() encodes probability density through colour opacity: regions of higher likelihood are darker/more opaque, fading toward the tails. This gives a more intuitive sense of where values are most plausible.\n\nexam %&gt;%\n  ggplot(aes(x = RACE, y = MATHS)) +\n  stat_gradientinterval(\n    fill         = \"skyblue\",\n    show.legend  = TRUE\n  ) +\n  labs(\n    title    = \"Visualising Confidence Intervals of Mean Maths Score\",\n    subtitle = \"Gradient + Interval Plot\",\n    x        = \"Race\",\n    y        = \"Maths Score\"\n  ) +\n  theme_minimal()\n\n\n\n\n\n\n\nFigure 6: Gradient interval plot: opacity encodes density of plausible values.\n\n\n\n\n\nWhy gradient plots are powerful:\n\nThey avoid the false binary of “inside the interval = plausible, outside = implausible”.\nThe continuous fade communicates that probability decreases gradually toward the tails.\nParticularly useful when communicating with non-statistical audiences."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04c.html#what-are-hops",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04c.html#what-are-hops",
+    "title": "Hands-on Exercise 4c: Visualising Uncertainty",
+    "section": "What are HOPs?",
+    "text": "What are HOPs?\nA Hypothetical Outcome Plot (HOP) is an animated visualisation that cycles through a set of plausible outcomes drawn from the uncertainty distribution. Rather than showing a static summary (a bar, an interval), it lets the viewer experience the uncertainty through repeated random draws.\nCognitive advantage: Research (Hullman et al., 2015; Kale et al., 2019) shows that people reason better about uncertainty when they see animated samples than when they see static interval representations."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04c.html#installing-the-ungeviz-package",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04c.html#installing-the-ungeviz-package",
+    "title": "Hands-on Exercise 4c: Visualising Uncertainty",
+    "section": "Installing the ungeviz Package",
+    "text": "Installing the ungeviz Package\nThe ungeviz package is not on CRAN and must be installed from GitHub. You only need to do this once.\n\ndevtools::install_github(\"wilkelab/ungeviz\")\n\n\nlibrary(ungeviz)"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04c.html#building-the-hop",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04c.html#building-the-hop",
+    "title": "Hands-on Exercise 4c: Visualising Uncertainty",
+    "section": "Building the HOP",
+    "text": "Building the HOP\nThe key functions are:\n\nsampler(k, group): draws k bootstrap samples within each group\ngeom_hpline(): draws a short horizontal line at the sample mean for each draw\ntransition_states(.draw, ...): animates through draws using gganimate\n\n\nggplot(data = exam, \n       (aes(x = factor(RACE), \n            y = MATHS))) +\n  geom_point(position = position_jitter(\n    height = 0.3, \n    width = 0.05), \n    size = 0.4, \n    color = \"#0072B2\", \n    alpha = 1/2) +\n  geom_hpline(data = sampler(25, \n                             group = RACE), \n              height = 0.6, \n              color = \"#D55E00\") +\n  theme_bw() + \n  transition_states(.draw, 1, 3)\n\n\n\n\n\n\n\nFigure 7: Hypothetical Outcome Plot (HOP): each frame shows a bootstrap sample mean per race group. The animation conveys how much the mean could plausibly vary.\n\n\n\n\n\nReading a HOP:\n\nEach frame shows one possible sample mean (orange horizontal line) for each race group.\nGroups with high uncertainty (small \\(n\\), high SD) will show orange lines that jump around a lot between frames.\nGroups with low uncertainty will show stable orange lines.\nThis directly shows the viewer that “the mean could plausibly be anywhere in this range” rather than asking them to interpret an abstract interval statistic."
   }
 ]
