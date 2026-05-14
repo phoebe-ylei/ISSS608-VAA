@@ -1,0 +1,94 @@
+---
+title: "5a. Creating Ternary Plot with R"
+author: "Lei Yuhe"
+date: "May 14, 2026"
+date-modified: "last-modified"
+execute:
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+---
+
+## Packages
+
+Two main packages are used:
+
+- [`ggtern`](http://www.ggtern.com/): extends `ggplot2` to support ternary coordinate systems
+- [`plotly`](https://plotly.com/r/): creates interactive web-based charts, its `scatterternary` trace type renders interactive ternary diagrams
+
+Supporting tidyverse packages (`readr`, `dplyr`, `tidyr`) handle data import and wrangling.
+
+```{r}
+#| label: load-packages
+
+pacman::p_load(plotly, ggtern, tidyverse)
+```
+
+> **Note:** `ggtern` masks several `ggplot2` functions (e.g. `annotate()`). Load it after tidyverse to avoid conflicts, and reload `ggplot2` functions with `ggplot2::` prefix if needed later.
+
+## Data Preparation
+
+### The Dataset
+
+**Singapore Residents by Planning Area/Subzone, Age Group, Sex and Type of Dwelling, June 2011-2020**
+Source: [SingStat](https://www.singstat.gov.sg/find-data/explore-data-themes/population/geographic-distribution/latest-news-data)
+
+File: `data/respopagesextod2011to2020`
+
+| Column | Description |
+|--------|-------------|
+| `PA` | Planning Area |
+| `SZ` | Subzone |
+| `AG` | Age Group |
+| `Sex` | Sex |
+| `TOD` | Type of Dwelling |
+| `Population` | Resident count |
+| `Year` | Reference year (2011 - 2020) |
+
+### Import Data
+
+```{r}
+#| label: import-data
+
+pop_data <- read_csv("data/respopagesextod2011to2020.csv")
+
+glimpse(pop_data)
+```
+
+
+### Derive Age-Group Aggregates
+
+Three composite measures are derived by summing across age-group columns after pivoting wide:
+
+| Measure | Age bands included |
+|---------|--------------------|
+| `YOUNG` | 0–4, 5–9, 10–14, 15–19, 20–24 (columns 4–8) |
+| `ACTIVE` | 25–29, … , 55–59, 60–64 (columns 9–16) |
+| `OLD` | 65–69, 70–74, 75–79, 80–84, 85+ (columns 17–21) |
+
+
+```{r}
+#| label: wrangle-data
+
+#Deriving the young, economy active and old measures
+agpop_mutated <- pop_data %>%
+  mutate(`Year` = as.character(Year))%>%
+  spread(AG, Population) %>%
+  mutate(YOUNG = rowSums(.[4:8]))%>%
+  mutate(ACTIVE = rowSums(.[9:16]))  %>%
+  mutate(OLD = rowSums(.[17:21])) %>%
+  mutate(TOTAL = rowSums(.[22:24])) %>%
+  filter(Year == 2018)%>%
+  filter(TOTAL > 0)
+
+glimpse(agpop_mutated)
+```
+
+> **Add-on tip:** To make the workflow more robust, replace column-index slicing (`.[4:8]`) with explicit column name ranges using `dplyr::across()` once you have verified the column order.
+
+---
+
+
+
+
