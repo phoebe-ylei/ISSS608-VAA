@@ -31,10 +31,10 @@ pacman::p_load(plotly, ggtern, tidyverse)
 
 ### The Dataset
 
-**Singapore Residents by Planning Area/Subzone, Age Group, Sex and Type of Dwelling, June 2011-2020**
+**Singapore Residents by Planning Area/Subzone, Age Group, Sex and Type of Dwelling, June 2000-2018**
 Source: [SingStat](https://www.singstat.gov.sg/find-data/explore-data-themes/population/geographic-distribution/latest-news-data)
 
-File: `data/respopagesextod2011to2020`
+File: `data/respopagsex2000to2018_tidy.csv`
 
 | Column | Description |
 |--------|-------------|
@@ -51,7 +51,7 @@ File: `data/respopagesextod2011to2020`
 ```{r}
 #| label: import-data
 
-pop_data <- read_csv("data/respopagesextod2011to2020.csv")
+pop_data <- read_csv("data/respopagsex2000to2018_tidy.csv")
 
 glimpse(pop_data)
 ```
@@ -88,6 +88,161 @@ glimpse(agpop_mutated)
 > **Add-on tip:** To make the workflow more robust, replace column-index slicing (`.[4:8]`) with explicit column name ranges using `dplyr::across()` once you have verified the column order.
 
 ---
+
+## Plotting Ternary Diagrams
+
+### Static Ternary Plot - Minimal
+
+`ggtern()` follows the same grammar as `ggplot2` but uses a ternary coordinate system with axes `x`, `y`, and `z`.
+
+```{r}
+#| label: static-basic
+#| fig-cap: "Basic static ternary plot — population structure by subzone, 2018"
+
+ggtern(data = agpop_mutated,
+       aes(x = YOUNG, y = ACTIVE, z = OLD)) +
+  geom_point()
+```
+
+### Static Ternary Plot - Styled
+
+Adding a title and the `theme_rgbw()` theme colours the axes Red / Green / Blue / White for easier reading.
+
+```{r}
+#| label: static-styled
+#| fig-cap: "Styled static ternary plot with theme_rgbw()"
+
+ggtern(data = agpop_mutated,
+       aes(x = YOUNG, y = ACTIVE, z = OLD)) +
+  geom_point(alpha = 0.6, size = 2, colour = "steelblue") +
+  labs(title    = "Population Structure by Subzone, 2018",
+       subtitle = "Singapore Residents — Young / Active / Old composition",
+       x = "Young", y = "Active", z = "Old") +
+  theme_rgbw()
+```
+
+
+#### Add-on: Colour-encode a grouping variable {.unnumbered}
+
+If planning areas (`PA`) are available after the spread, you can map colour to a categorical variable to reveal spatial clusters:
+
+```{r}
+#| label: static-coloured
+#| eval: false  # set to true if PA column is present
+
+ggtern(data = agpop_mutated,
+       aes(x = YOUNG, y = ACTIVE, z = OLD, colour = PA)) +
+  geom_point(alpha = 0.7, size = 2) +
+  labs(title = "Population Structure by Planning Area, 2018") +
+  theme_rgbw() +
+  theme(legend.position = "right")
+```
+
+### Interactive Ternary Plot with Plotly
+
+`plot_ly()` with `type = "scatterternary"` renders an interactive version where you can hover to inspect individual subzones.
+
+```{r}
+#| label: interactive-plotly
+#| fig-cap: "Interactive ternary plot — hover to see subzone details"
+
+# Helper: annotation label
+label <- function(txt) {
+  list(
+    text = txt,
+    x = 0.1, y = 1,
+    ax = 0, ay = 0,
+    xref = "paper", yref = "paper",
+    align = "center",
+    font = list(family = "serif", size = 15, color = "white"),
+    bgcolor = "#b3b3b3", bordercolor = "black", borderwidth = 2
+  )
+}
+
+# Helper: axis formatting
+axis <- function(txt) {
+  list(title = txt, tickformat = ".0%", tickfont = list(size = 10))
+}
+
+ternaryAxes <- list(
+  aaxis = axis("Young"),
+  baxis = axis("Active"),
+  caxis = axis("Old")
+)
+
+plot_ly(
+  agpop_mutated,
+  a     = ~YOUNG,
+  b     = ~ACTIVE,
+  c     = ~OLD,
+  color = I("steelblue"),
+  type  = "scatterternary",
+  mode  = "markers",
+  text  = ~paste("Subzone:", SZ, "<br>Total:", TOTAL),  # tooltip add-on
+  hoverinfo = "text"
+) %>%
+  layout(
+    title       = "Population Structure by Subzone, Singapore 2018",
+    annotations = label("Ternary Markers"),
+    ternary     = ternaryAxes
+  )
+```
+
+
+#### Add-on: Colour by population size {.unnumbered}
+
+Map marker colour to `TOTAL` population for a richer visual encoding:
+
+```{r}
+#| label: interactive-coloured
+#| fig-cap: "Interactive ternary plot — colour encodes total population"
+
+plot_ly(
+  agpop_mutated,
+  a          = ~YOUNG,
+  b          = ~ACTIVE,
+  c          = ~OLD,
+  color      = ~TOTAL,
+  colors     = "YlOrRd",
+  size       = ~TOTAL,
+  sizes      = c(5, 30),
+  type       = "scatterternary",
+  mode       = "markers",
+  text       = ~paste0("Subzone: ", SZ,
+                       "<br>Young: ",  scales::percent(YOUNG  / TOTAL, 0.1),
+                       "<br>Active: ", scales::percent(ACTIVE / TOTAL, 0.1),
+                       "<br>Old: ",    scales::percent(OLD    / TOTAL, 0.1),
+                       "<br>Total: ",  formatC(TOTAL, format = "d", big.mark = ",")),
+  hoverinfo  = "text"
+) %>%
+  layout(
+    title   = "Population Structure by Subzone, Singapore 2018",
+    ternary = ternaryAxes,
+    coloraxis = list(colorscale = "YlOrRd",
+                     colorbar   = list(title = "Total Population"))
+  )
+```
+
+---
+
+## Summary
+
+| Approach | Package | Interactivity | Best for |
+|----------|---------|---------------|----------|
+| `ggtern()` + `geom_point()` | `ggtern` | Static | Reports, print |
+| `ggtern()` + `theme_rgbw()` | `ggtern` | Static | Styled static output |
+| `plot_ly()` scatterternary | `plotly` | Interactive | Web / HTML output |
+
+**Key takeaways:**
+
+- Ternary plots are ideal when three proportions must sum to 1 (or 100%).
+- `ggtern` extends the familiar `ggplot2` API — most `geom_*` and `theme_*` functions still work.
+- `plotly`'s `scatterternary` type adds hover tooltips and zoom for exploratory analysis.
+- Encoding an additional variable (colour, size) can reveal structure that a plain ternary plot obscures.
+
+
+
+
 
 
 
