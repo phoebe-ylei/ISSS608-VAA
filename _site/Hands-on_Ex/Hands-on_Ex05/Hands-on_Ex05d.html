@@ -25,6 +25,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -72,6 +107,14 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script src="../../site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+
+<link href="../../site_libs/parallelPlot-0.4.0/parallelPlot.css" rel="stylesheet">
+
+<script src="../../site_libs/parallelPlot-binding-0.4.0/parallelPlot.js"></script>
+
+<link href="../../site_libs/htmltools-fill-0.5.9/fill.css" rel="stylesheet">
+
 
 
 <link rel="stylesheet" href="../../styles.css">
@@ -186,8 +229,36 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#installing-and-launching-r-packages" id="toc-installing-and-launching-r-packages" class="nav-link" data-scroll-target="#installing-and-launching-r-packages">Installing and Launching R Packages</a></li>
+  <li><a href="#data-preparation" id="toc-data-preparation" class="nav-link" data-scroll-target="#data-preparation">Data Preparation</a></li>
+  <li><a href="#plotting-static-parallel-coordinates-plot" id="toc-plotting-static-parallel-coordinates-plot" class="nav-link" data-scroll-target="#plotting-static-parallel-coordinates-plot">Plotting Static Parallel Coordinates Plot</a>
+  <ul class="collapse">
+  <li><a href="#plotting-a-simple-parallel-coordinates" id="toc-plotting-a-simple-parallel-coordinates" class="nav-link" data-scroll-target="#plotting-a-simple-parallel-coordinates">Plotting a Simple Parallel Coordinates</a></li>
+  <li><a href="#plotting-a-parallel-coordinates-with-boxplot" id="toc-plotting-a-parallel-coordinates-with-boxplot" class="nav-link" data-scroll-target="#plotting-a-parallel-coordinates-with-boxplot">Plotting a Parallel Coordinates with Boxplot</a></li>
+  <li><a href="#parallel-coordinates-with-facet" id="toc-parallel-coordinates-with-facet" class="nav-link" data-scroll-target="#parallel-coordinates-with-facet">Parallel Coordinates with Facet</a></li>
+  <li><a href="#rotating-x-axis-text-label" id="toc-rotating-x-axis-text-label" class="nav-link" data-scroll-target="#rotating-x-axis-text-label">Rotating x-axis Text Label</a></li>
+  <li><a href="#adjusting-the-rotated-x-axis-text-label" id="toc-adjusting-the-rotated-x-axis-text-label" class="nav-link" data-scroll-target="#adjusting-the-rotated-x-axis-text-label">Adjusting the Rotated x-axis Text Label</a></li>
+  </ul></li>
+  <li><a href="#plotting-interactive-parallel-coordinates-plot-parallelplot-methods" id="toc-plotting-interactive-parallel-coordinates-plot-parallelplot-methods" class="nav-link" data-scroll-target="#plotting-interactive-parallel-coordinates-plot-parallelplot-methods">Plotting Interactive Parallel Coordinates Plot: <code>parallelPlot</code> Methods</a>
+  <ul class="collapse">
+  <li><a href="#data-preparation-for-parallelplot" id="toc-data-preparation-for-parallelplot" class="nav-link" data-scroll-target="#data-preparation-for-parallelplot">Data Preparation for <code>parallelPlot</code></a></li>
+  <li><a href="#the-basic-plot" id="toc-the-basic-plot" class="nav-link" data-scroll-target="#the-basic-plot">The Basic Plot</a></li>
+  <li><a href="#rotate-axis-label" id="toc-rotate-axis-label" class="nav-link" data-scroll-target="#rotate-axis-label">Rotate Axis Label</a></li>
+  <li><a href="#changing-the-colour-scheme" id="toc-changing-the-colour-scheme" class="nav-link" data-scroll-target="#changing-the-colour-scheme">Changing the Colour Scheme</a></li>
+  <li><a href="#parallel-coordinates-plot-with-histogram" id="toc-parallel-coordinates-plot-with-histogram" class="nav-link" data-scroll-target="#parallel-coordinates-plot-with-histogram">Parallel Coordinates Plot with Histogram</a></li>
+  </ul></li>
+  <li><a href="#comparing-ggparcoord-vs-parallelplot" id="toc-comparing-ggparcoord-vs-parallelplot" class="nav-link" data-scroll-target="#comparing-ggparcoord-vs-parallelplot">Comparing <code>ggparcoord()</code> vs <code>parallelPlot()</code></a></li>
+  <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways">Key Takeaways</a></li>
+  <li><a href="#packages-reference" id="toc-packages-reference" class="nav-link" data-scroll-target="#packages-reference">Packages Reference</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -218,7 +289,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">May 14, 2026</p>
+      <p class="date-modified">May 17, 2026</p>
     </div>
   </div>
     
@@ -229,8 +300,521 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p>A <strong>parallel coordinates plot (PCP)</strong> is a multivariate visualisation technique where each variable is represented as a vertical axis, and each observation is drawn as a polyline connecting its values across all axes. It is specially designed for comparing multiple numerical variables simultaneously and surfacing relationships between them.</p>
+<p><strong>Key characteristics:</strong></p>
+<ul>
+<li>Invented by <strong>Alfred Inselberg</strong> in the 1970s for high-dimensional data visualisation.</li>
+<li>Better suited for <strong>analytical exploration</strong> than for communication to general audiences. As Stephen Few (2006) noted, its strength lies in revealing meaningful multivariate patterns and comparisons when used interactively — not in presenting conclusions to a board or the public.</li>
+<li>Practical use case: characterising clusters found during customer segmentation, or comparing indicators like those in the World Happiness Index.</li>
+</ul>
+<p><strong>Two approaches towards multivariate analysis using parallel coordinate plots:</strong></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Approach</th>
+<th>Package</th>
+<th>Function</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Static PCP</td>
+<td><code>GGally</code></td>
+<td><code>ggparcoord()</code></td>
+</tr>
+<tr class="even">
+<td>Interactive PCP</td>
+<td><code>parallelPlot</code></td>
+<td><code>parallelPlot()</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="installing-and-launching-r-packages" class="level2">
+<h2 class="anchored" data-anchor-id="installing-and-launching-r-packages">Installing and Launching R Packages</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(GGally, parallelPlot, tidyverse)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Package</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>GGally</code></td>
+<td>Extends ggplot2; provides <code>ggparcoord()</code> for static PCPs</td>
+</tr>
+<tr class="even">
+<td><code>parallelPlot</code></td>
+<td>Builds interactive PCPs via htmlwidgets and D3.js</td>
+</tr>
+<tr class="odd">
+<td><code>tidyverse</code></td>
+<td>Data import and wrangling (<code>readr</code>, <code>dplyr</code>)</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="data-preparation" class="level2">
+<h2 class="anchored" data-anchor-id="data-preparation">Data Preparation</h2>
+<p>The same <strong>World Happiness Report 2018</strong> dataset from Chapter 14 is used (<code>WHData-2018.csv</code>).</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>wh <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/WHData-2018.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>The tibble <code>wh</code> contains columns for country name, region, happiness score, and six contributing variables (columns 7–12):</p>
+<ul>
+<li>GDP per capita</li>
+<li>Social support</li>
+<li>Healthy life expectancy</li>
+<li>Freedom to make life choices</li>
+<li>Generosity</li>
+<li>Perceptions of corruption</li>
+</ul>
+<p>No additional matrix transformation is needed here, <code>ggparcoord()</code> and <code>parallelPlot()</code> work directly with data frames.</p>
+<hr>
+</section>
+<section id="plotting-static-parallel-coordinates-plot" class="level2">
+<h2 class="anchored" data-anchor-id="plotting-static-parallel-coordinates-plot">Plotting Static Parallel Coordinates Plot</h2>
+<p>Static PCPs are built using <code>ggparcoord()</code> from the <strong>GGally</strong> package. Because <code>GGally</code> extends <code>ggplot2</code>, standard ggplot2 functions like <code>facet_wrap()</code> and <code>theme()</code> can be combined with it.</p>
+<section id="plotting-a-simple-parallel-coordinates" class="level3">
+<h3 class="anchored" data-anchor-id="plotting-a-simple-parallel-coordinates">Plotting a Simple Parallel Coordinates</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggparcoord</span>(<span class="at">data    =</span> wh,</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">columns =</span> <span class="fu">c</span>(<span class="dv">7</span><span class="sc">:</span><span class="dv">12</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-on_Ex05d_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li><code>data</code>: the data frame.</li>
+<li><code>columns</code>: integer vector of column indices to use as parallel axes.</li>
+</ul>
+<blockquote class="blockquote">
+<p>This minimal plot is hard to read — all lines share the same colour, variables are on different scales, and there is no grouping. The following sections progressively improve it.</p>
+</blockquote>
+<hr>
+</section>
+<section id="plotting-a-parallel-coordinates-with-boxplot" class="level3">
+<h3 class="anchored" data-anchor-id="plotting-a-parallel-coordinates-with-boxplot">Plotting a Parallel Coordinates with Boxplot</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggparcoord</span>(<span class="at">data        =</span> wh,</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">columns     =</span> <span class="fu">c</span>(<span class="dv">7</span><span class="sc">:</span><span class="dv">12</span>),</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">groupColumn =</span> <span class="dv">2</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">scale       =</span> <span class="st">"uniminmax"</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>           <span class="at">alphaLines  =</span> <span class="fl">0.2</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>           <span class="at">boxplot     =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>           <span class="at">title       =</span> <span class="st">"Parallel Coordinates Plot of World Happiness Variables"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-on_Ex05d_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="1344"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Arguments explained:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Argument</th>
+<th>Value</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>groupColumn</code></td>
+<td><code>2</code> (Region)</td>
+<td>Colours each polyline by the observation’s region</td>
+</tr>
+<tr class="even">
+<td><code>scale</code></td>
+<td><code>"uniminmax"</code></td>
+<td>Scales each variable so its min = 0 and max = 1; enables fair comparison across axes</td>
+</tr>
+<tr class="odd">
+<td><code>alphaLines</code></td>
+<td><code>0.2</code></td>
+<td>Sets line transparency (0 = invisible, 1 = fully opaque); reduces overplotting clutter</td>
+</tr>
+<tr class="even">
+<td><code>boxplot</code></td>
+<td><code>TRUE</code></td>
+<td>Overlays a boxplot on each axis to show the variable’s distribution</td>
+</tr>
+<tr class="odd">
+<td><code>title</code></td>
+<td>string</td>
+<td>Adds a plot title</td>
+</tr>
+</tbody>
+</table>
+<blockquote class="blockquote">
+<p><strong>Why <code>uniminmax</code>?</strong> Without scaling, axes with larger raw ranges (e.g., GDP) dominate visually. <code>uniminmax</code> brings all variables to the same [0, 1] range without assuming normality (unlike z-score scaling).</p>
+</blockquote>
+<p><strong>Other <code>scale</code> options available in <code>ggparcoord()</code>:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>"std"</code></td>
+<td>Subtract mean, divide by SD (z-score)</td>
+</tr>
+<tr class="even">
+<td><code>"robust"</code></td>
+<td>Subtract median, divide by MAD</td>
+</tr>
+<tr class="odd">
+<td><code>"uniminmax"</code></td>
+<td>Min = 0, Max = 1 per variable</td>
+</tr>
+<tr class="even">
+<td><code>"globalminmax"</code></td>
+<td>Scales using global min/max across all selected variables</td>
+</tr>
+<tr class="odd">
+<td><code>"center"</code></td>
+<td>Centers each variable at a chosen <code>scaleSummary</code> statistic</td>
+</tr>
+<tr class="even">
+<td><code>"centerObs"</code></td>
+<td>Centers on a specific observation</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="parallel-coordinates-with-facet" class="level3">
+<h3 class="anchored" data-anchor-id="parallel-coordinates-with-facet">Parallel Coordinates with Facet</h3>
+<p>Since <code>ggparcoord()</code> returns a <code>ggplot</code> object, ggplot2 functions can be appended with <code>+</code>.</p>
+<p><code>facet_wrap()</code> splits the plot into small multiples — one panel per region:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggparcoord</span>(<span class="at">data        =</span> wh,</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">columns     =</span> <span class="fu">c</span>(<span class="dv">7</span><span class="sc">:</span><span class="dv">12</span>),</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">groupColumn =</span> <span class="dv">2</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">scale       =</span> <span class="st">"uniminmax"</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>           <span class="at">alphaLines  =</span> <span class="fl">0.2</span>,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>           <span class="at">boxplot     =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>           <span class="at">title       =</span> <span class="st">"Multiple Parallel Coordinates Plots of World Happiness Variables by Region"</span>) <span class="sc">+</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Region)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-on_Ex05d_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="1344"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>Each of the 10 panels shows the parallel coordinates for one geographic region.</li>
+<li>This makes within-region patterns much clearer than a single overcrowded plot.</li>
+</ul>
+<blockquote class="blockquote">
+<p><strong>Aesthetic issue:</strong> With many variables, the x-axis labels overlap. The next two sections fix this.</p>
+</blockquote>
+<hr>
+</section>
+<section id="rotating-x-axis-text-label" class="level3">
+<h3 class="anchored" data-anchor-id="rotating-x-axis-text-label">Rotating x-axis Text Label</h3>
+<p>Use <code>theme()</code> with <code>axis.text.x</code> to rotate labels:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggparcoord</span>(<span class="at">data        =</span> wh,</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">columns     =</span> <span class="fu">c</span>(<span class="dv">7</span><span class="sc">:</span><span class="dv">12</span>),</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">groupColumn =</span> <span class="dv">2</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">scale       =</span> <span class="st">"uniminmax"</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>           <span class="at">alphaLines  =</span> <span class="fl">0.2</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>           <span class="at">boxplot     =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>           <span class="at">title       =</span> <span class="st">"Multiple Parallel Coordinates Plots of World Happiness Variables by Region"</span>) <span class="sc">+</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Region) <span class="sc">+</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">30</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-on_Ex05d_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="1344"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li><code>angle = 30</code>: rotates x-axis labels 30° from horizontal.</li>
+</ul>
+<blockquote class="blockquote">
+<p><strong>Problem:</strong> Rotating without adjusting position causes labels to overlap with the plot area.</p>
+</blockquote>
+<hr>
+</section>
+<section id="adjusting-the-rotated-x-axis-text-label" class="level3">
+<h3 class="anchored" data-anchor-id="adjusting-the-rotated-x-axis-text-label">Adjusting the Rotated x-axis Text Label</h3>
+<p>Fix overlapping by adding <code>hjust = 1</code> to shift the text anchor to the right end of the label:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggparcoord</span>(<span class="at">data        =</span> wh,</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">columns     =</span> <span class="fu">c</span>(<span class="dv">7</span><span class="sc">:</span><span class="dv">12</span>),</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">groupColumn =</span> <span class="dv">2</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">scale       =</span> <span class="st">"uniminmax"</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>           <span class="at">alphaLines  =</span> <span class="fl">0.2</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>           <span class="at">boxplot     =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>           <span class="at">title       =</span> <span class="st">"Multiple Parallel Coordinates Plots of World Happiness Variables by Region"</span>) <span class="sc">+</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Region) <span class="sc">+</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">30</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-on_Ex05d_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="1344"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li><code>hjust = 1</code>: right-justifies the text, aligning the label’s right edge with the axis tick, preventing overlap with the plot area.</li>
+</ul>
+<blockquote class="blockquote">
+<p><strong>Rule of thumb:</strong> Whenever rotating axis text with <code>angle &gt; 0</code>, always pair it with <code>hjust = 1</code> (and sometimes <code>vjust = 1</code>) to keep labels properly anchored.</p>
+</blockquote>
+<hr>
+</section>
+</section>
+<section id="plotting-interactive-parallel-coordinates-plot-parallelplot-methods" class="level2">
+<h2 class="anchored" data-anchor-id="plotting-interactive-parallel-coordinates-plot-parallelplot-methods">Plotting Interactive Parallel Coordinates Plot: <code>parallelPlot</code> Methods</h2>
+<p>The <strong><code>parallelPlot</code></strong> package renders interactive parallel coordinates using <strong>htmlwidgets</strong> and <strong>D3.js</strong>. Key interactive features include:</p>
+<ul>
+<li><strong>Clicking on an axis</strong> recolours all lines by that variable’s values (intensity-based colour encoding).</li>
+<li><strong>Brushing</strong> on any axis filters the visible lines to observations within the selected range.</li>
+</ul>
+<section id="data-preparation-for-parallelplot" class="level3">
+<h3 class="anchored" data-anchor-id="data-preparation-for-parallelplot">Data Preparation for <code>parallelPlot</code></h3>
+<p>Before plotting, select only the columns of interest (all must be numeric):</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>wh <span class="ot">&lt;-</span> wh <span class="sc">%&gt;%</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="st">"Happiness score"</span>, <span class="fu">c</span>(<span class="dv">7</span><span class="sc">:</span><span class="dv">12</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+<section id="the-basic-plot" class="level3">
+<h3 class="anchored" data-anchor-id="the-basic-plot">The Basic Plot</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">parallelPlot</span>(wh,</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>             <span class="at">width  =</span> <span class="dv">320</span>,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">height =</span> <span class="dv">250</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="htmlwidget-b133e53816203f249f41" style="width:100%;height:507px;" class="parallelPlot html-widget"></div>
+<script type="application/json" data-for="htmlwidget-b133e53816203f249f41">{"x":{"data":{"Happiness score":[4.586,5.129,4.933,5.321,6.711,5.739,5.62,5.662,5.933,5.952,5.185,5.347,6.123,5.945,5.398,6.173,5.948,4.321,5.201,5.483,4.34,5.79,5.131,5.64,5.81,5.352,5.636,4.103,6.096,5.246,5.43,5.915,5.125,5.875,6.441,6.388,5.956,5.752,6.419,6.476,6.26,7.072,5.302,5.973,6.167,6.382,3.582,5.504,5.89,6.488,6.141,6.43,5.681,5.663,6.192,6.379,4.806,5.295,6.105,4.419,4.707,4.456,7.19,5.161,6.083,5.199,5.566,5.254,4.743,6.374,6.371,3.462,4.592,5.483,6.774,3.355,7.272,7.328,7.324,6.886,3.632,4.5,5.082,4.19,4.88,5.472,4.471,4.433,5.093,4.623,6.322,4.308,5.524,6.343,6.072,5.103,3.795,4.141,3.59,4.424,2.905,4.975,3.083,4.301,4.559,4.245,4.35,4.758,4.657,3.964,4.671,4.41,3.808,3.495,3.774,3.587,4.447,4.356,5.891,4.417,4.441,4.166,5.155,3.408,4.631,4.571,4.982,4.724,3.254,4.139,3.303,3.999,4.161,4.377,3.692,7.139,6.927,5.762,7.555,7.632,6.489,6.965,5.358,7.495,6.977,6,6.91,6.627,7.441,5.835,7.594,5.41,6.31,7.314,7.487,6.814],"GDP per capita":[0.916,0.915,1.054,1.115,1.233,1.2,1.171,0.855,1.148,1.197,0.959,1.017,1.176,1.116,0.975,1.21,1.219,0.8159999999999999,1.024,1.039,0.853,1.143,0.53,0.657,1.151,0.474,1.016,0.793,0.719,0.989,1.405,1.294,0.914,1.266,1.365,1.073,0.8070000000000001,0.751,0.986,1.131,0.96,1.01,0.982,0.889,0.806,0.781,0.315,0.62,0.819,1.038,0.668,1.112,0.835,0.9340000000000001,1.223,1.093,0.996,0.979,1.338,0.885,1.059,1.01,1.244,0.822,1.474,0.965,0.985,0.779,0.642,1.649,1.379,0.6889999999999999,0.9,1.148,1.467,0.442,1.34,1.33,1.268,1.398,0.332,0.532,0.796,0.721,0.425,0.652,0.918,0.549,0.899,0.72,1.161,0.6820000000000001,0.775,1.529,1.016,0.715,0.73,0.378,1.017,0.314,0.091,0.535,0.024,0.358,0.6820000000000001,0.06900000000000001,0.308,1.036,0.592,0.344,0.541,0.493,0.472,0.076,0.262,0.186,0.37,0.5570000000000001,1.09,0.198,0.874,0.131,0.6889999999999999,0.332,0.429,0.256,0,0.9399999999999999,0.337,0.605,0.455,0.259,0.322,0.5620000000000001,0.357,1.341,1.324,1.229,1.351,1.305,1.293,1.34,1.154,1.343,1.448,1.264,1.576,1.27,1.361,1.229,1.456,1.188,1.251,1.355,1.42,1.301],"Social support":[0.8169999999999999,1.078,1.515,1.161,1.489,1.532,1.401,1.23,1.454,1.527,1.239,1.279,1.448,1.219,1.369,1.537,1.506,0.99,1.161,1.498,0.592,1.516,1.416,1.301,1.479,1.179,1.533,1.413,1.584,1.142,1.29,1.462,1.517,1.204,1.436,1.468,1.101,1.223,1.474,1.331,1.439,1.459,1.441,1.33,1.231,1.268,0.714,1.205,1.493,1.252,1.319,1.438,1.522,1.249,1.492,1.459,1.469,1.154,1.366,1.025,0.771,0.971,1.433,1.265,1.301,1.166,1.35,0.797,1.217,1.303,1.331,0.382,0.906,1.38,1.296,1.073,1.573,1.532,1.601,1.471,0.537,0.85,1.335,0.747,1.228,0.8100000000000001,1.314,1.088,1.215,1.034,1.258,1.174,1.312,1.451,1.417,1.365,1.125,0.372,1.174,1.097,0.627,0.891,0,0.907,0.8110000000000001,1.136,0.95,1.164,0.896,0.792,0.872,1.048,1.215,0.858,0.908,0.541,1.233,1.245,1.387,0.902,1.281,0.867,1.172,0.896,1.117,0.8129999999999999,0.712,1.41,0.608,1.24,0.991,0.474,1.09,1.047,1.094,1.504,1.483,1.191,1.59,1.592,1.466,1.474,1.202,1.644,1.583,1.501,1.52,1.525,1.488,1.211,1.582,1.429,1.538,1.501,1.549,1.559],"Healthy life expectancy":[0.79,0.758,0.712,0.737,0.854,0.737,0.732,0.578,0.671,0.716,0.6909999999999999,0.729,0.781,0.726,0.6850000000000001,0.776,0.856,0.666,0.603,0.7,0.643,0.631,0.594,0.62,0.599,0.598,0.517,0.609,0.605,0.799,1.03,0.988,0.575,0.955,0.857,0.744,0.474,0.508,0.675,0.8080000000000001,0.635,0.8169999999999999,0.614,0.736,0.639,0.608,0.289,0.622,0.6929999999999999,0.761,0.7,0.759,0.615,0.674,0.5639999999999999,0.771,0.657,0.6870000000000001,0.698,0.553,0.6909999999999999,0.536,0.888,0.645,0.675,0.785,0.553,0.669,0.602,0.748,0.633,0.539,0.6899999999999999,0.6860000000000001,0.776,0.343,0.91,0.896,0.876,0.819,0.255,0.579,0.527,0.485,0.539,0.424,0.672,0.457,0.522,0.441,0.669,0.429,0.513,1.008,0.707,0.702,0.269,0.24,0.417,0.254,0.145,0.182,0.01,0.053,0.343,0.204,0.391,0.404,0.337,0.211,0.08,0.454,0.079,0.267,0.402,0.306,0.152,0.292,0.6840000000000001,0.173,0.365,0.221,0.048,0.4,0.433,0,0.115,0.33,0.177,0.312,0.381,0.253,0.237,0.295,0.248,0.891,0.894,0.909,0.868,0.874,0.908,0.861,0.879,0.914,0.876,0.946,0.896,0.884,0.878,0.909,0.861,0.884,0.965,0.913,0.927,0.883],"Freedom to make life choices":[0.419,0.28,0.359,0.38,0.543,0.553,0.259,0.448,0.363,0.35,0.394,0.259,0.546,0.528,0.288,0.354,0.633,0.26,0.43,0.307,0.375,0.454,0.54,0.232,0.399,0.503,0.417,0.163,0.724,0.597,0.524,0.553,0.395,0.244,0.418,0.57,0.593,0.606,0.493,0.431,0.531,0.632,0.578,0.556,0.461,0.604,0.025,0.459,0.575,0.479,0.527,0.597,0.541,0.53,0.575,0.625,0.133,0.077,0.594,0.312,0.459,0.304,0.464,0.468,0.554,0.292,0.496,0.46,0.266,0.654,0.509,0.08799999999999999,0.271,0.324,0.67,0.244,0.647,0.653,0.669,0.547,0.08500000000000001,0.58,0.541,0.539,0.526,0.334,0.585,0.696,0.538,0.626,0.356,0.58,0.643,0.631,0.637,0.618,0,0.44,0.5570000000000001,0.312,0.065,0.454,0.305,0.189,0.514,0.312,0.452,0.356,0.499,0.394,0.467,0.504,0.423,0.419,0.221,0.531,0.367,0.129,0.584,0.531,0.519,0.39,0.462,0.636,0.406,0.355,0.674,0.516,0.112,0.016,0.481,0.434,0.45,0.503,0.406,0.617,0.583,0.423,0.6830000000000001,0.681,0.52,0.586,0.131,0.677,0.614,0.281,0.632,0.645,0.638,0.495,0.6860000000000001,0.5620000000000001,0.449,0.659,0.66,0.533],"Generosity":[0.149,0.216,0.064,0.12,0.064,0.08599999999999999,0.061,0.274,0.092,0.026,0.173,0.111,0.108,0.08799999999999999,0.134,0.118,0.16,0.077,0.031,0.101,0.038,0.148,0.281,0.171,0.065,0.214,0.199,0.187,0.328,0.029,0.246,0.079,0.253,0.175,0.151,0.062,0.183,0.141,0.11,0.197,0.099,0.143,0.12,0.114,0.065,0.179,0.392,0.197,0.096,0.06900000000000001,0.208,0.125,0.162,0.092,0.171,0.13,0.056,0.055,0.243,0.092,0.282,0.148,0.262,0.13,0.167,0.187,0.116,0.026,0.08599999999999999,0.256,0.098,0.376,0.04,0.106,0.284,0.083,0.361,0.321,0.365,0.291,0.191,0.153,0.364,0.172,0.302,0.216,0.307,0.256,0.484,0.23,0.311,0.598,0.12,0.261,0.364,0.177,0.079,0.163,0.042,0.175,0.149,0.183,0.218,0.181,0.091,0.197,0.22,0.032,0.212,0.185,0.146,0.352,0.116,0.206,0.155,0.21,0.139,0.134,0.245,0.206,0.051,0.175,0.201,0.2,0.138,0.238,0.238,0.103,0.224,0.134,0.27,0.158,0.259,0.221,0.132,0.242,0.188,0.202,0.284,0.192,0.098,0.273,0,0.353,0.307,0.137,0.196,0.376,0.333,0.179,0.286,0.055,0.142,0.285,0.256,0.354],"Perceptions of corruption":[0.032,0,0.008999999999999999,0.039,0.034,0.174,0.022,0.023,0.066,0.006,0.052,0.081,0.064,0.001,0.043,0.014,0.051,0.028,0.176,0.154,0.215,0.121,0.035,0,0.025,0.136,0.037,0.011,0.259,0.103,0.291,0.15,0.032,0.051,0.078,0.054,0.089,0.054,0.08799999999999999,0.061,0.039,0.101,0.106,0.12,0.082,0.07099999999999999,0.104,0.074,0.031,0.095,0.128,0.063,0.074,0.034,0.019,0.155,0.052,0.135,0.123,0.107,0.129,0.095,0.082,0.134,0.106,0.034,0.148,0.074,0.076,0.171,0.127,0.144,0.063,0.109,0.186,0.064,0.302,0.291,0.389,0.133,0.036,0.144,0.171,0.093,0.078,0.113,0.05,0.065,0.018,0.174,0.059,0.178,0.105,0.457,0.029,0.079,0.061,0.067,0.092,0.128,0.076,0.043,0.038,0.06,0.077,0.052,0.146,0.052,0.029,0.094,0.103,0.055,0.112,0.03,0.049,0.08,0.056,0.093,0.05,0.158,0.064,0.099,0.032,0.444,0.082,0.053,0.282,0.056,0.106,0.082,0.097,0.101,0.061,0.082,0.099,0.224,0.24,0.035,0.408,0.393,0.176,0.28,0.044,0.138,0.306,0.028,0.321,0.142,0.295,0.154,0.34,0.017,0.074,0.383,0.357,0.272]},"rowLabels":["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58","59","60","61","62","63","64","65","66","67","68","69","70","71","72","73","74","75","76","77","78","79","80","81","82","83","84","85","86","87","88","89","90","91","92","93","94","95","96","97","98","99","100","101","102","103","104","105","106","107","108","109","110","111","112","113","114","115","116","117","118","119","120","121","122","123","124","125","126","127","128","129","130","131","132","133","134","135","136","137","138","139","140","141","142","143","144","145","146","147","148","149","150","151","152","153","154","155","156"],"categorical":[null,null,null,null,null,null,null],"categoriesRep":"EquallySpacedLines","arrangeMethod":"fromRight","inputColumns":null,"keptColumns":null,"histoVisibility":null,"invertedAxes":null,"cutoffs":null,"refRowIndex":null,"refColumnDim":null,"rotateTitle":false,"columnLabels":null,"continuousCS":"Viridis","categoricalCS":"Category10","eventInputId":null,"editionMode":"EditionOff","controlWidgets":false,"cssRules":null,"sliderPosition":null},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<ul>
+<li><code>width</code> / <code>height</code>: pixel dimensions of the widget.</li>
+<li>Default colour: monotonous blue for all lines.</li>
+<li><strong>Issue:</strong> Long axis labels may overlap — fixed in the next step.</li>
+</ul>
+<hr>
+</section>
+<section id="rotate-axis-label" class="level3">
+<h3 class="anchored" data-anchor-id="rotate-axis-label">Rotate Axis Label</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">parallelPlot</span>(wh,</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>             <span class="at">rotateTitle =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div class="parallelPlot html-widget html-fill-item" id="htmlwidget-f5657abf336560f1f201" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-f5657abf336560f1f201">{"x":{"data":{"Happiness score":[4.586,5.129,4.933,5.321,6.711,5.739,5.62,5.662,5.933,5.952,5.185,5.347,6.123,5.945,5.398,6.173,5.948,4.321,5.201,5.483,4.34,5.79,5.131,5.64,5.81,5.352,5.636,4.103,6.096,5.246,5.43,5.915,5.125,5.875,6.441,6.388,5.956,5.752,6.419,6.476,6.26,7.072,5.302,5.973,6.167,6.382,3.582,5.504,5.89,6.488,6.141,6.43,5.681,5.663,6.192,6.379,4.806,5.295,6.105,4.419,4.707,4.456,7.19,5.161,6.083,5.199,5.566,5.254,4.743,6.374,6.371,3.462,4.592,5.483,6.774,3.355,7.272,7.328,7.324,6.886,3.632,4.5,5.082,4.19,4.88,5.472,4.471,4.433,5.093,4.623,6.322,4.308,5.524,6.343,6.072,5.103,3.795,4.141,3.59,4.424,2.905,4.975,3.083,4.301,4.559,4.245,4.35,4.758,4.657,3.964,4.671,4.41,3.808,3.495,3.774,3.587,4.447,4.356,5.891,4.417,4.441,4.166,5.155,3.408,4.631,4.571,4.982,4.724,3.254,4.139,3.303,3.999,4.161,4.377,3.692,7.139,6.927,5.762,7.555,7.632,6.489,6.965,5.358,7.495,6.977,6,6.91,6.627,7.441,5.835,7.594,5.41,6.31,7.314,7.487,6.814],"GDP per capita":[0.916,0.915,1.054,1.115,1.233,1.2,1.171,0.855,1.148,1.197,0.959,1.017,1.176,1.116,0.975,1.21,1.219,0.8159999999999999,1.024,1.039,0.853,1.143,0.53,0.657,1.151,0.474,1.016,0.793,0.719,0.989,1.405,1.294,0.914,1.266,1.365,1.073,0.8070000000000001,0.751,0.986,1.131,0.96,1.01,0.982,0.889,0.806,0.781,0.315,0.62,0.819,1.038,0.668,1.112,0.835,0.9340000000000001,1.223,1.093,0.996,0.979,1.338,0.885,1.059,1.01,1.244,0.822,1.474,0.965,0.985,0.779,0.642,1.649,1.379,0.6889999999999999,0.9,1.148,1.467,0.442,1.34,1.33,1.268,1.398,0.332,0.532,0.796,0.721,0.425,0.652,0.918,0.549,0.899,0.72,1.161,0.6820000000000001,0.775,1.529,1.016,0.715,0.73,0.378,1.017,0.314,0.091,0.535,0.024,0.358,0.6820000000000001,0.06900000000000001,0.308,1.036,0.592,0.344,0.541,0.493,0.472,0.076,0.262,0.186,0.37,0.5570000000000001,1.09,0.198,0.874,0.131,0.6889999999999999,0.332,0.429,0.256,0,0.9399999999999999,0.337,0.605,0.455,0.259,0.322,0.5620000000000001,0.357,1.341,1.324,1.229,1.351,1.305,1.293,1.34,1.154,1.343,1.448,1.264,1.576,1.27,1.361,1.229,1.456,1.188,1.251,1.355,1.42,1.301],"Social support":[0.8169999999999999,1.078,1.515,1.161,1.489,1.532,1.401,1.23,1.454,1.527,1.239,1.279,1.448,1.219,1.369,1.537,1.506,0.99,1.161,1.498,0.592,1.516,1.416,1.301,1.479,1.179,1.533,1.413,1.584,1.142,1.29,1.462,1.517,1.204,1.436,1.468,1.101,1.223,1.474,1.331,1.439,1.459,1.441,1.33,1.231,1.268,0.714,1.205,1.493,1.252,1.319,1.438,1.522,1.249,1.492,1.459,1.469,1.154,1.366,1.025,0.771,0.971,1.433,1.265,1.301,1.166,1.35,0.797,1.217,1.303,1.331,0.382,0.906,1.38,1.296,1.073,1.573,1.532,1.601,1.471,0.537,0.85,1.335,0.747,1.228,0.8100000000000001,1.314,1.088,1.215,1.034,1.258,1.174,1.312,1.451,1.417,1.365,1.125,0.372,1.174,1.097,0.627,0.891,0,0.907,0.8110000000000001,1.136,0.95,1.164,0.896,0.792,0.872,1.048,1.215,0.858,0.908,0.541,1.233,1.245,1.387,0.902,1.281,0.867,1.172,0.896,1.117,0.8129999999999999,0.712,1.41,0.608,1.24,0.991,0.474,1.09,1.047,1.094,1.504,1.483,1.191,1.59,1.592,1.466,1.474,1.202,1.644,1.583,1.501,1.52,1.525,1.488,1.211,1.582,1.429,1.538,1.501,1.549,1.559],"Healthy life expectancy":[0.79,0.758,0.712,0.737,0.854,0.737,0.732,0.578,0.671,0.716,0.6909999999999999,0.729,0.781,0.726,0.6850000000000001,0.776,0.856,0.666,0.603,0.7,0.643,0.631,0.594,0.62,0.599,0.598,0.517,0.609,0.605,0.799,1.03,0.988,0.575,0.955,0.857,0.744,0.474,0.508,0.675,0.8080000000000001,0.635,0.8169999999999999,0.614,0.736,0.639,0.608,0.289,0.622,0.6929999999999999,0.761,0.7,0.759,0.615,0.674,0.5639999999999999,0.771,0.657,0.6870000000000001,0.698,0.553,0.6909999999999999,0.536,0.888,0.645,0.675,0.785,0.553,0.669,0.602,0.748,0.633,0.539,0.6899999999999999,0.6860000000000001,0.776,0.343,0.91,0.896,0.876,0.819,0.255,0.579,0.527,0.485,0.539,0.424,0.672,0.457,0.522,0.441,0.669,0.429,0.513,1.008,0.707,0.702,0.269,0.24,0.417,0.254,0.145,0.182,0.01,0.053,0.343,0.204,0.391,0.404,0.337,0.211,0.08,0.454,0.079,0.267,0.402,0.306,0.152,0.292,0.6840000000000001,0.173,0.365,0.221,0.048,0.4,0.433,0,0.115,0.33,0.177,0.312,0.381,0.253,0.237,0.295,0.248,0.891,0.894,0.909,0.868,0.874,0.908,0.861,0.879,0.914,0.876,0.946,0.896,0.884,0.878,0.909,0.861,0.884,0.965,0.913,0.927,0.883],"Freedom to make life choices":[0.419,0.28,0.359,0.38,0.543,0.553,0.259,0.448,0.363,0.35,0.394,0.259,0.546,0.528,0.288,0.354,0.633,0.26,0.43,0.307,0.375,0.454,0.54,0.232,0.399,0.503,0.417,0.163,0.724,0.597,0.524,0.553,0.395,0.244,0.418,0.57,0.593,0.606,0.493,0.431,0.531,0.632,0.578,0.556,0.461,0.604,0.025,0.459,0.575,0.479,0.527,0.597,0.541,0.53,0.575,0.625,0.133,0.077,0.594,0.312,0.459,0.304,0.464,0.468,0.554,0.292,0.496,0.46,0.266,0.654,0.509,0.08799999999999999,0.271,0.324,0.67,0.244,0.647,0.653,0.669,0.547,0.08500000000000001,0.58,0.541,0.539,0.526,0.334,0.585,0.696,0.538,0.626,0.356,0.58,0.643,0.631,0.637,0.618,0,0.44,0.5570000000000001,0.312,0.065,0.454,0.305,0.189,0.514,0.312,0.452,0.356,0.499,0.394,0.467,0.504,0.423,0.419,0.221,0.531,0.367,0.129,0.584,0.531,0.519,0.39,0.462,0.636,0.406,0.355,0.674,0.516,0.112,0.016,0.481,0.434,0.45,0.503,0.406,0.617,0.583,0.423,0.6830000000000001,0.681,0.52,0.586,0.131,0.677,0.614,0.281,0.632,0.645,0.638,0.495,0.6860000000000001,0.5620000000000001,0.449,0.659,0.66,0.533],"Generosity":[0.149,0.216,0.064,0.12,0.064,0.08599999999999999,0.061,0.274,0.092,0.026,0.173,0.111,0.108,0.08799999999999999,0.134,0.118,0.16,0.077,0.031,0.101,0.038,0.148,0.281,0.171,0.065,0.214,0.199,0.187,0.328,0.029,0.246,0.079,0.253,0.175,0.151,0.062,0.183,0.141,0.11,0.197,0.099,0.143,0.12,0.114,0.065,0.179,0.392,0.197,0.096,0.06900000000000001,0.208,0.125,0.162,0.092,0.171,0.13,0.056,0.055,0.243,0.092,0.282,0.148,0.262,0.13,0.167,0.187,0.116,0.026,0.08599999999999999,0.256,0.098,0.376,0.04,0.106,0.284,0.083,0.361,0.321,0.365,0.291,0.191,0.153,0.364,0.172,0.302,0.216,0.307,0.256,0.484,0.23,0.311,0.598,0.12,0.261,0.364,0.177,0.079,0.163,0.042,0.175,0.149,0.183,0.218,0.181,0.091,0.197,0.22,0.032,0.212,0.185,0.146,0.352,0.116,0.206,0.155,0.21,0.139,0.134,0.245,0.206,0.051,0.175,0.201,0.2,0.138,0.238,0.238,0.103,0.224,0.134,0.27,0.158,0.259,0.221,0.132,0.242,0.188,0.202,0.284,0.192,0.098,0.273,0,0.353,0.307,0.137,0.196,0.376,0.333,0.179,0.286,0.055,0.142,0.285,0.256,0.354],"Perceptions of corruption":[0.032,0,0.008999999999999999,0.039,0.034,0.174,0.022,0.023,0.066,0.006,0.052,0.081,0.064,0.001,0.043,0.014,0.051,0.028,0.176,0.154,0.215,0.121,0.035,0,0.025,0.136,0.037,0.011,0.259,0.103,0.291,0.15,0.032,0.051,0.078,0.054,0.089,0.054,0.08799999999999999,0.061,0.039,0.101,0.106,0.12,0.082,0.07099999999999999,0.104,0.074,0.031,0.095,0.128,0.063,0.074,0.034,0.019,0.155,0.052,0.135,0.123,0.107,0.129,0.095,0.082,0.134,0.106,0.034,0.148,0.074,0.076,0.171,0.127,0.144,0.063,0.109,0.186,0.064,0.302,0.291,0.389,0.133,0.036,0.144,0.171,0.093,0.078,0.113,0.05,0.065,0.018,0.174,0.059,0.178,0.105,0.457,0.029,0.079,0.061,0.067,0.092,0.128,0.076,0.043,0.038,0.06,0.077,0.052,0.146,0.052,0.029,0.094,0.103,0.055,0.112,0.03,0.049,0.08,0.056,0.093,0.05,0.158,0.064,0.099,0.032,0.444,0.082,0.053,0.282,0.056,0.106,0.082,0.097,0.101,0.061,0.082,0.099,0.224,0.24,0.035,0.408,0.393,0.176,0.28,0.044,0.138,0.306,0.028,0.321,0.142,0.295,0.154,0.34,0.017,0.074,0.383,0.357,0.272]},"rowLabels":["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58","59","60","61","62","63","64","65","66","67","68","69","70","71","72","73","74","75","76","77","78","79","80","81","82","83","84","85","86","87","88","89","90","91","92","93","94","95","96","97","98","99","100","101","102","103","104","105","106","107","108","109","110","111","112","113","114","115","116","117","118","119","120","121","122","123","124","125","126","127","128","129","130","131","132","133","134","135","136","137","138","139","140","141","142","143","144","145","146","147","148","149","150","151","152","153","154","155","156"],"categorical":[null,null,null,null,null,null,null],"categoriesRep":"EquallySpacedLines","arrangeMethod":"fromRight","inputColumns":null,"keptColumns":null,"histoVisibility":null,"invertedAxes":null,"cutoffs":null,"refRowIndex":null,"refColumnDim":null,"rotateTitle":true,"columnLabels":null,"continuousCS":"Viridis","categoricalCS":"Category10","eventInputId":null,"editionMode":"EditionOff","controlWidgets":false,"cssRules":null,"sliderPosition":null},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<ul>
+<li><code>rotateTitle = TRUE</code>: rotates all axis labels 90° to prevent overlap.</li>
+</ul>
+<blockquote class="blockquote">
+<p><strong>Interactive tip:</strong> After rotating, clicking on any axis variable (e.g., “Happiness score”) changes the colour scheme from uniform blue to a graduated blue intensity — lines are coloured by that variable’s value, immediately revealing correlations.</p>
+</blockquote>
+<hr>
+</section>
+<section id="changing-the-colour-scheme" class="level3">
+<h3 class="anchored" data-anchor-id="changing-the-colour-scheme">Changing the Colour Scheme</h3>
+<p>Replace the default blue with any named D3/ColorBrewer continuous palette:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">parallelPlot</span>(wh,</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>             <span class="at">continuousCS =</span> <span class="st">"YlOrRd"</span>,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">rotateTitle  =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div class="parallelPlot html-widget html-fill-item" id="htmlwidget-f444d2ee2566f2dd9485" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-f444d2ee2566f2dd9485">{"x":{"data":{"Happiness score":[4.586,5.129,4.933,5.321,6.711,5.739,5.62,5.662,5.933,5.952,5.185,5.347,6.123,5.945,5.398,6.173,5.948,4.321,5.201,5.483,4.34,5.79,5.131,5.64,5.81,5.352,5.636,4.103,6.096,5.246,5.43,5.915,5.125,5.875,6.441,6.388,5.956,5.752,6.419,6.476,6.26,7.072,5.302,5.973,6.167,6.382,3.582,5.504,5.89,6.488,6.141,6.43,5.681,5.663,6.192,6.379,4.806,5.295,6.105,4.419,4.707,4.456,7.19,5.161,6.083,5.199,5.566,5.254,4.743,6.374,6.371,3.462,4.592,5.483,6.774,3.355,7.272,7.328,7.324,6.886,3.632,4.5,5.082,4.19,4.88,5.472,4.471,4.433,5.093,4.623,6.322,4.308,5.524,6.343,6.072,5.103,3.795,4.141,3.59,4.424,2.905,4.975,3.083,4.301,4.559,4.245,4.35,4.758,4.657,3.964,4.671,4.41,3.808,3.495,3.774,3.587,4.447,4.356,5.891,4.417,4.441,4.166,5.155,3.408,4.631,4.571,4.982,4.724,3.254,4.139,3.303,3.999,4.161,4.377,3.692,7.139,6.927,5.762,7.555,7.632,6.489,6.965,5.358,7.495,6.977,6,6.91,6.627,7.441,5.835,7.594,5.41,6.31,7.314,7.487,6.814],"GDP per capita":[0.916,0.915,1.054,1.115,1.233,1.2,1.171,0.855,1.148,1.197,0.959,1.017,1.176,1.116,0.975,1.21,1.219,0.8159999999999999,1.024,1.039,0.853,1.143,0.53,0.657,1.151,0.474,1.016,0.793,0.719,0.989,1.405,1.294,0.914,1.266,1.365,1.073,0.8070000000000001,0.751,0.986,1.131,0.96,1.01,0.982,0.889,0.806,0.781,0.315,0.62,0.819,1.038,0.668,1.112,0.835,0.9340000000000001,1.223,1.093,0.996,0.979,1.338,0.885,1.059,1.01,1.244,0.822,1.474,0.965,0.985,0.779,0.642,1.649,1.379,0.6889999999999999,0.9,1.148,1.467,0.442,1.34,1.33,1.268,1.398,0.332,0.532,0.796,0.721,0.425,0.652,0.918,0.549,0.899,0.72,1.161,0.6820000000000001,0.775,1.529,1.016,0.715,0.73,0.378,1.017,0.314,0.091,0.535,0.024,0.358,0.6820000000000001,0.06900000000000001,0.308,1.036,0.592,0.344,0.541,0.493,0.472,0.076,0.262,0.186,0.37,0.5570000000000001,1.09,0.198,0.874,0.131,0.6889999999999999,0.332,0.429,0.256,0,0.9399999999999999,0.337,0.605,0.455,0.259,0.322,0.5620000000000001,0.357,1.341,1.324,1.229,1.351,1.305,1.293,1.34,1.154,1.343,1.448,1.264,1.576,1.27,1.361,1.229,1.456,1.188,1.251,1.355,1.42,1.301],"Social support":[0.8169999999999999,1.078,1.515,1.161,1.489,1.532,1.401,1.23,1.454,1.527,1.239,1.279,1.448,1.219,1.369,1.537,1.506,0.99,1.161,1.498,0.592,1.516,1.416,1.301,1.479,1.179,1.533,1.413,1.584,1.142,1.29,1.462,1.517,1.204,1.436,1.468,1.101,1.223,1.474,1.331,1.439,1.459,1.441,1.33,1.231,1.268,0.714,1.205,1.493,1.252,1.319,1.438,1.522,1.249,1.492,1.459,1.469,1.154,1.366,1.025,0.771,0.971,1.433,1.265,1.301,1.166,1.35,0.797,1.217,1.303,1.331,0.382,0.906,1.38,1.296,1.073,1.573,1.532,1.601,1.471,0.537,0.85,1.335,0.747,1.228,0.8100000000000001,1.314,1.088,1.215,1.034,1.258,1.174,1.312,1.451,1.417,1.365,1.125,0.372,1.174,1.097,0.627,0.891,0,0.907,0.8110000000000001,1.136,0.95,1.164,0.896,0.792,0.872,1.048,1.215,0.858,0.908,0.541,1.233,1.245,1.387,0.902,1.281,0.867,1.172,0.896,1.117,0.8129999999999999,0.712,1.41,0.608,1.24,0.991,0.474,1.09,1.047,1.094,1.504,1.483,1.191,1.59,1.592,1.466,1.474,1.202,1.644,1.583,1.501,1.52,1.525,1.488,1.211,1.582,1.429,1.538,1.501,1.549,1.559],"Healthy life expectancy":[0.79,0.758,0.712,0.737,0.854,0.737,0.732,0.578,0.671,0.716,0.6909999999999999,0.729,0.781,0.726,0.6850000000000001,0.776,0.856,0.666,0.603,0.7,0.643,0.631,0.594,0.62,0.599,0.598,0.517,0.609,0.605,0.799,1.03,0.988,0.575,0.955,0.857,0.744,0.474,0.508,0.675,0.8080000000000001,0.635,0.8169999999999999,0.614,0.736,0.639,0.608,0.289,0.622,0.6929999999999999,0.761,0.7,0.759,0.615,0.674,0.5639999999999999,0.771,0.657,0.6870000000000001,0.698,0.553,0.6909999999999999,0.536,0.888,0.645,0.675,0.785,0.553,0.669,0.602,0.748,0.633,0.539,0.6899999999999999,0.6860000000000001,0.776,0.343,0.91,0.896,0.876,0.819,0.255,0.579,0.527,0.485,0.539,0.424,0.672,0.457,0.522,0.441,0.669,0.429,0.513,1.008,0.707,0.702,0.269,0.24,0.417,0.254,0.145,0.182,0.01,0.053,0.343,0.204,0.391,0.404,0.337,0.211,0.08,0.454,0.079,0.267,0.402,0.306,0.152,0.292,0.6840000000000001,0.173,0.365,0.221,0.048,0.4,0.433,0,0.115,0.33,0.177,0.312,0.381,0.253,0.237,0.295,0.248,0.891,0.894,0.909,0.868,0.874,0.908,0.861,0.879,0.914,0.876,0.946,0.896,0.884,0.878,0.909,0.861,0.884,0.965,0.913,0.927,0.883],"Freedom to make life choices":[0.419,0.28,0.359,0.38,0.543,0.553,0.259,0.448,0.363,0.35,0.394,0.259,0.546,0.528,0.288,0.354,0.633,0.26,0.43,0.307,0.375,0.454,0.54,0.232,0.399,0.503,0.417,0.163,0.724,0.597,0.524,0.553,0.395,0.244,0.418,0.57,0.593,0.606,0.493,0.431,0.531,0.632,0.578,0.556,0.461,0.604,0.025,0.459,0.575,0.479,0.527,0.597,0.541,0.53,0.575,0.625,0.133,0.077,0.594,0.312,0.459,0.304,0.464,0.468,0.554,0.292,0.496,0.46,0.266,0.654,0.509,0.08799999999999999,0.271,0.324,0.67,0.244,0.647,0.653,0.669,0.547,0.08500000000000001,0.58,0.541,0.539,0.526,0.334,0.585,0.696,0.538,0.626,0.356,0.58,0.643,0.631,0.637,0.618,0,0.44,0.5570000000000001,0.312,0.065,0.454,0.305,0.189,0.514,0.312,0.452,0.356,0.499,0.394,0.467,0.504,0.423,0.419,0.221,0.531,0.367,0.129,0.584,0.531,0.519,0.39,0.462,0.636,0.406,0.355,0.674,0.516,0.112,0.016,0.481,0.434,0.45,0.503,0.406,0.617,0.583,0.423,0.6830000000000001,0.681,0.52,0.586,0.131,0.677,0.614,0.281,0.632,0.645,0.638,0.495,0.6860000000000001,0.5620000000000001,0.449,0.659,0.66,0.533],"Generosity":[0.149,0.216,0.064,0.12,0.064,0.08599999999999999,0.061,0.274,0.092,0.026,0.173,0.111,0.108,0.08799999999999999,0.134,0.118,0.16,0.077,0.031,0.101,0.038,0.148,0.281,0.171,0.065,0.214,0.199,0.187,0.328,0.029,0.246,0.079,0.253,0.175,0.151,0.062,0.183,0.141,0.11,0.197,0.099,0.143,0.12,0.114,0.065,0.179,0.392,0.197,0.096,0.06900000000000001,0.208,0.125,0.162,0.092,0.171,0.13,0.056,0.055,0.243,0.092,0.282,0.148,0.262,0.13,0.167,0.187,0.116,0.026,0.08599999999999999,0.256,0.098,0.376,0.04,0.106,0.284,0.083,0.361,0.321,0.365,0.291,0.191,0.153,0.364,0.172,0.302,0.216,0.307,0.256,0.484,0.23,0.311,0.598,0.12,0.261,0.364,0.177,0.079,0.163,0.042,0.175,0.149,0.183,0.218,0.181,0.091,0.197,0.22,0.032,0.212,0.185,0.146,0.352,0.116,0.206,0.155,0.21,0.139,0.134,0.245,0.206,0.051,0.175,0.201,0.2,0.138,0.238,0.238,0.103,0.224,0.134,0.27,0.158,0.259,0.221,0.132,0.242,0.188,0.202,0.284,0.192,0.098,0.273,0,0.353,0.307,0.137,0.196,0.376,0.333,0.179,0.286,0.055,0.142,0.285,0.256,0.354],"Perceptions of corruption":[0.032,0,0.008999999999999999,0.039,0.034,0.174,0.022,0.023,0.066,0.006,0.052,0.081,0.064,0.001,0.043,0.014,0.051,0.028,0.176,0.154,0.215,0.121,0.035,0,0.025,0.136,0.037,0.011,0.259,0.103,0.291,0.15,0.032,0.051,0.078,0.054,0.089,0.054,0.08799999999999999,0.061,0.039,0.101,0.106,0.12,0.082,0.07099999999999999,0.104,0.074,0.031,0.095,0.128,0.063,0.074,0.034,0.019,0.155,0.052,0.135,0.123,0.107,0.129,0.095,0.082,0.134,0.106,0.034,0.148,0.074,0.076,0.171,0.127,0.144,0.063,0.109,0.186,0.064,0.302,0.291,0.389,0.133,0.036,0.144,0.171,0.093,0.078,0.113,0.05,0.065,0.018,0.174,0.059,0.178,0.105,0.457,0.029,0.079,0.061,0.067,0.092,0.128,0.076,0.043,0.038,0.06,0.077,0.052,0.146,0.052,0.029,0.094,0.103,0.055,0.112,0.03,0.049,0.08,0.056,0.093,0.05,0.158,0.064,0.099,0.032,0.444,0.082,0.053,0.282,0.056,0.106,0.082,0.097,0.101,0.061,0.082,0.099,0.224,0.24,0.035,0.408,0.393,0.176,0.28,0.044,0.138,0.306,0.028,0.321,0.142,0.295,0.154,0.34,0.017,0.074,0.383,0.357,0.272]},"rowLabels":["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58","59","60","61","62","63","64","65","66","67","68","69","70","71","72","73","74","75","76","77","78","79","80","81","82","83","84","85","86","87","88","89","90","91","92","93","94","95","96","97","98","99","100","101","102","103","104","105","106","107","108","109","110","111","112","113","114","115","116","117","118","119","120","121","122","123","124","125","126","127","128","129","130","131","132","133","134","135","136","137","138","139","140","141","142","143","144","145","146","147","148","149","150","151","152","153","154","155","156"],"categorical":[null,null,null,null,null,null,null],"categoriesRep":"EquallySpacedLines","arrangeMethod":"fromRight","inputColumns":null,"keptColumns":null,"histoVisibility":null,"invertedAxes":null,"cutoffs":null,"refRowIndex":null,"refColumnDim":null,"rotateTitle":true,"columnLabels":null,"continuousCS":"YlOrRd","categoricalCS":"Category10","eventInputId":null,"editionMode":"EditionOff","controlWidgets":false,"cssRules":null,"sliderPosition":null},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<ul>
+<li><code>continuousCS</code>: sets the continuous colour scale used when an axis is clicked.</li>
+<li><code>"YlOrRd"</code> (Yellow-Orange-Red) is a sequential palette that clearly encodes magnitude — high values appear red, low values appear yellow.</li>
+</ul>
+<hr>
+</section>
+<section id="parallel-coordinates-plot-with-histogram" class="level3">
+<h3 class="anchored" data-anchor-id="parallel-coordinates-plot-with-histogram">Parallel Coordinates Plot with Histogram</h3>
+<p>Histograms can be displayed along each axis to show marginal distributions:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>histoVisibility <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="cn">TRUE</span>, <span class="fu">ncol</span>(wh))</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">parallelPlot</span>(wh,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>             <span class="at">rotateTitle     =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>             <span class="at">histoVisibility =</span> histoVisibility)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div class="parallelPlot html-widget html-fill-item" id="htmlwidget-66fd43d9780cfbf662eb" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-66fd43d9780cfbf662eb">{"x":{"data":{"Happiness score":[4.586,5.129,4.933,5.321,6.711,5.739,5.62,5.662,5.933,5.952,5.185,5.347,6.123,5.945,5.398,6.173,5.948,4.321,5.201,5.483,4.34,5.79,5.131,5.64,5.81,5.352,5.636,4.103,6.096,5.246,5.43,5.915,5.125,5.875,6.441,6.388,5.956,5.752,6.419,6.476,6.26,7.072,5.302,5.973,6.167,6.382,3.582,5.504,5.89,6.488,6.141,6.43,5.681,5.663,6.192,6.379,4.806,5.295,6.105,4.419,4.707,4.456,7.19,5.161,6.083,5.199,5.566,5.254,4.743,6.374,6.371,3.462,4.592,5.483,6.774,3.355,7.272,7.328,7.324,6.886,3.632,4.5,5.082,4.19,4.88,5.472,4.471,4.433,5.093,4.623,6.322,4.308,5.524,6.343,6.072,5.103,3.795,4.141,3.59,4.424,2.905,4.975,3.083,4.301,4.559,4.245,4.35,4.758,4.657,3.964,4.671,4.41,3.808,3.495,3.774,3.587,4.447,4.356,5.891,4.417,4.441,4.166,5.155,3.408,4.631,4.571,4.982,4.724,3.254,4.139,3.303,3.999,4.161,4.377,3.692,7.139,6.927,5.762,7.555,7.632,6.489,6.965,5.358,7.495,6.977,6,6.91,6.627,7.441,5.835,7.594,5.41,6.31,7.314,7.487,6.814],"GDP per capita":[0.916,0.915,1.054,1.115,1.233,1.2,1.171,0.855,1.148,1.197,0.959,1.017,1.176,1.116,0.975,1.21,1.219,0.8159999999999999,1.024,1.039,0.853,1.143,0.53,0.657,1.151,0.474,1.016,0.793,0.719,0.989,1.405,1.294,0.914,1.266,1.365,1.073,0.8070000000000001,0.751,0.986,1.131,0.96,1.01,0.982,0.889,0.806,0.781,0.315,0.62,0.819,1.038,0.668,1.112,0.835,0.9340000000000001,1.223,1.093,0.996,0.979,1.338,0.885,1.059,1.01,1.244,0.822,1.474,0.965,0.985,0.779,0.642,1.649,1.379,0.6889999999999999,0.9,1.148,1.467,0.442,1.34,1.33,1.268,1.398,0.332,0.532,0.796,0.721,0.425,0.652,0.918,0.549,0.899,0.72,1.161,0.6820000000000001,0.775,1.529,1.016,0.715,0.73,0.378,1.017,0.314,0.091,0.535,0.024,0.358,0.6820000000000001,0.06900000000000001,0.308,1.036,0.592,0.344,0.541,0.493,0.472,0.076,0.262,0.186,0.37,0.5570000000000001,1.09,0.198,0.874,0.131,0.6889999999999999,0.332,0.429,0.256,0,0.9399999999999999,0.337,0.605,0.455,0.259,0.322,0.5620000000000001,0.357,1.341,1.324,1.229,1.351,1.305,1.293,1.34,1.154,1.343,1.448,1.264,1.576,1.27,1.361,1.229,1.456,1.188,1.251,1.355,1.42,1.301],"Social support":[0.8169999999999999,1.078,1.515,1.161,1.489,1.532,1.401,1.23,1.454,1.527,1.239,1.279,1.448,1.219,1.369,1.537,1.506,0.99,1.161,1.498,0.592,1.516,1.416,1.301,1.479,1.179,1.533,1.413,1.584,1.142,1.29,1.462,1.517,1.204,1.436,1.468,1.101,1.223,1.474,1.331,1.439,1.459,1.441,1.33,1.231,1.268,0.714,1.205,1.493,1.252,1.319,1.438,1.522,1.249,1.492,1.459,1.469,1.154,1.366,1.025,0.771,0.971,1.433,1.265,1.301,1.166,1.35,0.797,1.217,1.303,1.331,0.382,0.906,1.38,1.296,1.073,1.573,1.532,1.601,1.471,0.537,0.85,1.335,0.747,1.228,0.8100000000000001,1.314,1.088,1.215,1.034,1.258,1.174,1.312,1.451,1.417,1.365,1.125,0.372,1.174,1.097,0.627,0.891,0,0.907,0.8110000000000001,1.136,0.95,1.164,0.896,0.792,0.872,1.048,1.215,0.858,0.908,0.541,1.233,1.245,1.387,0.902,1.281,0.867,1.172,0.896,1.117,0.8129999999999999,0.712,1.41,0.608,1.24,0.991,0.474,1.09,1.047,1.094,1.504,1.483,1.191,1.59,1.592,1.466,1.474,1.202,1.644,1.583,1.501,1.52,1.525,1.488,1.211,1.582,1.429,1.538,1.501,1.549,1.559],"Healthy life expectancy":[0.79,0.758,0.712,0.737,0.854,0.737,0.732,0.578,0.671,0.716,0.6909999999999999,0.729,0.781,0.726,0.6850000000000001,0.776,0.856,0.666,0.603,0.7,0.643,0.631,0.594,0.62,0.599,0.598,0.517,0.609,0.605,0.799,1.03,0.988,0.575,0.955,0.857,0.744,0.474,0.508,0.675,0.8080000000000001,0.635,0.8169999999999999,0.614,0.736,0.639,0.608,0.289,0.622,0.6929999999999999,0.761,0.7,0.759,0.615,0.674,0.5639999999999999,0.771,0.657,0.6870000000000001,0.698,0.553,0.6909999999999999,0.536,0.888,0.645,0.675,0.785,0.553,0.669,0.602,0.748,0.633,0.539,0.6899999999999999,0.6860000000000001,0.776,0.343,0.91,0.896,0.876,0.819,0.255,0.579,0.527,0.485,0.539,0.424,0.672,0.457,0.522,0.441,0.669,0.429,0.513,1.008,0.707,0.702,0.269,0.24,0.417,0.254,0.145,0.182,0.01,0.053,0.343,0.204,0.391,0.404,0.337,0.211,0.08,0.454,0.079,0.267,0.402,0.306,0.152,0.292,0.6840000000000001,0.173,0.365,0.221,0.048,0.4,0.433,0,0.115,0.33,0.177,0.312,0.381,0.253,0.237,0.295,0.248,0.891,0.894,0.909,0.868,0.874,0.908,0.861,0.879,0.914,0.876,0.946,0.896,0.884,0.878,0.909,0.861,0.884,0.965,0.913,0.927,0.883],"Freedom to make life choices":[0.419,0.28,0.359,0.38,0.543,0.553,0.259,0.448,0.363,0.35,0.394,0.259,0.546,0.528,0.288,0.354,0.633,0.26,0.43,0.307,0.375,0.454,0.54,0.232,0.399,0.503,0.417,0.163,0.724,0.597,0.524,0.553,0.395,0.244,0.418,0.57,0.593,0.606,0.493,0.431,0.531,0.632,0.578,0.556,0.461,0.604,0.025,0.459,0.575,0.479,0.527,0.597,0.541,0.53,0.575,0.625,0.133,0.077,0.594,0.312,0.459,0.304,0.464,0.468,0.554,0.292,0.496,0.46,0.266,0.654,0.509,0.08799999999999999,0.271,0.324,0.67,0.244,0.647,0.653,0.669,0.547,0.08500000000000001,0.58,0.541,0.539,0.526,0.334,0.585,0.696,0.538,0.626,0.356,0.58,0.643,0.631,0.637,0.618,0,0.44,0.5570000000000001,0.312,0.065,0.454,0.305,0.189,0.514,0.312,0.452,0.356,0.499,0.394,0.467,0.504,0.423,0.419,0.221,0.531,0.367,0.129,0.584,0.531,0.519,0.39,0.462,0.636,0.406,0.355,0.674,0.516,0.112,0.016,0.481,0.434,0.45,0.503,0.406,0.617,0.583,0.423,0.6830000000000001,0.681,0.52,0.586,0.131,0.677,0.614,0.281,0.632,0.645,0.638,0.495,0.6860000000000001,0.5620000000000001,0.449,0.659,0.66,0.533],"Generosity":[0.149,0.216,0.064,0.12,0.064,0.08599999999999999,0.061,0.274,0.092,0.026,0.173,0.111,0.108,0.08799999999999999,0.134,0.118,0.16,0.077,0.031,0.101,0.038,0.148,0.281,0.171,0.065,0.214,0.199,0.187,0.328,0.029,0.246,0.079,0.253,0.175,0.151,0.062,0.183,0.141,0.11,0.197,0.099,0.143,0.12,0.114,0.065,0.179,0.392,0.197,0.096,0.06900000000000001,0.208,0.125,0.162,0.092,0.171,0.13,0.056,0.055,0.243,0.092,0.282,0.148,0.262,0.13,0.167,0.187,0.116,0.026,0.08599999999999999,0.256,0.098,0.376,0.04,0.106,0.284,0.083,0.361,0.321,0.365,0.291,0.191,0.153,0.364,0.172,0.302,0.216,0.307,0.256,0.484,0.23,0.311,0.598,0.12,0.261,0.364,0.177,0.079,0.163,0.042,0.175,0.149,0.183,0.218,0.181,0.091,0.197,0.22,0.032,0.212,0.185,0.146,0.352,0.116,0.206,0.155,0.21,0.139,0.134,0.245,0.206,0.051,0.175,0.201,0.2,0.138,0.238,0.238,0.103,0.224,0.134,0.27,0.158,0.259,0.221,0.132,0.242,0.188,0.202,0.284,0.192,0.098,0.273,0,0.353,0.307,0.137,0.196,0.376,0.333,0.179,0.286,0.055,0.142,0.285,0.256,0.354],"Perceptions of corruption":[0.032,0,0.008999999999999999,0.039,0.034,0.174,0.022,0.023,0.066,0.006,0.052,0.081,0.064,0.001,0.043,0.014,0.051,0.028,0.176,0.154,0.215,0.121,0.035,0,0.025,0.136,0.037,0.011,0.259,0.103,0.291,0.15,0.032,0.051,0.078,0.054,0.089,0.054,0.08799999999999999,0.061,0.039,0.101,0.106,0.12,0.082,0.07099999999999999,0.104,0.074,0.031,0.095,0.128,0.063,0.074,0.034,0.019,0.155,0.052,0.135,0.123,0.107,0.129,0.095,0.082,0.134,0.106,0.034,0.148,0.074,0.076,0.171,0.127,0.144,0.063,0.109,0.186,0.064,0.302,0.291,0.389,0.133,0.036,0.144,0.171,0.093,0.078,0.113,0.05,0.065,0.018,0.174,0.059,0.178,0.105,0.457,0.029,0.079,0.061,0.067,0.092,0.128,0.076,0.043,0.038,0.06,0.077,0.052,0.146,0.052,0.029,0.094,0.103,0.055,0.112,0.03,0.049,0.08,0.056,0.093,0.05,0.158,0.064,0.099,0.032,0.444,0.082,0.053,0.282,0.056,0.106,0.082,0.097,0.101,0.061,0.082,0.099,0.224,0.24,0.035,0.408,0.393,0.176,0.28,0.044,0.138,0.306,0.028,0.321,0.142,0.295,0.154,0.34,0.017,0.074,0.383,0.357,0.272]},"rowLabels":["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58","59","60","61","62","63","64","65","66","67","68","69","70","71","72","73","74","75","76","77","78","79","80","81","82","83","84","85","86","87","88","89","90","91","92","93","94","95","96","97","98","99","100","101","102","103","104","105","106","107","108","109","110","111","112","113","114","115","116","117","118","119","120","121","122","123","124","125","126","127","128","129","130","131","132","133","134","135","136","137","138","139","140","141","142","143","144","145","146","147","148","149","150","151","152","153","154","155","156"],"categorical":[null,null,null,null,null,null,null],"categoriesRep":"EquallySpacedLines","arrangeMethod":"fromRight","inputColumns":null,"keptColumns":null,"histoVisibility":[true,true,true,true,true,true,true],"invertedAxes":null,"cutoffs":null,"refRowIndex":null,"refColumnDim":null,"rotateTitle":true,"columnLabels":null,"continuousCS":"Viridis","categoricalCS":"Category10","eventInputId":null,"editionMode":"EditionOff","controlWidgets":false,"cssRules":null,"sliderPosition":null},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<ul>
+<li><code>histoVisibility</code>: a logical vector with one element per column. <code>TRUE</code> shows a histogram for that axis; <code>FALSE</code> hides it.</li>
+<li><code>rep(TRUE, ncol(wh))</code> enables histograms for all columns.</li>
+<li>This gives an at-a-glance view of each variable’s distribution alongside the parallel lines.</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="comparing-ggparcoord-vs-parallelplot" class="level2">
+<h2 class="anchored" data-anchor-id="comparing-ggparcoord-vs-parallelplot">Comparing <code>ggparcoord()</code> vs <code>parallelPlot()</code></h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Feature</th>
+<th><code>ggparcoord()</code> (GGally)</th>
+<th><code>parallelPlot()</code> (parallelPlot)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Output type</td>
+<td>Static ggplot2 object</td>
+<td>Interactive HTML widget</td>
+</tr>
+<tr class="even">
+<td>Scaling</td>
+<td>Built-in via <code>scale</code> argument</td>
+<td>Manual pre-processing required</td>
+</tr>
+<tr class="odd">
+<td>Grouping / colour</td>
+<td>Via <code>groupColumn</code></td>
+<td>Via axis click (interactive)</td>
+</tr>
+<tr class="even">
+<td>Boxplots on axes</td>
+<td>Yes (<code>boxplot = TRUE</code>)</td>
+<td>No</td>
+</tr>
+<tr class="odd">
+<td>Faceting</td>
+<td>Yes (via <code>facet_wrap</code>)</td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td>Histograms on axes</td>
+<td>No</td>
+<td>Yes (<code>histoVisibility</code>)</td>
+</tr>
+<tr class="odd">
+<td>Brushing / filtering</td>
+<td>No</td>
+<td>Yes (D3-powered)</td>
+</tr>
+<tr class="even">
+<td>Best for</td>
+<td>Publication figures, faceted comparisons</td>
+<td>Exploratory analysis, interactive dashboards</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="key-takeaways" class="level2">
+<h2 class="anchored" data-anchor-id="key-takeaways">Key Takeaways</h2>
+<ol type="1">
+<li><p><strong>Parallel coordinates are for exploration, not communication.</strong> They excel at revealing multivariate patterns when used interactively but are not suitable for general audiences or executive presentations.</p></li>
+<li><p><strong>Always scale your variables.</strong> Raw values on different ranges make PCPs unreadable. <code>uniminmax</code> in <code>ggparcoord()</code> is the most intuitive choice; it preserves the shape of each variable without assuming normality.</p></li>
+<li><p><strong>Use <code>groupColumn</code> to add colour.</strong> Colouring lines by a categorical variable (e.g., region) is the fastest way to spot group-level patterns in a static PCP.</p></li>
+<li><p><strong><code>facet_wrap()</code> works with <code>ggparcoord()</code></strong> because it returns a ggplot2 object — leverage the full ggplot2 ecosystem for labels, themes, and layout.</p></li>
+<li><p><strong>Fix rotated labels with <code>hjust = 1</code>.</strong> Rotating alone (<code>angle = 30</code>) causes labels to overlap the plot; <code>hjust = 1</code> right-aligns them to the tick mark.</p></li>
+<li><p><strong><code>parallelPlot</code> enables brushing</strong> — clicking an axis variable instantly recolours by value, and selecting a range on any axis filters lines. This makes it far more powerful for interactive discovery.</p></li>
+<li><p><strong>Add histograms</strong> via <code>histoVisibility</code> in <code>parallelPlot</code> to understand marginal distributions without switching to a separate plot.</p></li>
+</ol>
+<hr>
+</section>
+<section id="packages-reference" class="level2">
+<h2 class="anchored" data-anchor-id="packages-reference">Packages Reference</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(GGally, parallelPlot, tidyverse)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Package</th>
+<th>Key Functions</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>GGally</code></td>
+<td><code>ggparcoord()</code></td>
+</tr>
+<tr class="even">
+<td><code>parallelPlot</code></td>
+<td><code>parallelPlot()</code></td>
+</tr>
+<tr class="odd">
+<td><code>ggplot2</code> (via tidyverse)</td>
+<td><code>facet_wrap()</code>, <code>theme()</code>, <code>element_text()</code></td>
+</tr>
+<tr class="even">
+<td><code>readr</code> (via tidyverse)</td>
+<td><code>read_csv()</code></td>
+</tr>
+<tr class="odd">
+<td><code>dplyr</code> (via tidyverse)</td>
+<td><code>select()</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<ul>
+<li>Kam T. S. (2023). <a href="https://r4va.netlify.app/chap15">R for Visual Analytics</a></li>
+<li><a href="http://ggobi.github.io/ggally/reference/ggparcoord.html"><code>ggparcoord()</code> documentation</a> — GGally package</li>
+<li><a href="https://cran.r-project.org/web/packages/parallelPlot/parallelPlot.pdf"><code>parallelPlot</code> CRAN documentation</a></li>
+<li>Stephen Few (2006), <em>Parallel Coordinates: Strengths and Limitations</em> — Perceptual Edge</li>
+</ul>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
