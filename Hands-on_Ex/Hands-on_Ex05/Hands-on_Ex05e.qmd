@@ -9,3 +9,442 @@ execute:
   warning: false
   freeze: true
 ---
+
+## Overview
+
+A **treemap** is a space-filling visualisation that encodes hierarchical data as nested rectangles. Two visual channels are used simultaneously:
+
+- **Rectangle size**: quantitative variable (e.g., total units sold)
+- **Rectangle colour**: a second quantitative variable (e.g., median unit price)
+
+Treemaps are especially effective for displaying part-to-whole relationships across multiple levels of a hierarchy, such as property transactions grouped by region planning area, and then project name.
+
+**This chapter covers three approaches:**
+
+| Approach | Package | Function(s) |
+|---|---|---|
+| Static treemap (full-featured) | `treemap` | `treemap()` |
+| Static treemap (ggplot2-based) | `treemapify` | `geom_treemap()` + ggplot2 |
+| Interactive treemap | `d3treeR` | `d3tree()` |
+
+---
+
+## Installing and Launching R Packages
+
+```{r}
+pacman::p_load(treemap, treemapify, tidyverse)
+```
+
+`d3treeR` is not on CRAN and must be installed from GitHub:
+
+```{r}
+# install.packages("devtools")          # skip if already installed
+library(devtools)
+install_github("timelyportfolio/d3treeR")
+library(d3treeR)
+```
+
+| Package | Role |
+|---|---|
+| `treemap` | Full-featured static treemaps with 43+ arguments |
+| `treemapify` | Treemaps as ggplot2 layers; supports ggplot2 ecosystem |
+| `d3treeR` | Interactive, zoomable treemaps built on D3.js |
+| `tidyverse` | Data import (`readr`) and wrangling (`dplyr`) |
+
+---
+
+## Data Wrangling
+
+The dataset is `realis2018.csv`, private property transaction records from Singapore's Urban Redevelopment Authority (URA) REALIS portal for 2018.
+
+### Importing the data set
+
+```{r}
+realis2018 <- read_csv("data/realis2018.csv")
+```
+
+### Data Wrangling and Manipulation
+
+The raw data is at **transaction level** (one row per transaction), which is too disaggregated for a treemap. We need to aggregate it to **project level**, computing:
+
+- `Total Unit Sold` = sum of units per project
+- `Total Area` = sum of floor area per project
+- `Median Unit Price ($ psm)` = median unit price per project
+- `Median Transacted Price` = median transacted price per project
+
+Grouping variables: `Project Name`, `Planning Region`, `Planning Area`, `Property Type`, `Type of Sale`.
+
+Two `dplyr` verbs do this: `group_by()` and `summarise()`.
+
+### Grouped Summaries without the Pipe
+
+```{r}
+realis2018_grouped <- group_by(realis2018, `Project Name`,
+                               `Planning Region`, `Planning Area`,
+                               `Property Type`, `Type of Sale`)
+
+realis2018_summarised <- summarise(realis2018_grouped,
+                          `Total Unit Sold`          = sum(`No. of Units`, na.rm = TRUE),
+                          `Total Area`               = sum(`Area (sqm)`, na.rm = TRUE),
+                          `Median Unit Price ($ psm)` = median(`Unit Price ($ psm)`, na.rm = TRUE),
+                          `Median Transacted Price`  = median(`Transacted Price ($)`, na.rm = TRUE))
+```
+
+> **Note:** `na.rm = TRUE` is required in all aggregation functions (`sum()`, `median()`) because any `NA` in the input would otherwise propagate to the output, silently producing missing aggregates.
+
+This approach names every intermediate object, which gets unwieldy in longer pipelines.
+
+### Grouped Summaries with the Pipe
+
+The pipe operator `%>%` passes the output of one function directly into the next, eliminating intermediate objects:
+
+```{r}
+realis2018_summarised <- realis2018 %>%
+  group_by(`Project Name`, `Planning Region`,
+           `Planning Area`, `Property Type`,
+           `Type of Sale`) %>%
+  summarise(`Total Unit Sold`           = sum(`No. of Units`, na.rm = TRUE),
+            `Total Area`                = sum(`Area (sqm)`, na.rm = TRUE),
+            `Median Unit Price ($ psm)` = median(`Unit Price ($ psm)`, na.rm = TRUE),
+            `Median Transacted Price`   = median(`Transacted Price ($)`, na.rm = TRUE))
+```
+
+> **Preferred style:** The pipe version is more readable and idiomatic in tidyverse workflows. Both produce identical results.
+
+---
+
+## Designing Treemap with `treemap` Package
+
+`treemap()` is the core function of the **treemap** package, offering 43+ arguments for fine-grained control.
+
+### Designing a Static Treemap
+
+First, filter to the property type of interest:
+
+```{r}
+realis2018_selected <- realis2018_summarised %>%
+  filter(`Property Type` == "Condominium", `Type of Sale` == "Resale")
+```
+
+---
+
+### Using the Basic Arguments
+
+```{r}
+treemap(realis2018_selected,
+        index        = c("Planning Region", "Planning Area", "Project Name"),
+        vSize        = "Total Unit Sold",
+        vColor       = "Median Unit Price ($ psm)",
+        title        = "Resale Condominium by Planning Region and Area, 2017",
+        title.legend = "Median Unit Price (S$ per sq. m)")
+```
+
+**Three core arguments:**
+
+| Argument | Purpose | Rule |
+|---|---|---|
+| `index` | Defines the hierarchy levels | Must have **at least two** column names; first = highest level |
+| `vSize` | Maps rectangle size | Column must contain **non-negative** values only |
+| `vColor` | Maps rectangle colour | Used together with `type` to determine colour encoding |
+
+> **Common mistake:** Without specifying `type`, `treemap()` defaults to `type = "index"`, which colours rectangles by their hierarchy group rather than by the `vColor` variable's actual values. This produces a misleading result where the rectangles are coloured categorically by planning area, not by unit price intensity.
+
+---
+
+### Working with `vColor` and `type` Arguments
+
+Setting `type = "value"` corrects the colour encoding so rectangles reflect the numeric values of `vColor`:
+
+```{r}
+treemap(realis2018_selected,
+        index        = c("Planning Region", "Planning Area", "Project Name"),
+        vSize        = "Total Unit Sold",
+        vColor       = "Median Unit Price ($ psm)",
+        type         = "value",
+        title        = "Resale Condominium by Planning Region and Area, 2017",
+        title.legend = "Median Unit Price (S$ per sq. m)")
+```
+
+- Rectangles now show different intensities of green reflecting median unit prices.
+- The legend is binned into equal-interval bins (e.g., 0–5000, 5000–10000, …).
+
+---
+
+### Colours in `treemap` Package
+
+The `type` argument controls how the `vColor` values are mapped to a colour palette. Two key types:
+
+| `type` | Palette assumption | Colour mapping |
+|---|---|---|
+| `"value"` | Diverging palette (e.g., RdYlBu) | 0 → midpoint colour; ±max(abs) → ends. Treats the palette as centred at zero. |
+| `"manual"` | Any palette | min(values) → left end; max(values) → right end; mean(range) → midpoint. Linear mapping. |
+
+Two relevant arguments work alongside `type`:
+
+- **`palette`**: name of the ColorBrewer (or other) palette to use.
+- **`mapping`**: controls the exact value-to-colour mapping (auto-set by `type`).
+
+---
+
+### The `"value"` Type Treemap
+
+```{r}
+treemap(realis2018_selected,
+        index        = c("Planning Region", "Planning Area", "Project Name"),
+        vSize        = "Total Unit Sold",
+        vColor       = "Median Unit Price ($ psm)",
+        type         = "value",
+        palette      = "RdYlBu",
+        title        = "Resale Condominium by Planning Region and Area, 2017",
+        title.legend = "Median Unit Price (S$ per sq. m)")
+```
+
+> **Why no red?** The "value" type maps 0 to the middle colour and negative values to the red end of RdYlBu. Since all median unit prices are positive, only the yellow-to-blue half of the palette is used, thus no red appears.
+
+> **Legend range:** Displays only the actual data range (e.g., 5,000–45,000) with pretty rounding, not the full palette range.
+
+---
+
+### The `"manual"` Type Treemap
+
+```{r}
+# Avoid: diverging palette with all-positive data is confusing
+treemap(realis2018_selected,
+        index        = c("Planning Region", "Planning Area", "Project Name"),
+        vSize        = "Total Unit Sold",
+        vColor       = "Median Unit Price ($ psm)",
+        type         = "manual",
+        palette      = "RdYlBu",   # problematic for all-positive values
+        title        = "Resale Condominium by Planning Region and Area, 2017",
+        title.legend = "Median Unit Price (S$ per sq. m)")
+```
+
+> **Problem:** With `type = "manual"`, the midpoint colour (yellow in RdYlBu) is placed at `mean(range(values))`, and both red and blue ends appear, creating a confusing impression that some values are negative or below a threshold. Use a **sequential palette** instead when all values are on one side.
+
+```{r}
+# Correct: sequential palette for all-positive data
+treemap(realis2018_selected,
+        index        = c("Planning Region", "Planning Area", "Project Name"),
+        vSize        = "Total Unit Sold",
+        vColor       = "Median Unit Price ($ psm)",
+        type         = "manual",
+        palette      = "Blues",
+        title        = "Resale Condominium by Planning Region and Area, 2017",
+        title.legend = "Median Unit Price (S$ per sq. m)")
+```
+
+> **Palette selection rule:** Use **diverging** palettes (RdYlBu, RdBu) only when data has a meaningful midpoint (e.g., z-scores, change from baseline). Use **sequential** palettes (Blues, Greens, YlOrRd) for all-positive or all-negative data.
+
+---
+
+### Treemap Layout
+
+`treemap()` supports two layout algorithms:
+
+| Algorithm | Reference | Behaviour |
+|---|---|---|
+| `"squarified"` | Bruls et al. (2000) | Optimises aspect ratios (rectangles close to square); **ignores `sortID`** |
+| `"pivotSize"` | Bederson et al. (2002) | Respects `sortID` ordering while maintaining acceptable aspect ratios. **Default.** |
+
+### Working with the `algorithm` Argument
+
+```{r}
+treemap(realis2018_selected,
+        index        = c("Planning Region", "Planning Area", "Project Name"),
+        vSize        = "Total Unit Sold",
+        vColor       = "Median Unit Price ($ psm)",
+        type         = "manual",
+        palette      = "Blues",
+        algorithm    = "squarified",
+        title        = "Resale Condominium by Planning Region and Area, 2017",
+        title.legend = "Median Unit Price (S$ per sq. m)")
+```
+
+### Using `sortID`
+
+`sortID` only takes effect when `algorithm = "pivotSize"`. It determines the order in which rectangles are placed from **top-left to bottom-right**:
+
+```{r}
+treemap(realis2018_selected,
+        index        = c("Planning Region", "Planning Area", "Project Name"),
+        vSize        = "Total Unit Sold",
+        vColor       = "Median Unit Price ($ psm)",
+        type         = "manual",
+        palette      = "Blues",
+        algorithm    = "pivotSize",
+        sortID       = "Median Transacted Price",
+        title        = "Resale Condominium by Planning Region and Area, 2017",
+        title.legend = "Median Unit Price (S$ per sq. m)")
+```
+
+> Use `sortID` to place the most important or highest-value items in the top-left, where the eye naturally lands first.
+
+---
+
+## Designing Treemap using `treemapify` Package
+
+**`treemapify`** integrates treemaps into **ggplot2** using `geom_treemap()` as a layer. This gives access to the full ggplot2 ecosystem, including scales, themes, labels, and more.
+
+### Designing a Basic Treemap
+
+```{r}
+ggplot(data = realis2018_selected,
+       aes(area = `Total Unit Sold`,
+           fill = `Median Unit Price ($ psm)`),
+       layout = "scol",
+       start  = "bottomleft") +
+  geom_treemap() +
+  scale_fill_gradient(low = "light blue", high = "blue")
+```
+
+**Key aesthetics:**
+
+| Aesthetic | Maps to |
+|---|---|
+| `area` | Rectangle size (quantitative, non-negative) |
+| `fill` | Rectangle colour |
+
+- `layout` and `start` control tile arrangement direction.
+- `scale_fill_gradient()` gives direct control over the colour ramp, without the need to choose between `"value"` and `"manual"` types.
+
+---
+
+### Defining Hierarchy
+
+`treemapify` uses `subgroup` and `subgroup2` aesthetics (in `aes()`) to create hierarchical nesting.
+
+**Level 1. Group by Planning Region:**
+
+```{r}
+ggplot(data = realis2018_selected,
+       aes(area     = `Total Unit Sold`,
+           fill     = `Median Unit Price ($ psm)`,
+           subgroup = `Planning Region`),
+       start = "topleft") +
+  geom_treemap()
+```
+
+**Level 2. Group by Planning Region and Planning Area:**
+
+```{r}
+ggplot(data = realis2018_selected,
+       aes(area      = `Total Unit Sold`,
+           fill      = `Median Unit Price ($ psm)`,
+           subgroup  = `Planning Region`,
+           subgroup2 = `Planning Area`)) +
+  geom_treemap()
+```
+
+**Adding boundary lines between hierarchy levels:**
+
+```{r}
+ggplot(data = realis2018_selected,
+       aes(area      = `Total Unit Sold`,
+           fill      = `Median Unit Price ($ psm)`,
+           subgroup  = `Planning Region`,
+           subgroup2 = `Planning Area`)) +
+  geom_treemap() +
+  geom_treemap_subgroup2_border(colour = "gray40", size = 2) +
+  geom_treemap_subgroup_border(colour  = "gray20")
+```
+
+**Border geoms for hierarchy levels:**
+
+| Geom | Draws border around |
+|---|---|
+| `geom_treemap_subgroup_border()` | Level 1 groups (`subgroup`) |
+| `geom_treemap_subgroup2_border()` | Level 2 groups (`subgroup2`) |
+
+> **Tip:** Use darker or thicker borders for higher-level groups (Planning Region) and lighter/thinner borders for lower-level groups (Planning Area) to reinforce the visual hierarchy.
+
+---
+
+## Designing Interactive Treemap using `d3treeR`
+
+`d3treeR` wraps a static `treemap` object in a D3.js-powered interactive widget, adding **drill-down zoom** - clicking a rectangle zooms into that group, revealing its sub-rectangles.
+
+### Designing an Interactive Treemap
+
+The workflow is two steps: build the static treemap, then wrap it with `d3tree()`.
+
+**Step 1 — Build and save the static treemap:**
+
+```{r}
+tm <- treemap(realis2018_summarised,
+              index        = c("Planning Region", "Planning Area"),
+              vSize        = "Total Unit Sold",
+              vColor       = "Median Unit Price ($ psm)",
+              type         = "value",
+              title        = "Private Residential Property Sold, 2017",
+              title.legend = "Median Unit Price (S$ per sq. m)")
+```
+
+- The treemap object `tm` is saved (not just plotted) by assigning it to a variable.
+- Note: `realis2018_summarised` (all property types) is used here, not the filtered `realis2018_selected`.
+
+**Step 2 — Wrap with `d3tree()` for interactivity:**
+
+```{r}
+d3tree(tm, rootname = "Singapore")
+```
+
+- `rootname`: label shown at the top level before any drill-down.
+- **Interaction:** Clicking any rectangle zooms into that group; clicking the breadcrumb trail at the top zooms back out.
+
+> **Key advantage:** `d3treeR` adds drill-down navigation without requiring a different data structure — it reuses the `treemap` object directly.
+
+---
+
+## Comparing the Three Approaches
+
+| Feature | `treemap` | `treemapify` | `d3treeR` |
+|---|---|---|---|
+| Output | Static plot | Static ggplot2 | Interactive HTML widget |
+| Hierarchy levels | Via `index` vector | Via `subgroup` / `subgroup2` | Via `index` (inherited from `treemap`) |
+| Colour type control | `type` argument | `scale_fill_*()` functions | Inherited from `treemap` |
+| Layout algorithms | squarified, pivotSize | Fixed (squarified default) | Inherited from `treemap` |
+| ggplot2 integration | No | Yes (full ecosystem) | No |
+| Drill-down zoom | No | No | Yes |
+| Border control | Limited | `geom_treemap_*_border()` | Limited |
+| Best for | Quick, publication static | Customised ggplot2 figures | Exploratory, interactive |
+
+---
+
+## Key Takeaways
+
+1. **Always specify `type`** in `treemap()`. The default `type = "index"` colours by hierarchy group, not by `vColor` values. 
+
+2. **Match palette type to data.** Use diverging palettes (RdYlBu) only when values span a meaningful zero. For all-positive data (like prices), use sequential palettes (Blues, YlOrRd). Using a diverging palette on one-sided data implies a false midpoint.
+
+3. **`vSize` must be non-negative.** Negative sizes are geometrically undefined for rectangle area, need to check the data before plotting.
+
+4. **`sortID` only works with `algorithm = "pivotSize"`** (the default). If switch to `"squarified"`, sort order is ignored.
+
+5. **`treemapify` is the ggplot2 way.** It's the best choice when you need to combine treemaps with other ggplot2 features, such as faceting, custom themes, additional annotation layers.
+
+6. **`d3treeR` converts any `treemap` object to interactive.** The two-step workflow (build `tm`, then `d3tree(tm)`) means you can prototype statically and interactivise with one extra line.
+
+7. **Hierarchy requires at least two levels** in `treemap()`'s `index`. A single-level index produces a flat (non-nested) treemap with no visible grouping structure.
+
+---
+
+## Packages Reference
+
+```{r}
+# Main packages
+pacman::p_load(treemap, treemapify, tidyverse)
+
+# d3treeR (GitHub only)
+library(devtools)
+install_github("timelyportfolio/d3treeR")
+library(d3treeR)
+```
+
+| Package | Key Functions |
+|---|---|
+| `treemap` | `treemap()` |
+| `treemapify` | `geom_treemap()`, `geom_treemap_subgroup_border()`, `geom_treemap_subgroup2_border()` |
+| `d3treeR` | `d3tree()` |
+| `dplyr` (tidyverse) | `group_by()`, `summarise()`, `filter()` |
+| `readr` (tidyverse) | `read_csv()` |
+| `ggplot2` (tidyverse) | `ggplot()`, `aes()`, `scale_fill_gradient()` |

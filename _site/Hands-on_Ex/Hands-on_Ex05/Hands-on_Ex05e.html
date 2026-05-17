@@ -25,6 +25,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -72,6 +107,16 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<link href="../../site_libs/htmltools-fill-0.5.9/fill.css" rel="stylesheet">
+
+<script src="../../site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+
+<script src="../../site_libs/d3-3.5.5/d3.min.js"></script>
+
+<link href="../../site_libs/d3tree-0.1/d3tree.css" rel="stylesheet">
+
+<script src="../../site_libs/d3tree-binding-0.1/d3tree.js"></script>
+
 
 
 <link rel="stylesheet" href="../../styles.css">
@@ -186,8 +231,46 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#installing-and-launching-r-packages" id="toc-installing-and-launching-r-packages" class="nav-link" data-scroll-target="#installing-and-launching-r-packages">Installing and Launching R Packages</a></li>
+  <li><a href="#data-wrangling" id="toc-data-wrangling" class="nav-link" data-scroll-target="#data-wrangling">Data Wrangling</a>
+  <ul class="collapse">
+  <li><a href="#importing-the-data-set" id="toc-importing-the-data-set" class="nav-link" data-scroll-target="#importing-the-data-set">Importing the data set</a></li>
+  <li><a href="#data-wrangling-and-manipulation" id="toc-data-wrangling-and-manipulation" class="nav-link" data-scroll-target="#data-wrangling-and-manipulation">Data Wrangling and Manipulation</a></li>
+  <li><a href="#grouped-summaries-without-the-pipe" id="toc-grouped-summaries-without-the-pipe" class="nav-link" data-scroll-target="#grouped-summaries-without-the-pipe">Grouped Summaries without the Pipe</a></li>
+  <li><a href="#grouped-summaries-with-the-pipe" id="toc-grouped-summaries-with-the-pipe" class="nav-link" data-scroll-target="#grouped-summaries-with-the-pipe">Grouped Summaries with the Pipe</a></li>
+  </ul></li>
+  <li><a href="#designing-treemap-with-treemap-package" id="toc-designing-treemap-with-treemap-package" class="nav-link" data-scroll-target="#designing-treemap-with-treemap-package">Designing Treemap with <code>treemap</code> Package</a>
+  <ul class="collapse">
+  <li><a href="#designing-a-static-treemap" id="toc-designing-a-static-treemap" class="nav-link" data-scroll-target="#designing-a-static-treemap">Designing a Static Treemap</a></li>
+  <li><a href="#using-the-basic-arguments" id="toc-using-the-basic-arguments" class="nav-link" data-scroll-target="#using-the-basic-arguments">Using the Basic Arguments</a></li>
+  <li><a href="#working-with-vcolor-and-type-arguments" id="toc-working-with-vcolor-and-type-arguments" class="nav-link" data-scroll-target="#working-with-vcolor-and-type-arguments">Working with <code>vColor</code> and <code>type</code> Arguments</a></li>
+  <li><a href="#colours-in-treemap-package" id="toc-colours-in-treemap-package" class="nav-link" data-scroll-target="#colours-in-treemap-package">Colours in <code>treemap</code> Package</a></li>
+  <li><a href="#the-value-type-treemap" id="toc-the-value-type-treemap" class="nav-link" data-scroll-target="#the-value-type-treemap">The <code>"value"</code> Type Treemap</a></li>
+  <li><a href="#the-manual-type-treemap" id="toc-the-manual-type-treemap" class="nav-link" data-scroll-target="#the-manual-type-treemap">The <code>"manual"</code> Type Treemap</a></li>
+  <li><a href="#treemap-layout" id="toc-treemap-layout" class="nav-link" data-scroll-target="#treemap-layout">Treemap Layout</a></li>
+  <li><a href="#working-with-the-algorithm-argument" id="toc-working-with-the-algorithm-argument" class="nav-link" data-scroll-target="#working-with-the-algorithm-argument">Working with the <code>algorithm</code> Argument</a></li>
+  <li><a href="#using-sortid" id="toc-using-sortid" class="nav-link" data-scroll-target="#using-sortid">Using <code>sortID</code></a></li>
+  </ul></li>
+  <li><a href="#designing-treemap-using-treemapify-package" id="toc-designing-treemap-using-treemapify-package" class="nav-link" data-scroll-target="#designing-treemap-using-treemapify-package">Designing Treemap using <code>treemapify</code> Package</a>
+  <ul class="collapse">
+  <li><a href="#designing-a-basic-treemap" id="toc-designing-a-basic-treemap" class="nav-link" data-scroll-target="#designing-a-basic-treemap">Designing a Basic Treemap</a></li>
+  <li><a href="#defining-hierarchy" id="toc-defining-hierarchy" class="nav-link" data-scroll-target="#defining-hierarchy">Defining Hierarchy</a></li>
+  </ul></li>
+  <li><a href="#designing-interactive-treemap-using-d3treer" id="toc-designing-interactive-treemap-using-d3treer" class="nav-link" data-scroll-target="#designing-interactive-treemap-using-d3treer">Designing Interactive Treemap using <code>d3treeR</code></a>
+  <ul class="collapse">
+  <li><a href="#designing-an-interactive-treemap" id="toc-designing-an-interactive-treemap" class="nav-link" data-scroll-target="#designing-an-interactive-treemap">Designing an Interactive Treemap</a></li>
+  </ul></li>
+  <li><a href="#comparing-the-three-approaches" id="toc-comparing-the-three-approaches" class="nav-link" data-scroll-target="#comparing-the-three-approaches">Comparing the Three Approaches</a></li>
+  <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways">Key Takeaways</a></li>
+  <li><a href="#packages-reference" id="toc-packages-reference" class="nav-link" data-scroll-target="#packages-reference">Packages Reference</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -218,7 +301,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">May 14, 2026</p>
+      <p class="date-modified">May 17, 2026</p>
     </div>
   </div>
     
@@ -229,8 +312,733 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p>A <strong>treemap</strong> is a space-filling visualisation that encodes hierarchical data as nested rectangles. Two visual channels are used simultaneously:</p>
+<ul>
+<li><strong>Rectangle size</strong>: quantitative variable (e.g., total units sold)</li>
+<li><strong>Rectangle colour</strong>: a second quantitative variable (e.g., median unit price)</li>
+</ul>
+<p>Treemaps are especially effective for displaying part-to-whole relationships across multiple levels of a hierarchy, such as property transactions grouped by region planning area, and then project name.</p>
+<p><strong>This chapter covers three approaches:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Approach</th>
+<th>Package</th>
+<th>Function(s)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Static treemap (full-featured)</td>
+<td><code>treemap</code></td>
+<td><code>treemap()</code></td>
+</tr>
+<tr class="even">
+<td>Static treemap (ggplot2-based)</td>
+<td><code>treemapify</code></td>
+<td><code>geom_treemap()</code> + ggplot2</td>
+</tr>
+<tr class="odd">
+<td>Interactive treemap</td>
+<td><code>d3treeR</code></td>
+<td><code>d3tree()</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="installing-and-launching-r-packages" class="level2">
+<h2 class="anchored" data-anchor-id="installing-and-launching-r-packages">Installing and Launching R Packages</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(treemap, treemapify, tidyverse)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><code>d3treeR</code> is not on CRAN and must be installed from GitHub:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("devtools")          # skip if already installed</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(devtools)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">install_github</span>(<span class="st">"timelyportfolio/d3treeR"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(d3treeR)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Package</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>treemap</code></td>
+<td>Full-featured static treemaps with 43+ arguments</td>
+</tr>
+<tr class="even">
+<td><code>treemapify</code></td>
+<td>Treemaps as ggplot2 layers; supports ggplot2 ecosystem</td>
+</tr>
+<tr class="odd">
+<td><code>d3treeR</code></td>
+<td>Interactive, zoomable treemaps built on D3.js</td>
+</tr>
+<tr class="even">
+<td><code>tidyverse</code></td>
+<td>Data import (<code>readr</code>) and wrangling (<code>dplyr</code>)</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="data-wrangling" class="level2">
+<h2 class="anchored" data-anchor-id="data-wrangling">Data Wrangling</h2>
+<p>The dataset is <code>realis2018.csv</code>, private property transaction records from Singapore’s Urban Redevelopment Authority (URA) REALIS portal for 2018.</p>
+<section id="importing-the-data-set" class="level3">
+<h3 class="anchored" data-anchor-id="importing-the-data-set">Importing the data set</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>realis2018 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/realis2018.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="data-wrangling-and-manipulation" class="level3">
+<h3 class="anchored" data-anchor-id="data-wrangling-and-manipulation">Data Wrangling and Manipulation</h3>
+<p>The raw data is at <strong>transaction level</strong> (one row per transaction), which is too disaggregated for a treemap. We need to aggregate it to <strong>project level</strong>, computing:</p>
+<ul>
+<li><code>Total Unit Sold</code> = sum of units per project</li>
+<li><code>Total Area</code> = sum of floor area per project</li>
+<li><code>Median Unit Price ($ psm)</code> = median unit price per project</li>
+<li><code>Median Transacted Price</code> = median transacted price per project</li>
+</ul>
+<p>Grouping variables: <code>Project Name</code>, <code>Planning Region</code>, <code>Planning Area</code>, <code>Property Type</code>, <code>Type of Sale</code>.</p>
+<p>Two <code>dplyr</code> verbs do this: <code>group_by()</code> and <code>summarise()</code>.</p>
+</section>
+<section id="grouped-summaries-without-the-pipe" class="level3">
+<h3 class="anchored" data-anchor-id="grouped-summaries-without-the-pipe">Grouped Summaries without the Pipe</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>realis2018_grouped <span class="ot">&lt;-</span> <span class="fu">group_by</span>(realis2018, <span class="st">`</span><span class="at">Project Name</span><span class="st">`</span>,</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                               <span class="st">`</span><span class="at">Planning Region</span><span class="st">`</span>, <span class="st">`</span><span class="at">Planning Area</span><span class="st">`</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                               <span class="st">`</span><span class="at">Property Type</span><span class="st">`</span>, <span class="st">`</span><span class="at">Type of Sale</span><span class="st">`</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>realis2018_summarised <span class="ot">&lt;-</span> <span class="fu">summarise</span>(realis2018_grouped,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>                          <span class="st">`</span><span class="at">Total Unit Sold</span><span class="st">`</span>          <span class="ot">=</span> <span class="fu">sum</span>(<span class="st">`</span><span class="at">No. of Units</span><span class="st">`</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>                          <span class="st">`</span><span class="at">Total Area</span><span class="st">`</span>               <span class="ot">=</span> <span class="fu">sum</span>(<span class="st">`</span><span class="at">Area (sqm)</span><span class="st">`</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>                          <span class="st">`</span><span class="at">Median Unit Price ($ psm)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">median</span>(<span class="st">`</span><span class="at">Unit Price ($ psm)</span><span class="st">`</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>                          <span class="st">`</span><span class="at">Median Transacted Price</span><span class="st">`</span>  <span class="ot">=</span> <span class="fu">median</span>(<span class="st">`</span><span class="at">Transacted Price ($)</span><span class="st">`</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Note:</strong> <code>na.rm = TRUE</code> is required in all aggregation functions (<code>sum()</code>, <code>median()</code>) because any <code>NA</code> in the input would otherwise propagate to the output, silently producing missing aggregates.</p>
+</blockquote>
+<p>This approach names every intermediate object, which gets unwieldy in longer pipelines.</p>
+</section>
+<section id="grouped-summaries-with-the-pipe" class="level3">
+<h3 class="anchored" data-anchor-id="grouped-summaries-with-the-pipe">Grouped Summaries with the Pipe</h3>
+<p>The pipe operator <code>%&gt;%</code> passes the output of one function directly into the next, eliminating intermediate objects:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>realis2018_summarised <span class="ot">&lt;-</span> realis2018 <span class="sc">%&gt;%</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="st">`</span><span class="at">Project Name</span><span class="st">`</span>, <span class="st">`</span><span class="at">Planning Region</span><span class="st">`</span>,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>           <span class="st">`</span><span class="at">Planning Area</span><span class="st">`</span>, <span class="st">`</span><span class="at">Property Type</span><span class="st">`</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>           <span class="st">`</span><span class="at">Type of Sale</span><span class="st">`</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="st">`</span><span class="at">Total Unit Sold</span><span class="st">`</span>           <span class="ot">=</span> <span class="fu">sum</span>(<span class="st">`</span><span class="at">No. of Units</span><span class="st">`</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>            <span class="st">`</span><span class="at">Total Area</span><span class="st">`</span>                <span class="ot">=</span> <span class="fu">sum</span>(<span class="st">`</span><span class="at">Area (sqm)</span><span class="st">`</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>            <span class="st">`</span><span class="at">Median Unit Price ($ psm)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">median</span>(<span class="st">`</span><span class="at">Unit Price ($ psm)</span><span class="st">`</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">`</span><span class="at">Median Transacted Price</span><span class="st">`</span>   <span class="ot">=</span> <span class="fu">median</span>(<span class="st">`</span><span class="at">Transacted Price ($)</span><span class="st">`</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Preferred style:</strong> The pipe version is more readable and idiomatic in tidyverse workflows. Both produce identical results.</p>
+</blockquote>
+<hr>
+</section>
+</section>
+<section id="designing-treemap-with-treemap-package" class="level2">
+<h2 class="anchored" data-anchor-id="designing-treemap-with-treemap-package">Designing Treemap with <code>treemap</code> Package</h2>
+<p><code>treemap()</code> is the core function of the <strong>treemap</strong> package, offering 43+ arguments for fine-grained control.</p>
+<section id="designing-a-static-treemap" class="level3">
+<h3 class="anchored" data-anchor-id="designing-a-static-treemap">Designing a Static Treemap</h3>
+<p>First, filter to the property type of interest:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>realis2018_selected <span class="ot">&lt;-</span> realis2018_summarised <span class="sc">%&gt;%</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="st">`</span><span class="at">Property Type</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"Condominium"</span>, <span class="st">`</span><span class="at">Type of Sale</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"Resale"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+<section id="using-the-basic-arguments" class="level3">
+<h3 class="anchored" data-anchor-id="using-the-basic-arguments">Using the Basic Arguments</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">treemap</span>(realis2018_selected,</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>        <span class="at">index        =</span> <span class="fu">c</span>(<span class="st">"Planning Region"</span>, <span class="st">"Planning Area"</span>, <span class="st">"Project Name"</span>),</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">vSize        =</span> <span class="st">"Total Unit Sold"</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">vColor       =</span> <span class="st">"Median Unit Price ($ psm)"</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">title        =</span> <span class="st">"Resale Condominium by Planning Region and Area, 2017"</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">title.legend =</span> <span class="st">"Median Unit Price (S$ per sq. m)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-on_Ex05e_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Three core arguments:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Argument</th>
+<th>Purpose</th>
+<th>Rule</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>index</code></td>
+<td>Defines the hierarchy levels</td>
+<td>Must have <strong>at least two</strong> column names; first = highest level</td>
+</tr>
+<tr class="even">
+<td><code>vSize</code></td>
+<td>Maps rectangle size</td>
+<td>Column must contain <strong>non-negative</strong> values only</td>
+</tr>
+<tr class="odd">
+<td><code>vColor</code></td>
+<td>Maps rectangle colour</td>
+<td>Used together with <code>type</code> to determine colour encoding</td>
+</tr>
+</tbody>
+</table>
+<blockquote class="blockquote">
+<p><strong>Common mistake:</strong> Without specifying <code>type</code>, <code>treemap()</code> defaults to <code>type = "index"</code>, which colours rectangles by their hierarchy group rather than by the <code>vColor</code> variable’s actual values. This produces a misleading result where the rectangles are coloured categorically by planning area, not by unit price intensity.</p>
+</blockquote>
+<hr>
+</section>
+<section id="working-with-vcolor-and-type-arguments" class="level3">
+<h3 class="anchored" data-anchor-id="working-with-vcolor-and-type-arguments">Working with <code>vColor</code> and <code>type</code> Arguments</h3>
+<p>Setting <code>type = "value"</code> corrects the colour encoding so rectangles reflect the numeric values of <code>vColor</code>:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">treemap</span>(realis2018_selected,</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>        <span class="at">index        =</span> <span class="fu">c</span>(<span class="st">"Planning Region"</span>, <span class="st">"Planning Area"</span>, <span class="st">"Project Name"</span>),</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">vSize        =</span> <span class="st">"Total Unit Sold"</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">vColor       =</span> <span class="st">"Median Unit Price ($ psm)"</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">type         =</span> <span class="st">"value"</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">title        =</span> <span class="st">"Resale Condominium by Planning Region and Area, 2017"</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">title.legend =</span> <span class="st">"Median Unit Price (S$ per sq. m)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-on_Ex05e_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>Rectangles now show different intensities of green reflecting median unit prices.</li>
+<li>The legend is binned into equal-interval bins (e.g., 0–5000, 5000–10000, …).</li>
+</ul>
+<hr>
+</section>
+<section id="colours-in-treemap-package" class="level3">
+<h3 class="anchored" data-anchor-id="colours-in-treemap-package">Colours in <code>treemap</code> Package</h3>
+<p>The <code>type</code> argument controls how the <code>vColor</code> values are mapped to a colour palette. Two key types:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th><code>type</code></th>
+<th>Palette assumption</th>
+<th>Colour mapping</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>"value"</code></td>
+<td>Diverging palette (e.g., RdYlBu)</td>
+<td>0 → midpoint colour; ±max(abs) → ends. Treats the palette as centred at zero.</td>
+</tr>
+<tr class="even">
+<td><code>"manual"</code></td>
+<td>Any palette</td>
+<td>min(values) → left end; max(values) → right end; mean(range) → midpoint. Linear mapping.</td>
+</tr>
+</tbody>
+</table>
+<p>Two relevant arguments work alongside <code>type</code>:</p>
+<ul>
+<li><strong><code>palette</code></strong>: name of the ColorBrewer (or other) palette to use.</li>
+<li><strong><code>mapping</code></strong>: controls the exact value-to-colour mapping (auto-set by <code>type</code>).</li>
+</ul>
+<hr>
+</section>
+<section id="the-value-type-treemap" class="level3">
+<h3 class="anchored" data-anchor-id="the-value-type-treemap">The <code>"value"</code> Type Treemap</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">treemap</span>(realis2018_selected,</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>        <span class="at">index        =</span> <span class="fu">c</span>(<span class="st">"Planning Region"</span>, <span class="st">"Planning Area"</span>, <span class="st">"Project Name"</span>),</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">vSize        =</span> <span class="st">"Total Unit Sold"</span>,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">vColor       =</span> <span class="st">"Median Unit Price ($ psm)"</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">type         =</span> <span class="st">"value"</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">palette      =</span> <span class="st">"RdYlBu"</span>,</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">title        =</span> <span class="st">"Resale Condominium by Planning Region and Area, 2017"</span>,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">title.legend =</span> <span class="st">"Median Unit Price (S$ per sq. m)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-on_Ex05e_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Why no red?</strong> The “value” type maps 0 to the middle colour and negative values to the red end of RdYlBu. Since all median unit prices are positive, only the yellow-to-blue half of the palette is used, thus no red appears.</p>
+</blockquote>
+<blockquote class="blockquote">
+<p><strong>Legend range:</strong> Displays only the actual data range (e.g., 5,000–45,000) with pretty rounding, not the full palette range.</p>
+</blockquote>
+<hr>
+</section>
+<section id="the-manual-type-treemap" class="level3">
+<h3 class="anchored" data-anchor-id="the-manual-type-treemap">The <code>"manual"</code> Type Treemap</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Avoid: diverging palette with all-positive data is confusing</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">treemap</span>(realis2018_selected,</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">index        =</span> <span class="fu">c</span>(<span class="st">"Planning Region"</span>, <span class="st">"Planning Area"</span>, <span class="st">"Project Name"</span>),</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">vSize        =</span> <span class="st">"Total Unit Sold"</span>,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">vColor       =</span> <span class="st">"Median Unit Price ($ psm)"</span>,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">type         =</span> <span class="st">"manual"</span>,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">palette      =</span> <span class="st">"RdYlBu"</span>,   <span class="co"># problematic for all-positive values</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">title        =</span> <span class="st">"Resale Condominium by Planning Region and Area, 2017"</span>,</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">title.legend =</span> <span class="st">"Median Unit Price (S$ per sq. m)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-on_Ex05e_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Problem:</strong> With <code>type = "manual"</code>, the midpoint colour (yellow in RdYlBu) is placed at <code>mean(range(values))</code>, and both red and blue ends appear, creating a confusing impression that some values are negative or below a threshold. Use a <strong>sequential palette</strong> instead when all values are on one side.</p>
+</blockquote>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Correct: sequential palette for all-positive data</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">treemap</span>(realis2018_selected,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">index        =</span> <span class="fu">c</span>(<span class="st">"Planning Region"</span>, <span class="st">"Planning Area"</span>, <span class="st">"Project Name"</span>),</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">vSize        =</span> <span class="st">"Total Unit Sold"</span>,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">vColor       =</span> <span class="st">"Median Unit Price ($ psm)"</span>,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">type         =</span> <span class="st">"manual"</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">palette      =</span> <span class="st">"Blues"</span>,</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">title        =</span> <span class="st">"Resale Condominium by Planning Region and Area, 2017"</span>,</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">title.legend =</span> <span class="st">"Median Unit Price (S$ per sq. m)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-on_Ex05e_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Palette selection rule:</strong> Use <strong>diverging</strong> palettes (RdYlBu, RdBu) only when data has a meaningful midpoint (e.g., z-scores, change from baseline). Use <strong>sequential</strong> palettes (Blues, Greens, YlOrRd) for all-positive or all-negative data.</p>
+</blockquote>
+<hr>
+</section>
+<section id="treemap-layout" class="level3">
+<h3 class="anchored" data-anchor-id="treemap-layout">Treemap Layout</h3>
+<p><code>treemap()</code> supports two layout algorithms:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Algorithm</th>
+<th>Reference</th>
+<th>Behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>"squarified"</code></td>
+<td>Bruls et al.&nbsp;(2000)</td>
+<td>Optimises aspect ratios (rectangles close to square); <strong>ignores <code>sortID</code></strong></td>
+</tr>
+<tr class="even">
+<td><code>"pivotSize"</code></td>
+<td>Bederson et al.&nbsp;(2002)</td>
+<td>Respects <code>sortID</code> ordering while maintaining acceptable aspect ratios. <strong>Default.</strong></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="working-with-the-algorithm-argument" class="level3">
+<h3 class="anchored" data-anchor-id="working-with-the-algorithm-argument">Working with the <code>algorithm</code> Argument</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">treemap</span>(realis2018_selected,</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>        <span class="at">index        =</span> <span class="fu">c</span>(<span class="st">"Planning Region"</span>, <span class="st">"Planning Area"</span>, <span class="st">"Project Name"</span>),</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">vSize        =</span> <span class="st">"Total Unit Sold"</span>,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">vColor       =</span> <span class="st">"Median Unit Price ($ psm)"</span>,</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">type         =</span> <span class="st">"manual"</span>,</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">palette      =</span> <span class="st">"Blues"</span>,</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">algorithm    =</span> <span class="st">"squarified"</span>,</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">title        =</span> <span class="st">"Resale Condominium by Planning Region and Area, 2017"</span>,</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">title.legend =</span> <span class="st">"Median Unit Price (S$ per sq. m)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-on_Ex05e_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="using-sortid" class="level3">
+<h3 class="anchored" data-anchor-id="using-sortid">Using <code>sortID</code></h3>
+<p><code>sortID</code> only takes effect when <code>algorithm = "pivotSize"</code>. It determines the order in which rectangles are placed from <strong>top-left to bottom-right</strong>:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">treemap</span>(realis2018_selected,</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>        <span class="at">index        =</span> <span class="fu">c</span>(<span class="st">"Planning Region"</span>, <span class="st">"Planning Area"</span>, <span class="st">"Project Name"</span>),</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">vSize        =</span> <span class="st">"Total Unit Sold"</span>,</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">vColor       =</span> <span class="st">"Median Unit Price ($ psm)"</span>,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">type         =</span> <span class="st">"manual"</span>,</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">palette      =</span> <span class="st">"Blues"</span>,</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">algorithm    =</span> <span class="st">"pivotSize"</span>,</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">sortID       =</span> <span class="st">"Median Transacted Price"</span>,</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">title        =</span> <span class="st">"Resale Condominium by Planning Region and Area, 2017"</span>,</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">title.legend =</span> <span class="st">"Median Unit Price (S$ per sq. m)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-on_Ex05e_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<blockquote class="blockquote">
+<p>Use <code>sortID</code> to place the most important or highest-value items in the top-left, where the eye naturally lands first.</p>
+</blockquote>
+<hr>
+</section>
+</section>
+<section id="designing-treemap-using-treemapify-package" class="level2">
+<h2 class="anchored" data-anchor-id="designing-treemap-using-treemapify-package">Designing Treemap using <code>treemapify</code> Package</h2>
+<p><strong><code>treemapify</code></strong> integrates treemaps into <strong>ggplot2</strong> using <code>geom_treemap()</code> as a layer. This gives access to the full ggplot2 ecosystem, including scales, themes, labels, and more.</p>
+<section id="designing-a-basic-treemap" class="level3">
+<h3 class="anchored" data-anchor-id="designing-a-basic-treemap">Designing a Basic Treemap</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> realis2018_selected,</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">area =</span> <span class="st">`</span><span class="at">Total Unit Sold</span><span class="st">`</span>,</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">fill =</span> <span class="st">`</span><span class="at">Median Unit Price ($ psm)</span><span class="st">`</span>),</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">layout =</span> <span class="st">"scol"</span>,</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">start  =</span> <span class="st">"bottomleft"</span>) <span class="sc">+</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_treemap</span>() <span class="sc">+</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient</span>(<span class="at">low =</span> <span class="st">"light blue"</span>, <span class="at">high =</span> <span class="st">"blue"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-on_Ex05e_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Key aesthetics:</strong></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Aesthetic</th>
+<th>Maps to</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>area</code></td>
+<td>Rectangle size (quantitative, non-negative)</td>
+</tr>
+<tr class="even">
+<td><code>fill</code></td>
+<td>Rectangle colour</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><code>layout</code> and <code>start</code> control tile arrangement direction.</li>
+<li><code>scale_fill_gradient()</code> gives direct control over the colour ramp, without the need to choose between <code>"value"</code> and <code>"manual"</code> types.</li>
+</ul>
+<hr>
+</section>
+<section id="defining-hierarchy" class="level3">
+<h3 class="anchored" data-anchor-id="defining-hierarchy">Defining Hierarchy</h3>
+<p><code>treemapify</code> uses <code>subgroup</code> and <code>subgroup2</code> aesthetics (in <code>aes()</code>) to create hierarchical nesting.</p>
+<p><strong>Level 1. Group by Planning Region:</strong></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> realis2018_selected,</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">area     =</span> <span class="st">`</span><span class="at">Total Unit Sold</span><span class="st">`</span>,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">fill     =</span> <span class="st">`</span><span class="at">Median Unit Price ($ psm)</span><span class="st">`</span>,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">subgroup =</span> <span class="st">`</span><span class="at">Planning Region</span><span class="st">`</span>),</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">start =</span> <span class="st">"topleft"</span>) <span class="sc">+</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_treemap</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-on_Ex05e_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Level 2. Group by Planning Region and Planning Area:</strong></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> realis2018_selected,</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">area      =</span> <span class="st">`</span><span class="at">Total Unit Sold</span><span class="st">`</span>,</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">fill      =</span> <span class="st">`</span><span class="at">Median Unit Price ($ psm)</span><span class="st">`</span>,</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">subgroup  =</span> <span class="st">`</span><span class="at">Planning Region</span><span class="st">`</span>,</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>           <span class="at">subgroup2 =</span> <span class="st">`</span><span class="at">Planning Area</span><span class="st">`</span>)) <span class="sc">+</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_treemap</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-on_Ex05e_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Adding boundary lines between hierarchy levels:</strong></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> realis2018_selected,</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">area      =</span> <span class="st">`</span><span class="at">Total Unit Sold</span><span class="st">`</span>,</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">fill      =</span> <span class="st">`</span><span class="at">Median Unit Price ($ psm)</span><span class="st">`</span>,</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">subgroup  =</span> <span class="st">`</span><span class="at">Planning Region</span><span class="st">`</span>,</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>           <span class="at">subgroup2 =</span> <span class="st">`</span><span class="at">Planning Area</span><span class="st">`</span>)) <span class="sc">+</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_treemap</span>() <span class="sc">+</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_treemap_subgroup2_border</span>(<span class="at">colour =</span> <span class="st">"gray40"</span>, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_treemap_subgroup_border</span>(<span class="at">colour  =</span> <span class="st">"gray20"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-on_Ex05e_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Border geoms for hierarchy levels:</strong></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Geom</th>
+<th>Draws border around</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>geom_treemap_subgroup_border()</code></td>
+<td>Level 1 groups (<code>subgroup</code>)</td>
+</tr>
+<tr class="even">
+<td><code>geom_treemap_subgroup2_border()</code></td>
+<td>Level 2 groups (<code>subgroup2</code>)</td>
+</tr>
+</tbody>
+</table>
+<blockquote class="blockquote">
+<p><strong>Tip:</strong> Use darker or thicker borders for higher-level groups (Planning Region) and lighter/thinner borders for lower-level groups (Planning Area) to reinforce the visual hierarchy.</p>
+</blockquote>
+<hr>
+</section>
+</section>
+<section id="designing-interactive-treemap-using-d3treer" class="level2">
+<h2 class="anchored" data-anchor-id="designing-interactive-treemap-using-d3treer">Designing Interactive Treemap using <code>d3treeR</code></h2>
+<p><code>d3treeR</code> wraps a static <code>treemap</code> object in a D3.js-powered interactive widget, adding <strong>drill-down zoom</strong> - clicking a rectangle zooms into that group, revealing its sub-rectangles.</p>
+<section id="designing-an-interactive-treemap" class="level3">
+<h3 class="anchored" data-anchor-id="designing-an-interactive-treemap">Designing an Interactive Treemap</h3>
+<p>The workflow is two steps: build the static treemap, then wrap it with <code>d3tree()</code>.</p>
+<p><strong>Step 1 — Build and save the static treemap:</strong></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>tm <span class="ot">&lt;-</span> <span class="fu">treemap</span>(realis2018_summarised,</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>              <span class="at">index        =</span> <span class="fu">c</span>(<span class="st">"Planning Region"</span>, <span class="st">"Planning Area"</span>),</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">vSize        =</span> <span class="st">"Total Unit Sold"</span>,</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">vColor       =</span> <span class="st">"Median Unit Price ($ psm)"</span>,</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>              <span class="at">type         =</span> <span class="st">"value"</span>,</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>              <span class="at">title        =</span> <span class="st">"Private Residential Property Sold, 2017"</span>,</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">title.legend =</span> <span class="st">"Median Unit Price (S$ per sq. m)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-on_Ex05e_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>The treemap object <code>tm</code> is saved (not just plotted) by assigning it to a variable.</li>
+<li>Note: <code>realis2018_summarised</code> (all property types) is used here, not the filtered <code>realis2018_selected</code>.</li>
+</ul>
+<p><strong>Step 2 — Wrap with <code>d3tree()</code> for interactivity:</strong></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">d3tree</span>(tm, <span class="at">rootname =</span> <span class="st">"Singapore"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div class="d3tree html-widget html-fill-item" id="htmlwidget-92a07000ff08df35725a" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-92a07000ff08df35725a">{"x":{"data":{"name":"Singapore","id":1,"size":null,"children":[{"name":"Central Region","color":"#006837","h":1,"id":2,"size":10825,"stdErr":10825,"vColor":20978846.5,"vColorValue":20978846.5,"vSize":10825,"w":0.4664942900237018,"x0":0,"y0":0,"children":[{"name":"Bishan","color":"#D9EF8B","h":0.2165611047442029,"id":3,"size":698,"stdErr":698,"vColor":749211.5,"vColorValue":749211.5,"vSize":698,"w":0.1388971682283426,"x0":0.3275971217953593,"y0":0.3973880869417094},{"name":"Bukit Merah","color":"#DCF090","h":0.2165611047442029,"id":4,"size":708,"stdErr":708,"vColor":689448,"vColorValue":689448,"vSize":708,"w":0.1408870990052529,"x0":0.1867100227901064,"y0":0.3973880869417094},{"name":"Bukit Timah","color":"#219B51","h":0.2702761291218809,"id":5,"size":1171,"stdErr":1171,"vColor":2823552.5,"vColorValue":2823552.5,"vSize":1171,"w":0.1867100227901064,"x0":0,"y0":0.3436730625640314},{"name":"Downtown Core","color":"#E0F295","h":0.225794694775928,"id":6,"size":439,"stdErr":439,"vColor":570894,"vColorValue":570894,"vSize":439,"w":0.08378556716830476,"x0":0.3035036878329677,"y0":0.1715933921657813},{"name":"Geylang","color":"#66BD63","h":0.3860508083140878,"id":7,"size":1489,"stdErr":1489,"vColor":2140814.5,"vColorValue":2140814.5,"vSize":1489,"w":0.1662144048445302,"x0":0,"y0":0.6139491916859122},{"name":"Kallang","color":"#A6D96A","h":0.1747216308670059,"id":8,"size":757,"stdErr":757,"vColor":1415268,"vColorValue":1415268,"vSize":757,"w":0.1867100227901064,"x0":0,"y0":0.1689514316970255},{"name":"Marine Parade","color":"#ABDB6D","h":0.1807986653680943,"id":9,"size":490,"stdErr":490,"vColor":1397529.5,"vColorValue":1397529.5,"vSize":490,"w":0.1167936650428614,"x0":0.1867100227901064,"y0":0},{"name":"Museum","color":"#FBFDB9","h":0.0351116940585223,"id":10,"size":28,"stdErr":28,"vColor":135893,"vColorValue":135893,"vSize":28,"w":0.03436565888114059,"x0":0.4321286311425612,"y0":0.02884174869092903},{"name":"Newton","color":"#B0DD70","h":0.1715933921657813,"id":11,"size":268,"stdErr":268,"vColor":1306816,"vColorValue":1306816,"vSize":268,"w":0.06730582648246029,"x0":0.3035036878329677,"y0":0},{"name":"Novena","color":"#40AA59","h":0.1689514316970255,"id":12,"size":732,"stdErr":732,"vColor":2483944.5,"vColorValue":2483944.5,"vSize":732,"w":0.1867100227901064,"x0":0,"y0":0},{"name":"Orchard","color":"#F3FAAF","h":0.06395344274945129,"id":13,"size":42,"stdErr":42,"vColor":251834.5,"vColorValue":251834.5,"vSize":42,"w":0.02830113084329224,"x0":0.403827500299269,"y0":0},{"name":"Outram","color":"#FBFDB9","h":0.02884174869092899,"id":14,"size":23,"stdErr":23,"vColor":130671,"vColorValue":130671,"vSize":23,"w":0.03436565888114063,"x0":0.4321286311425612,"y0":0},{"name":"Queenstown","color":"#C9E881","h":0.3860508083140878,"id":15,"size":1432,"stdErr":1432,"vColor":953979.5,"vColorValue":953979.5,"vSize":1432,"w":0.1598515968686147,"x0":0.1662144048445302,"y0":0.6139491916859122},{"name":"River Valley","color":"#72C264","h":0.216589421573615,"id":16,"size":587,"stdErr":587,"vColor":1998014,"vColorValue":1998014,"vSize":587,"w":0.1167936650428614,"x0":0.1867100227901064,"y0":0.1807986653680943},{"name":"Rochor","color":"#E4F39A","h":0.1076399494163301,"id":17,"size":132,"stdErr":132,"vColor":520971,"vColorValue":520971,"vSize":132,"w":0.05284682173009263,"x0":0.3708095143154281,"y0":0.06395344274945132},{"name":"Singapore River","color":"#ECF7A4","h":0.10763994941633,"id":18,"size":107,"stdErr":107,"vColor":378001,"vColorValue":378001,"vSize":107,"w":0.04283795397818115,"x0":0.4236563360455207,"y0":0.06395344274945133},{"name":"Southern Islands","color":"#F7FBB4","h":0.06395344274945129,"id":19,"size":49,"stdErr":49,"vColor":173903,"vColorValue":173903,"vSize":49,"w":0.03301798598384095,"x0":0.3708095143154281,"y0":0},{"name":"Tanglin","color":"#66BD63","h":0.225794694775928,"id":20,"size":415,"stdErr":415,"vColor":2187332,"vColorValue":2187332,"vSize":415,"w":0.07920503502242932,"x0":0.3872892550012725,"y0":0.1715933921657814},{"name":"Toa Payoh","color":"#DCF090","h":0.3860508083140878,"id":21,"size":1258,"stdErr":1258,"vColor":670769,"vColorValue":670769,"vSize":1258,"w":0.1404282883105568,"x0":0.326066001713145,"y0":0.6139491916859122}]},{"name":"East Region","color":"#006837","h":0.6954765751211631,"id":22,"size":3775,"stdErr":3775,"vColor":4616987.5,"vColorValue":4616987.5,"vSize":3775,"w":0.2339122015285163,"x0":0.7660877984714837,"y0":0.3045234248788369,"children":[{"name":"Bedok","color":"#006837","h":0.3334602916474981,"id":23,"size":1810,"stdErr":1810,"vColor":3529868.5,"vColorValue":3529868.5,"vSize":1810,"w":0.2339122015285163,"x0":0.7660877984714837,"y0":0.666539708352502},{"name":"Changi","color":"#FFFFBF","h":0.001895373211904017,"id":24,"size":5,"stdErr":5,"vColor":20564,"vColorValue":20564,"vSize":5,"w":0.113682520335742,"x0":0.886317479664258,"y0":0.3045234248788369},{"name":"Pasir Ris","color":"#DCF090","h":0.360120910261761,"id":25,"size":950,"stdErr":950,"vColor":669171,"vColorValue":669171,"vSize":950,"w":0.113682520335742,"x0":0.886317479664258,"y0":0.306418798090741},{"name":"Tampines","color":"#ECF7A4","h":0.362016283473665,"id":26,"size":1010,"stdErr":1010,"vColor":397384,"vColorValue":397384,"vSize":1010,"w":0.1202296811927743,"x0":0.7660877984714837,"y0":0.304523424878837}]},{"name":"North East Region","color":"#006837","h":0.6954765751211631,"id":27,"size":4835,"stdErr":4835,"vColor":4208661,"vColorValue":4208661,"vSize":4835,"w":0.2995935084477819,"x0":0.4664942900237018,"y0":0.3045234248788369,"children":[{"name":"Ang Mo Kio","color":"#DCF090","h":0.1240051577145652,"id":28,"size":316,"stdErr":316,"vColor":640722.5,"vColorValue":640722.5,"vSize":316,"w":0.1098160354391928,"x0":0.656271763032291,"y0":0.427351318437884},{"name":"Hougang","color":"#99D368","h":0.4486435238475507,"id":29,"size":1875,"stdErr":1875,"vColor":1617014.5,"vColorValue":1617014.5,"vSize":1875,"w":0.1801019007180478,"x0":0.4664942900237018,"y0":0.5513564761524492},{"name":"Punggol","color":"#FBFDB9","h":0.1228278935590471,"id":30,"size":313,"stdErr":313,"vColor":126110,"vColorValue":126110,"vSize":313,"w":0.1098160354391928,"x0":0.656271763032291,"y0":0.3045234248788369},{"name":"Sengkang","color":"#EFF8AA","h":0.4486435238475507,"id":31,"size":1244,"stdErr":1244,"vColor":348343.5,"vColorValue":348343.5,"vSize":1244,"w":0.1194916077297341,"x0":0.6465961907417496,"y0":0.5513564761524492},{"name":"Serangoon","color":"#A6D96A","h":0.2468330512736124,"id":32,"size":1087,"stdErr":1087,"vColor":1476470.5,"vColorValue":1476470.5,"vSize":1087,"w":0.1897774730085891,"x0":0.4664942900237018,"y0":0.3045234248788368}]},{"name":"North Region","color":"#CEEA84","h":0.3045234248788368,"id":33,"size":1117,"stdErr":1117,"vColor":866745,"vColorValue":866745,"vSize":1117,"w":0.1580705246799801,"x0":0.8419294753200199,"y0":0,"children":[{"name":"Mandai","color":"#FFFFBF","h":0.02952717240970038,"id":34,"size":29,"stdErr":29,"vColor":62025,"vColorValue":62025,"vSize":29,"w":0.04232476595303115,"x0":0.9503778606067911,"y0":0},{"name":"Sembawang","color":"#F3FAAF","h":0.1968360902081649,"id":35,"size":286,"stdErr":286,"vColor":244075,"vColorValue":244075,"vSize":286,"w":0.06261519398680651,"x0":0.9373848060131935,"y0":0.1076873346706719},{"name":"Sungei Kadut","color":"#FFFFBF","h":0.02952717240970027,"id":36,"size":5,"stdErr":5,"vColor":24359,"vColorValue":24359,"vSize":5,"w":0.007297373440177785,"x0":0.9927026265598221,"y0":0},{"name":"Woodlands","color":"#F7FBB4","h":0.1076873346706719,"id":37,"size":271,"stdErr":271,"vColor":164195,"vColorValue":164195,"vSize":271,"w":0.1084483852867712,"x0":0.8419294753200199,"y0":0},{"name":"Yishun","color":"#EFF8AA","h":0.1968360902081649,"id":38,"size":436,"stdErr":436,"vColor":313496,"vColorValue":313496,"vSize":436,"w":0.09545533069317358,"x0":0.8419294753200199,"y0":0.1076873346706719},{"name":"YISHUN","color":"#FFFFBF","h":0.07816016226097153,"id":39,"size":90,"stdErr":90,"vColor":58595,"vColorValue":58595,"vSize":90,"w":0.04962213939320893,"x0":0.9503778606067911,"y0":0.02952717240970034}]},{"name":"West Region","color":"#79C565","h":0.3045234248788369,"id":40,"size":2653,"stdErr":2653,"vColor":1919890.5,"vColorValue":1919890.5,"vSize":2653,"w":0.3754351852963181,"x0":0.4664942900237018,"y0":0,"children":[{"name":"Bukit Batok","color":"#E0F295","h":0.2045358948206935,"id":41,"size":583,"stdErr":583,"vColor":618812.5,"vColorValue":618812.5,"vSize":583,"w":0.1228336754003785,"x0":0.6316404872497866,"y0":0.09998753005814345},{"name":"Bukit Panjang","color":"#ECF7A4","h":0.09998753005814345,"id":42,"size":285,"stdErr":285,"vColor":374543.5,"vColorValue":374543.5,"vSize":285,"w":0.1228336754003785,"x0":0.6316404872497866,"y0":0},{"name":"Choa Chu Kang","color":"#FBFDB9","h":0.1320587020510166,"id":43,"size":268,"stdErr":268,"vColor":125114,"vColorValue":125114,"vSize":268,"w":0.08745531266985472,"x0":0.7544741626501652,"y0":0.03498570091650066},{"name":"Clementi","color":"#E4F39A","h":0.3045234248788369,"id":44,"size":1167,"stdErr":1167,"vColor":531398.5,"vColorValue":531398.5,"vSize":1167,"w":0.1651461972260849,"x0":0.4664942900237018,"y0":0},{"name":"Jurong East","color":"#FFFFBF","h":0.03498570091650072,"id":45,"size":71,"stdErr":71,"vColor":65122,"vColorValue":65122,"vSize":71,"w":0.08745531266985475,"x0":0.7544741626501652,"y0":0},{"name":"Jurong West","color":"#F7FBB4","h":0.1374790219113196,"id":46,"size":279,"stdErr":279,"vColor":204900,"vColorValue":204900,"vSize":279,"w":0.08745531266985472,"x0":0.7544741626501652,"y0":0.1670444029675173}]}]},"meta":{"type":"value","vSize":"Total Unit Sold","vColor":"Median Unit Price ($ psm)","stdErr":"Total Unit Sold","algorithm":"pivotSize","vpCoorX":[0.02812148481439815,0.9718785151856019],"vpCoorY":[0.1716850393700787,0.9103149606299213],"aspRatio":1.788798157900348,"range":[0,3500000],"mapping":[null,null,null],"draw":true},"options":{"id":"id","celltext":"name","valueField":"size"}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<ul>
+<li><code>rootname</code>: label shown at the top level before any drill-down.</li>
+<li><strong>Interaction:</strong> Clicking any rectangle zooms into that group; clicking the breadcrumb trail at the top zooms back out.</li>
+</ul>
+<blockquote class="blockquote">
+<p><strong>Key advantage:</strong> <code>d3treeR</code> adds drill-down navigation without requiring a different data structure — it reuses the <code>treemap</code> object directly.</p>
+</blockquote>
+<hr>
+</section>
+</section>
+<section id="comparing-the-three-approaches" class="level2">
+<h2 class="anchored" data-anchor-id="comparing-the-three-approaches">Comparing the Three Approaches</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Feature</th>
+<th><code>treemap</code></th>
+<th><code>treemapify</code></th>
+<th><code>d3treeR</code></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Output</td>
+<td>Static plot</td>
+<td>Static ggplot2</td>
+<td>Interactive HTML widget</td>
+</tr>
+<tr class="even">
+<td>Hierarchy levels</td>
+<td>Via <code>index</code> vector</td>
+<td>Via <code>subgroup</code> / <code>subgroup2</code></td>
+<td>Via <code>index</code> (inherited from <code>treemap</code>)</td>
+</tr>
+<tr class="odd">
+<td>Colour type control</td>
+<td><code>type</code> argument</td>
+<td><code>scale_fill_*()</code> functions</td>
+<td>Inherited from <code>treemap</code></td>
+</tr>
+<tr class="even">
+<td>Layout algorithms</td>
+<td>squarified, pivotSize</td>
+<td>Fixed (squarified default)</td>
+<td>Inherited from <code>treemap</code></td>
+</tr>
+<tr class="odd">
+<td>ggplot2 integration</td>
+<td>No</td>
+<td>Yes (full ecosystem)</td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td>Drill-down zoom</td>
+<td>No</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr class="odd">
+<td>Border control</td>
+<td>Limited</td>
+<td><code>geom_treemap_*_border()</code></td>
+<td>Limited</td>
+</tr>
+<tr class="even">
+<td>Best for</td>
+<td>Quick, publication static</td>
+<td>Customised ggplot2 figures</td>
+<td>Exploratory, interactive</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="key-takeaways" class="level2">
+<h2 class="anchored" data-anchor-id="key-takeaways">Key Takeaways</h2>
+<ol type="1">
+<li><p><strong>Always specify <code>type</code></strong> in <code>treemap()</code>. The default <code>type = "index"</code> colours by hierarchy group, not by <code>vColor</code> values.</p></li>
+<li><p><strong>Match palette type to data.</strong> Use diverging palettes (RdYlBu) only when values span a meaningful zero. For all-positive data (like prices), use sequential palettes (Blues, YlOrRd). Using a diverging palette on one-sided data implies a false midpoint.</p></li>
+<li><p><strong><code>vSize</code> must be non-negative.</strong> Negative sizes are geometrically undefined for rectangle area, need to check the data before plotting.</p></li>
+<li><p><strong><code>sortID</code> only works with <code>algorithm = "pivotSize"</code></strong> (the default). If switch to <code>"squarified"</code>, sort order is ignored.</p></li>
+<li><p><strong><code>treemapify</code> is the ggplot2 way.</strong> It’s the best choice when you need to combine treemaps with other ggplot2 features, such as faceting, custom themes, additional annotation layers.</p></li>
+<li><p><strong><code>d3treeR</code> converts any <code>treemap</code> object to interactive.</strong> The two-step workflow (build <code>tm</code>, then <code>d3tree(tm)</code>) means you can prototype statically and interactivise with one extra line.</p></li>
+<li><p><strong>Hierarchy requires at least two levels</strong> in <code>treemap()</code>’s <code>index</code>. A single-level index produces a flat (non-nested) treemap with no visible grouping structure.</p></li>
+</ol>
+<hr>
+</section>
+<section id="packages-reference" class="level2">
+<h2 class="anchored" data-anchor-id="packages-reference">Packages Reference</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Main packages</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(treemap, treemapify, tidyverse)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co"># d3treeR (GitHub only)</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(devtools)</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="fu">install_github</span>(<span class="st">"timelyportfolio/d3treeR"</span>)</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(d3treeR)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Package</th>
+<th>Key Functions</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>treemap</code></td>
+<td><code>treemap()</code></td>
+</tr>
+<tr class="even">
+<td><code>treemapify</code></td>
+<td><code>geom_treemap()</code>, <code>geom_treemap_subgroup_border()</code>, <code>geom_treemap_subgroup2_border()</code></td>
+</tr>
+<tr class="odd">
+<td><code>d3treeR</code></td>
+<td><code>d3tree()</code></td>
+</tr>
+<tr class="even">
+<td><code>dplyr</code> (tidyverse)</td>
+<td><code>group_by()</code>, <code>summarise()</code>, <code>filter()</code></td>
+</tr>
+<tr class="odd">
+<td><code>readr</code> (tidyverse)</td>
+<td><code>read_csv()</code></td>
+</tr>
+<tr class="even">
+<td><code>ggplot2</code> (tidyverse)</td>
+<td><code>ggplot()</code>, <code>aes()</code>, <code>scale_fill_gradient()</code></td>
+</tr>
+</tbody>
+</table>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
